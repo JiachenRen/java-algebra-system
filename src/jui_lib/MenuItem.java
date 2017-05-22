@@ -9,8 +9,8 @@ public class MenuItem extends Label implements MouseControl {
     private MenuDropdown menu;
     private boolean expandable;
 
-    public MenuItem(String id, String content) {
-        super(id);
+    public MenuItem(String content) {
+        super();
         super.setContent(content);
     }
 

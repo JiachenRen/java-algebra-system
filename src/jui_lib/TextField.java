@@ -28,18 +28,18 @@ public class TextField extends Contextual {
     private PGraphics textArea;
     private int tx, ty;
 
-    public TextField(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public TextField(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public TextField(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public TextField(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public TextField(String id) {
-        super(id);
+    public TextField() {
+        super();
         init();
     }
 

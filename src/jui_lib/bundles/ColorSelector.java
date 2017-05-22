@@ -32,16 +32,16 @@ public class ColorSelector extends VBox {
     private static PFont font = JNode.UNI_FONT;
     private ArrayList<LinkedColorVar> linkedColorVars;
 
-    public ColorSelector(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public ColorSelector(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
     }
 
-    public ColorSelector(String id) {
-        super(id);
+    public ColorSelector() {
+        super();
     }
 
-    public ColorSelector(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public ColorSelector(float x, float y, float w, float h) {
+        super(x, y, w, h);
     }
 
     /**
@@ -72,41 +72,45 @@ public class ColorSelector extends VBox {
         colorSliderValues = new Label[4];
         String colorVarNames[] = new String[]{"R", "G", "B", "Alpha"};
 
-        title = new Label("title");
+        title = new Label();
         title.setContent("Color Selector");
 
-        renderedColor = new Label("renderedColor", .1f, 1.0f);
+        renderedColor = new Label(.1f, 1.0f);
         renderedColor.setContent("");
         renderedColor.setBackgroundColor(255);
 
-        titleWrapper = new HBox("titleWrapper");
+        titleWrapper = new HBox();
+        titleWrapper.setId("titleWrapper");
         titleWrapper.add(title);
         titleWrapper.add(renderedColor);
 
-        colorVarsWrapper = new VBox("currentColorVarWrapper", 0.3f, 1.0f);
+        colorVarsWrapper = new VBox(0.3f, 1.0f);
+        colorVarsWrapper.setId("currentColorVarWrapper");
         colorVarsWrapper.setContainerVisible(true);
 
-        slidersWrapper = new HBox("slidersWrapper");
+        slidersWrapper = new HBox();
+        slidersWrapper.setId("slidersWrapper");
         slidersWrapper.setContainerVisible(false);
 
 
         for (int i = 0; i < colorSliders.length; i++) {
-            VSlider colorSlider = new VSlider(i + "", 1.0f, 0.8f);
+            VSlider colorSlider = new VSlider(1.0f, 0.8f);
+            colorSlider.setId(i + "");
             colorSlider.setRollerShape(PConstants.RECT);
             colorSlider.setRollerScalingWidth(1.0f);
             colorSlider.setRange(0, 255);
             colorSlider.setValue(255);
             update(colorSlider, i);
 
-            Label colorSliderValLabel = new Label(colorVarNames[i]);
+            Label colorSliderValLabel = new Label().setId(colorVarNames[i]);
             colorSliderValLabel.setAlign(CENTER);
             colorSliderValLabel.setContent(255 + "");
 
-            Label colorSliderNameLabel = new Label(colorVarNames[i] + "rect");
+            Label colorSliderNameLabel = new Label().setId(colorVarNames[i] + "rect");
             colorSliderNameLabel.setAlign(CENTER);
             colorSliderNameLabel.setContent(colorVarNames[i]);
 
-            VBox rgbSliderWrapper = new VBox("rgbSliderWrapper");
+            VBox rgbSliderWrapper = new VBox();
             rgbSliderWrapper.add(colorSliderValLabel);
             colorSliderValues[i] = colorSliderValLabel;
             rgbSliderWrapper.add(colorSlider);
@@ -116,7 +120,8 @@ public class ColorSelector extends VBox {
 
         }
 
-        centralPanelWrapper = new HBox("centralPanelWrapper", 1.0f, 0.8f);
+        centralPanelWrapper = new HBox(1.0f, 0.8f);
+        centralPanelWrapper.setId("centralPanelWrapper");
         centralPanelWrapper.setMargins(0, 0);
         centralPanelWrapper.setSpacing(3);
         centralPanelWrapper.add(colorVarsWrapper);
@@ -199,9 +204,11 @@ public class ColorSelector extends VBox {
         for (int i = 0; i < names.length; i++) {
             LinkedColorVar linkedColorVar;
             if (names.length <= 5) {
-                linkedColorVar = new LinkedColorVar(names[i], 1.0f, 0.2f);
+                linkedColorVar = new LinkedColorVar(1.0f, 0.2f);
+                linkedColorVar.setId(names[i]);
             } else {
-                linkedColorVar = new LinkedColorVar(names[i]);
+                linkedColorVar = new LinkedColorVar();
+                linkedColorVar.setId(names[i]);
             }
             linkedColorVar.setContent(names[i]);
             linkedColorVar.setBackgroundColor(backgroundColor);
@@ -281,18 +288,18 @@ public class ColorSelector extends VBox {
         private int alpha;
         private Runnable linkedMethod;
 
-        LinkedColorVar(String id, float relativeW, float relativeH) {
-            super(id, relativeW, relativeH);
+        LinkedColorVar(float relativeW, float relativeH) {
+            super(relativeW, relativeH);
             init();
         }
 
-        LinkedColorVar(String id) {
-            super(id);
+        LinkedColorVar() {
+            super();
             init();
         }
 
-        public LinkedColorVar(String id, float x, float y, float w, float h) {
-            super(id, x, y, w, h);
+        public LinkedColorVar(float x, float y, float w, float h) {
+            super(x, y, w, h);
             init();
         }
 

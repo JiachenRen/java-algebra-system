@@ -16,31 +16,31 @@ public class Table extends Container /*implements Controllable*/ {
     private boolean tableVisible;
     private float cellMarginX = 2, cellMarginY = 2;
 
-    public Table(String id, float relativeW, float relativeH, int columns, int rows) {
-        super(id, relativeW, relativeH);
+    public Table(float relativeW, float relativeH, int columns, int rows) {
+        super(relativeW, relativeH);
         this.rows = rows;
         this.columns = columns;
         init();
     }
 
-    public Table(String id, float relativeW, float relativeH) {
-        this(id, relativeW, relativeH, 2, 2);
+    public Table(float relativeW, float relativeH) {
+        this(relativeW, relativeH, 2, 2);
     }
 
-    public Table(String id, float x, float y, float w, float h, int columns, int rows) {
-        super(id, x, y, w, h);
+    public Table(float x, float y, float w, float h, int columns, int rows) {
+        super(x, y, w, h);
         this.rows = rows;
         this.columns = columns;
         init();
     }
 
-    public Table(String id, float x, float y, float w, float h) {
-        this(id, x, y, w, h, 2, 2);
+    public Table(float x, float y, float w, float h) {
+        this(x, y, w, h, 2, 2);
     }
 
 
-    public Table(String id) {
-        super(id);
+    public Table() {
+        super();
         this.rows = 2;
         this.columns = 2;
         init();
@@ -51,7 +51,7 @@ public class Table extends Container /*implements Controllable*/ {
         displayables = new ArrayList<>();
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < columns; c++)
-                this.set(r, c, new TextInput(""));
+                this.set(r, c, new TextInput());
         tableVisible = true;
     }
 
@@ -184,7 +184,7 @@ public class Table extends Container /*implements Controllable*/ {
     public Table fill() {
         for (int c = 0; c < columns; c++)
             for (int r = 0; r < rows; r++)
-                if (get(c, r) == null) displayables.add(new TextInput(c + " " + r));
+                if (get(c, r) == null) displayables.add(new TextInput().setId(c + " " + r));
         JNode.addAll(displayables);
         arrangeCells();
         return this;

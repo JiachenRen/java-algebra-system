@@ -11,16 +11,16 @@ public class VSlider extends Slider implements MouseControl {
         syncSettings();
     }
 
-    public VSlider(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public VSlider(float x, float y, float w, float h) {
+        super(x, y, w, h);
     }
 
-    public VSlider(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public VSlider(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
     }
 
     public VSlider(String id) {
-        super(id);
+        super();
     }
 
     /**

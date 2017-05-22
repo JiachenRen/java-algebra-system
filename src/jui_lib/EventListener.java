@@ -12,6 +12,7 @@ public class EventListener {
     public EventListener(String id, Event event) {
         this.event = event;
         this.id = id;
+        disabled = false;
     }
 
     public Event getEvent() {

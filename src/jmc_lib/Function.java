@@ -79,13 +79,15 @@ public abstract class Function implements Evaluable {
      * method represents his life's work
      */
     public static InterpretedFunction interpret(String expression) {
+        if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
+            throw new IllegalArgumentException("incorrect format: '()' mismatch");
+        if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
+            throw new IllegalArgumentException("incorrect format: '<>' mismatch");
         expression = expression.replace(" ", "");
         String exp = Function.formatCoefficients(expression);
         exp = handleParentheticalNotation(Function.handleCalcPriority(exp));
         System.out.println((char) 27 + "[1m" + "formatted input: " + (char) 27 + "[0m" + exp);
         ArrayList<Operable> components = new ArrayList<>();
-        if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
-            throw new IllegalArgumentException("incorrect format: parenthesis mismatch");
         int hashId = 0;
         while (exp.indexOf(')') != -1) {
             int[] innerIndices = extractInnerParenthesis(exp, '(', ')');
@@ -463,7 +465,7 @@ public abstract class Function implements Evaluable {
     }
 
 
-    protected String getName() {
+    public String getName() {
         return name;
     }
 
@@ -566,6 +568,7 @@ public abstract class Function implements Evaluable {
 
     /**
      * TODO debug, java doc, not yet functional!
+     *
      * @param x
      * @param y
      * @param allowed_diff

@@ -14,18 +14,18 @@ import static processing.core.PConstants.RIGHT;
  */
 public class HBox extends Container {
 
-    public HBox(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public HBox(float x, float y, float w, float h) {
+        super(x, y, w, h);
         setAlignH(LEFT);
     }
 
-    public HBox(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public HBox(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         setAlignH(LEFT);
     }
 
-    public HBox(String id) {
-        super(id);
+    public HBox() {
+        super();
         setAlignH(LEFT);
     }
 

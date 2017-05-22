@@ -15,18 +15,18 @@ public class MenuDropdown extends Contextual implements MouseControl {
     private Runnable triggeringEvent;
 
 
-    public MenuDropdown(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public MenuDropdown(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public MenuDropdown(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public MenuDropdown(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
     public MenuDropdown(String id) {
-        super(id, 0, 0, 0, 0);
+        super(0, 0, 0, 0);
         init();
     }
 

@@ -29,25 +29,25 @@ public class ProgressBar extends Contextual implements Scalable {
         END, MIDDLE, LEFT,RIGHT
     }
 
-    public ProgressBar(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public ProgressBar(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
         resize(w, h);
         relocate(x, y);
     }
 
-    public ProgressBar(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public ProgressBar(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public ProgressBar(String id) {
-        super(id);
+    public ProgressBar() {
+        super();
         init();
     }
 
     private void init() {
-        percentageLabel = (Label) new Label("").setVisible(false);
+        percentageLabel = (Label) new Label().setVisible(false);
         setScalingFactor(0.6f);
         setPercentageVisible(true);
         setPercentageTextStyle(Style.END);

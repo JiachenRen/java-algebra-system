@@ -24,16 +24,18 @@ public class GraphTestB extends PApplet {
 
     public void setup() {
         JNode.init(this);
-        VBox parent = new VBox("parent", 0, 0, width, height);
+        VBox parent = new VBox(0, 0, width, height);
+        parent.setId("parent");
         JNode.add(parent);
 
-        Table table = new Table("parent", 1.0f, 0.9f);
+        Table table = new Table(1.0f, 0.9f);
+        table.setId("parent");
         parent.add(table);
 
         for (int r = 0; r < table.getRows(); r++) {
             for (int c = 0; c < table.getColumns(); c++) {
                 int which = (int)(Math.random()*4);
-                Graph graph = new Graph("graph");
+                Graph graph = new Graph().setId("graph");
                 graph.add(new Function("f1") {
                     @Override
                     public double eval(double val) {
@@ -46,7 +48,8 @@ public class GraphTestB extends PApplet {
         }
 
 
-        HSlider control1 = new HSlider("control1");
+        HSlider control1 = new HSlider();
+        control1.setId("control1");
         control1.setScalingFactor(0.5f);
         control1.setRange(-10f, 10f);
         control1.setValue(0);

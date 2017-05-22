@@ -25,18 +25,18 @@ public class ScrollField extends Contextual {
         }
     */
 
-    public ScrollField(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public ScrollField(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public ScrollField(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public ScrollField(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
     public ScrollField(String id) {
-        super(id);
+        super();
         init();
     }
 

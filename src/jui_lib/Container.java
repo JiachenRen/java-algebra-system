@@ -23,18 +23,18 @@ public abstract class Container extends Displayable {
         matchWindowDimension = false;
     }
 
-    public Container(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public Container(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public Container(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public Container(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public Container(String id) {
-        super(id);
+    public Container() {
+        super();
         init();
     }
 
@@ -437,6 +437,12 @@ public abstract class Container extends Displayable {
 
     public void matchWindowDimension(boolean temp) {
         this.matchWindowDimension = temp;
+    }
+
+    @Override
+    public Container setId(String id){
+        super.setId(id);
+        return this;
     }
 }
 

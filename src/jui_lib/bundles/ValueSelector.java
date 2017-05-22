@@ -29,18 +29,18 @@ public class ValueSelector extends VBox {
         }
     }
 
-    public ValueSelector(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public ValueSelector(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         initialize();
     }
 
-    public ValueSelector(String id) {
-        super(id);
+    public ValueSelector() {
+        super();
         initialize();
     }
 
-    public ValueSelector(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public ValueSelector(float x, float y, float w, float h) {
+        super(x, y, w, h);
         initialize();
     }
 
@@ -51,33 +51,37 @@ public class ValueSelector extends VBox {
         this.removeAll();
         switch (style) {
             case COMPOSITE:
-                HBox titleWrapper = new HBox("titleWrapper");
+                HBox titleWrapper = new HBox();
+                titleWrapper.setId("titleWrapper");
                 titleWrapper.setMargins(0, 0);
                 this.add(titleWrapper);
 
-                titleLabel = new Label("titleLabel", titlePercentage, 1.0f);
+                titleLabel = new Label(titlePercentage, 1.0f);
                 titleLabel.setContent("Var");
                 titleWrapper.add(titleLabel);
 
-                valueSlider = new HSlider("valueSlider");
+                valueSlider = new HSlider();
+                valueSlider.setId("valueSlider");
                 this.add(valueSlider);
 
-                textInput = new TextInput("textInput");
+                textInput = new TextInput();
                 titleWrapper.add(textInput);
                 break;
             case HORIZONTAL:
-                HBox wrapper = new HBox("wrapper");
+                HBox wrapper = new HBox();
+                wrapper.setId("wrapper");
                 wrapper.setMargins(0, 0);
                 this.add(wrapper);
 
-                titleLabel = new Label("titleLabel", titlePercentage, 1.0f);
+                titleLabel = new Label(titlePercentage, 1.0f);
                 titleLabel.setContent("Var");
                 wrapper.add(titleLabel);
 
-                textInput = new TextInput("textInput", 0.1f, 1.0f);
+                textInput = new TextInput( 0.1f, 1.0f);
                 wrapper.add(textInput);
 
-                valueSlider = new HSlider("valueSlider");
+                valueSlider = new HSlider();
+                valueSlider.setId("valueSlider");
                 wrapper.add(valueSlider);
 
                 break;

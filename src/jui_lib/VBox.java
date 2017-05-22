@@ -11,18 +11,18 @@ import processing.core.PConstants;
  */
 public class VBox extends Container {
 
-    public VBox(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public VBox(float x, float y, float w, float h) {
+        super(x, y, w, h);
         setAlignV(PConstants.DOWN);
     }
 
-    public VBox(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public VBox(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         setAlignV(PConstants.DOWN);
     }
 
-    public VBox(String id) {
-        super(id);
+    public VBox() {
+        super();
         setAlignV(PConstants.DOWN);
     }
 

@@ -5,7 +5,6 @@ import processing.core.PApplet;
 
 /**
  * Created by Jiachen on 21/05/2017.
- *
  */
 public class GraphIndependenceTest extends PApplet {
     public static void main(String args[]) {
@@ -20,7 +19,7 @@ public class GraphIndependenceTest extends PApplet {
 
     public void setup() {
         JNode.init(this);
-        JNode.add(new Graph("", 0, 0, width, height));
+        JNode.add(new Graph(0, 0, width, height));
         Graph graph = ((Graph) JNode.getDisplayables().get(0));
         graph.add(Function.interpret("x"));
 

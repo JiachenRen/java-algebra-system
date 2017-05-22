@@ -33,18 +33,18 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
     private int progressBackgroundColor;
     public Runnable onFocusMethod;
 
-    public Slider(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public Slider(float x, float y, float w, float h) {
+        super( x, y, w, h);
         init();
     }
 
-    public Slider(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public Slider(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public Slider(String id) {
-        super(id);
+    public Slider() {
+        super();
         init();
     }
 

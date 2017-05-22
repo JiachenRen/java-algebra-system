@@ -22,13 +22,16 @@ public class GraphTestA extends PApplet {
 
     public void setup() {
         JNode.init(this);
-        VBox parent = new VBox("parent", 0, 0, width, height);
+        VBox parent = new VBox(0, 0, width, height);
+        parent.setId("parent");
 
 
-        Graph graph = new Graph("graph", 1.0f, 0.9f);
+        Graph graph = new Graph(1.0f, 0.9f);
+        graph.setId("graph");
         parent.add(graph);
 
-        HSlider control1 = new HSlider("control1");
+        HSlider control1 = new HSlider();
+        control1.setId("control1");
         control1.setScalingFactor(0.5f);
         control1.setRange(0.5f, 1.5f);
         control1.setValue(1);
@@ -45,7 +48,8 @@ public class GraphTestA extends PApplet {
         */
         parent.add(control1);
 
-        HSlider control2 = new HSlider("control2");
+        HSlider control2 = new HSlider();
+        control2.setId("control2");
         control2.setScalingFactor(0.5f);
         control2.setRange(0.5f, 1.5f);
         control2.setValue(1);
@@ -55,7 +59,7 @@ public class GraphTestA extends PApplet {
             graph.override("f1", new Function() {
                 @Override
                 public double eval(double val) {
-                    return Math.tan(val)*Math.cos(control1.getFloatValue()*val)*Math.sin(control2.getFloatValue()*val);
+                    return Math.tan(val) * Math.cos(control1.getFloatValue() * val) * Math.sin(control2.getFloatValue() * val);
                 }
             });
         });
@@ -63,7 +67,7 @@ public class GraphTestA extends PApplet {
             graph.override("f1", new Function() {
                 @Override
                 public double eval(double val) {
-                    return Math.tan(val)*Math.cos(control1.getFloatValue()*val)*Math.sin(control2.getFloatValue()*val);
+                    return Math.tan(val) * Math.cos(control1.getFloatValue() * val) * Math.sin(control2.getFloatValue() * val);
                 }
             });
         });
@@ -73,7 +77,7 @@ public class GraphTestA extends PApplet {
         graph.add(new Function("f1") {
             @Override
             public double eval(double val) {
-                return (val+3)*(val-2)*(val*val+7)/((val+2)*(val-2));
+                return (val + 3) * (val - 2) * (val * val + 7) / ((val + 2) * (val - 2));
             }
         });
 

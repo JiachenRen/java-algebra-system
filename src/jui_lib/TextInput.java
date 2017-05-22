@@ -15,7 +15,7 @@ import java.util.Scanner;
 //refactored Feb 4th. Debugged the issue where the textSize won't refresh, which is caused by the abstracting of the displayText() method.
 public class TextInput extends Contextual implements MouseControl, KeyControl {
     //add setAlign and shift down. Done. Jan 21.
-    //add onFocus method. Idea Jan 26th. Resolved.
+    //add onEditing method. Idea Jan 26th. Resolved.
     //considering allowing the user to change textSize with a ratio that factors into the total height. No. discouraged. Jan 26th.
     //using event listeners instead of Runnable? Resolved May 21st.
     private boolean isFocusedOn;
@@ -30,8 +30,9 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
     private float cursorThickness;
     private int timesSubmitted;
     private Runnable submitMethod;
-    private Runnable onFocusMethod;
+    private Runnable onEditingMethod;
     private Runnable onKeyTypedMethod;
+    private Runnable onFocusMethod;
     private static String sketchRenderer;
     private boolean commandDown;
     private boolean controlDown;
@@ -46,18 +47,18 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
         fx2dKeyboardMismatchDict = "à`þ'";
     }
 
-    public TextInput(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public TextInput(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public TextInput(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public TextInput(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public TextInput(String id) {
-        super(id);
+    public TextInput() {
+        super();
         init();
     }
 
@@ -82,8 +83,8 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
     @Override
     public void run() {
         super.run();
-        if (isFocusedOn() && onFocusMethod != null) {
-            onFocusMethod.run();
+        if (isFocusedOn() && onEditingMethod != null) {
+            onEditingMethod.run();
         }
     }
 
@@ -349,6 +350,7 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
             if (this.getContent().equals(defaultContent))
                 this.setContent("");
             this.isFocusedOn = true;
+            if (onFocusMethod != null) onFocusMethod.run();
         } else {
             this.isLockedOn = false;
             this.isFocusedOn = false;
@@ -457,13 +459,18 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
         setTextSize(h * maxTextPercentage);
     }
 
-    public TextInput onFocus(Runnable runnable) {
-        this.onFocusMethod = runnable;
+    public TextInput onEditing(Runnable runnable) {
+        this.onEditingMethod = runnable;
         return this;
     }
 
     public TextInput onKeyTyped(Runnable runnable) {
         this.onKeyTypedMethod = runnable;
+        return this;
+    }
+
+    public TextInput onFocus(Runnable runnable) {
+        this.onFocusMethod = runnable;
         return this;
     }
 

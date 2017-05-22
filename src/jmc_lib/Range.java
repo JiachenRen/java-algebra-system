@@ -103,8 +103,8 @@ public class Range {
         double original_span = this.getSpan();
         double mid = (getLow() + getHigh()) / 2;
         original_span *= scale;
-        this.low = mid - original_span;
-        this.high = mid + original_span;
+        this.low = mid - original_span/2;
+        this.high = mid + original_span/2;
         current = low;
         hasNextStep = true;
     }

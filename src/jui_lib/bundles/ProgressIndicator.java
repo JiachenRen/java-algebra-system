@@ -18,16 +18,16 @@ public class ProgressIndicator extends VBox {
     private int fakeDelayMillis;
     private boolean applyFakeDelay;
 
-    public ProgressIndicator(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public ProgressIndicator(float x, float y, float w, float h) {
+        super(x, y, w, h);
     }
 
-    public ProgressIndicator(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public ProgressIndicator(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
     }
 
-    public ProgressIndicator(String id) {
-        super(id);
+    public ProgressIndicator() {
+        super();
     }
 
     public void init() {
@@ -37,16 +37,16 @@ public class ProgressIndicator extends VBox {
         this.setContainerVisible(false);
         this.fakeDelayMillis = 1000;
 
-        titleLabel = (Label) new Label("titleLabel", 1.0f, 0.33f)
+        titleLabel = (Label) new Label(1.0f, 0.33f)
                 .setContent("Progress Indicator")
                 .setAlign(CENTER);
 
 
-        progressBar = (ProgressBar) new ProgressBar("progressBar", 1.0f, 0.33f)
+        progressBar = (ProgressBar) new ProgressBar(1.0f, 0.33f)
                 .setPercentageTextStyle(ProgressBar.Style.MIDDLE).setTextColor(255);
 
 
-        descriptionLabel = new Label("descriptionLabel", 1.0f, 0.33f)
+        descriptionLabel = new Label(1.0f, 0.33f)
                 .setContent("Description for what's going on");
 
         this.add(titleLabel);

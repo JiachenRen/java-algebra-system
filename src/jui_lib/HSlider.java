@@ -10,16 +10,16 @@ public class HSlider extends Slider implements MouseControl {
         syncSettings();
     }
 
-    public HSlider(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public HSlider(float x, float y, float w, float h) {
+        super(x, y, w, h);
     }
 
-    public HSlider(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public HSlider(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
     }
 
-    public HSlider(String id) {
-        super(id);
+    public HSlider() {
+        super();
     }
 
     public void syncSettings() {

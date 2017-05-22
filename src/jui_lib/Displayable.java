@@ -60,33 +60,18 @@ public class Displayable implements MouseControl {
         RESERVED, STRETCH
     }
 
-    public Displayable(float x, float y, float w, float h) {
-        this("", x, y, w, h);
-    }
-
-    public Displayable() {
-        this("");
-    }
-
     public Displayable(float relativeW, float relativeH) {
-        this("", relativeW, relativeH);
-    }
-
-    public Displayable(String id, float relativeW, float relativeH) {
-        this.id = id;
         setRelativeW(relativeW);
         setRelativeH(relativeH);
         this.isRelative = true;
     }
 
-    public Displayable(String id) {
-        this.id = id;
+    public Displayable() {
         this.isRelative = true;
         this.isUndeclared = true;
     }
 
-    public Displayable(String id, float x, float y, float w, float h) {
-        this.id = id;
+    public Displayable(float x, float y, float w, float h) {
         this.x = x;
         this.y = y;
         this.w = w;

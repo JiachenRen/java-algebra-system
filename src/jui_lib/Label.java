@@ -8,23 +8,28 @@ import static processing.core.PApplet.*;
 //Jan 29th: deprecated all textHeight dividend variable in TextInput, Button, and Label.
 //TODO the adjustTextSize method should be replaced with a better one. April 22nd.
 public class Label extends Contextual {
-    public Label(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public Label(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public Label(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public Label(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public Label(String id) {
-        super(id);
+    public Label() {
+        super();
         init();
+    }
+
+    public Label(String content) {
+        super();
+        init();
+        setContent(content);
     }
 
     public void init() {
-        setContent("Label");
         setTextStyle(JStyle.CONSTANT);
         setAlign(PConstants.LEFT);
     }
@@ -39,6 +44,12 @@ public class Label extends Contextual {
     @Override
     public Label setContent(String content) {
         super.setContent(content);
+        return this;
+    }
+
+    @Override
+    public Label setId(String id) {
+        super.setId(id);
         return this;
     }
 }

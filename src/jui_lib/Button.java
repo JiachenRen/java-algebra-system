@@ -14,19 +14,25 @@ public class Button extends Contextual implements MouseControl {
     /*TODO add event listeners with enum*/
     private Runnable onClickMethod, mousePressedMethod, mouseHeldMethod, mouseOverMethod, mouseFloatMethod;
 
-    public Button(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public Button(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public Button(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public Button(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public Button(String id) {
-        super(id);
+    public Button() {
+        super();
         init();
+    }
+
+    public Button(String content) {
+        this();
+        init();
+        this.setContent(content);
     }
 
     public void init() {
@@ -111,11 +117,11 @@ public class Button extends Contextual implements MouseControl {
         mousePressedOnButton = false;
     }
 
-    public void keyPressed(){
+    public void keyPressed() {
         super.keyPressed();
     }
 
-    public void keyReleased(){
+    public void keyReleased() {
         super.keyReleased();
     }
 
@@ -127,6 +133,12 @@ public class Button extends Contextual implements MouseControl {
 
     public Button setContent(String temp) {
         super.setContent(temp);
+        return this;
+    }
+
+    @Override
+    public Button setId(String id) {
+        super.setId(id);
         return this;
     }
 }

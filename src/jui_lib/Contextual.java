@@ -28,18 +28,18 @@ public abstract class Contextual extends Displayable implements KeyControl {
         applyTextDescentLetters = new String[]{"g", "j", "p", "q", "y"};
     }
 
-    public Contextual(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public Contextual(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
-    public Contextual(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public Contextual(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public Contextual(String id) {
-        super(id);
+    public Contextual() {
+        super();
         init();
     }
 

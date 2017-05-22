@@ -8,8 +8,12 @@ import java.util.ArrayList;
 
 /**
  * Created by Jiachen on 04/05/2017
- * TODO Add polar & parametric graph.
- * TODO add grids
+ * May 21st: simple, powerful, impressive syntax:
+ * this.addEventListener(Event.MOUSE_ENTERED, getParent()::noCursor);
+ * this.addEventListener(Event.MOUSE_LEFT, getParent()::cursor);
+ * <p>
+ * TODO: Add polar & parametric graph.
+ * TODO: add grids
  */
 public class Graph extends Displayable {
     private Range rangeX;
@@ -27,14 +31,8 @@ public class Graph extends Displayable {
     private int tangentLineColor;
     private Mode mode;
 
-    public enum Mode {
-        DRAG,
-        ZOOM_IN,
-        ZOOM_OUT,
-        ZOOM_RECT,
-        CONTINUOUS_ZOOM_IN,
-        CONTINUOUS_ZOOM_OUT
-    }
+    private float initMousePosX;
+    private float initMousePosY;
 
     {
         functions = new ArrayList<>();
@@ -57,20 +55,19 @@ public class Graph extends Displayable {
         setMaxMarkingLength(30);
         setMinMarkingLength(35);
         automaticAsymptoteExtension = true;
-
         /*
         colors
          */
         asymptoteColor = JNode.getParent().color(0, 100, 170, 190);
         tangentLineColor = JNode.getParent().color(0, 0, 0, 100);
 
-        setMode(Mode.DRAG);
         initEventListeners();
+        setMode(Mode.ZOOM_RECT);
     }
 
-    private void initEventListeners(){
-        this.addEventListener(new EventListener("drag", Event.MOUSE_DRAGGED).attachMethod(()->{
-            if (!isMouseOver() || !mode.equals(Mode.DRAG)) return;
+    private void initEventListeners() {
+        this.addEventListener(new EventListener("DRAG", Event.MOUSE_DRAGGED).attachMethod(() -> {
+            if (!isMouseOver()) return;
             float dmx = getParent().mouseX - getParent().pmouseX;
             float dmy = getParent().mouseY - getParent().pmouseY;
             float hs = Plot.map(Math.abs(dmx), 0, w, 0, rangeX.getHigh() - rangeX.getLow()) * (dmx > 0 ? -1 : 1);
@@ -80,22 +77,45 @@ public class Graph extends Displayable {
             double minY = rangeY.getLow() + vs;
             double maxY = rangeY.getHigh() + vs;
             this.setWindow(minX, maxX, minY, maxY);
-        }).setDisabled(false));
+        }).setDisabled(true));
+        this.addEventListener(new EventListener("ZOOM_IN", Event.MOUSE_PRESSED).attachMethod(() -> {
+            double converted[] = convertToPointOnGraph(getParent().mouseX, getParent().mouseY);
+            zoom(0.5, converted[0], converted[1]);
+        }).setDisabled(true));
+        this.addEventListener(new EventListener("ZOOM_OUT", Event.MOUSE_PRESSED).attachMethod(() -> {
+            double converted[] = convertToPointOnGraph(getParent().mouseX, getParent().mouseY);
+            zoom(1.5, converted[0], converted[1]);
+        }).setDisabled(true));
+
+        this.addEventListener(new EventListener("ZOOM_RECT", Event.MOUSE_PRESSED).attachMethod(() -> {
+            initMousePosX = getParent().mouseX;
+            initMousePosY = getParent().mouseY;
+        }).setDisabled(true));
+        this.addEventListener(new EventListener("ZOOM_RECT", Event.MOUSE_RELEASED).attachMethod(() -> {
+            double converted[] = convertToPointOnGraph(initMousePosX, initMousePosY);
+            double cur[] = convertToPointOnGraph(getParent().mouseX, getParent().mouseY);
+            this.setWindow(converted[0], cur[0], converted[1], cur[1]);
+        }).setDisabled(true));
+        this.addEventListener(new EventListener("ZOOM_RECT", Event.MOUSE_HELD).attachMethod(() -> {
+            getParent().fill(0, 25);
+            getParent().stroke(0);
+            getParent().rect(initMousePosX, initMousePosY, getParent().mouseX - initMousePosX, getParent().mouseY - initMousePosY);
+        }).setDisabled(true));
     }
 
-    public Graph(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public Graph(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
         init();
     }
 
-    public Graph(String id) {
-        super(id);
+    public Graph() {
+        super();
         init();
     }
 
     //TODO debug constructor, it would not work!!!
-    public Graph(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public Graph(float x, float y, float w, float h) {
+        super(x, y, w, h);
         init();
     }
 
@@ -657,10 +677,20 @@ public class Graph extends Displayable {
 
     /**
      * TODO link with disable/enabling of event listeners
+     *
      * @param mode
      */
     public void setMode(Mode mode) {
         this.mode = mode;
+        getEventListeners().forEach(eventListener -> {
+            if (Mode.contains(eventListener.getId())) {
+                eventListener.setDisabled(!mode.equals(eventListener.getId()));
+            }
+        });
+    }
+
+    public Mode getMode() {
+        return mode;
     }
 
     public ArrayList<Function> getFunctions() {
@@ -680,5 +710,42 @@ public class Graph extends Displayable {
         Function function = this.getFunction(name);
         double graph_pos[] = this.convertToPointOnGraph(screenX, screenY);
         return function.containsPoint(graph_pos[0], graph_pos[1], allowed_diff / h * rangeX.getSpan(), 2);
+    }
+
+    public enum Mode {
+        DRAG("DRAG"),
+        ZOOM_OUT("ZOOM_OUT"),
+        ZOOM_RECT("ZOOM_RECT"),
+        ZOOM_IN("ZOOM_IN");
+
+        private String name;
+        private static String[] list;
+
+        static {
+            list = new String[]{"DRAG", "ZOOM_IN", "ZOOM_OUT", "ZOOM_RECT"};
+        }
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+        public boolean equals(Mode other) {
+            return other.name.equals(name);
+        }
+
+        public boolean equals(String other) {
+            return this.name.equals(other);
+        }
+
+        public static boolean contains(String name) {
+            for (String s : list) if (s.equals(name)) return true;
+            return false;
+        }
+    }
+
+    @Override
+    public Graph setId(String id) {
+        super.setId(id);
+        return this;
     }
 }

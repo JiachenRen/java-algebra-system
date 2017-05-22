@@ -14,16 +14,16 @@ public class EnumSelector extends HBox {
     private ArrayList<Button> enumStates;
     private Button currentEnumState;
 
-    public EnumSelector(String id, float x, float y, float w, float h) {
-        super(id, x, y, w, h);
+    public EnumSelector(float x, float y, float w, float h) {
+        super(x, y, w, h);
     }
 
-    public EnumSelector(String id, float relativeW, float relativeH) {
-        super(id, relativeW, relativeH);
+    public EnumSelector(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
     }
 
-    public EnumSelector(String id) {
-        super(id);
+    public EnumSelector() {
+        super();
         this.setMargins(0, 0);
     }
 
@@ -35,14 +35,14 @@ public class EnumSelector extends HBox {
         enumStates = new ArrayList<>();
         this.removeAll();
         Arrays.stream(names).forEach((name) -> {
-            enumStates.add(new Button(name).setContent(name));
+            enumStates.add(new Button().setId(name).setContent(name));
         });
         this.addAll(enumStates);
         return this;
     }
 
-    public EnumSelector addEnumState(String name){
-        Button newEnumState = new Button(name).setContent(name);
+    public EnumSelector addEnumState(String name) {
+        Button newEnumState = new Button().setId(name).setContent(name);
         enumStates.add(newEnumState);
         this.add(newEnumState);
         return this;
@@ -50,12 +50,13 @@ public class EnumSelector extends HBox {
 
     /**
      * don't know if this is legal yet. TODO debug
+     *
      * @param name the name of the enum state to be removed
      * @return this instance of EnumSelector
      */
-    public EnumSelector removeEnumState(String name){
-        enumStates.forEach((e)->{
-            if (e.getId().equals(name)){
+    public EnumSelector removeEnumState(String name) {
+        enumStates.forEach((e) -> {
+            if (e.getId().equals(name)) {
                 enumStates.remove(e);
                 this.displayables.remove(e);
             }
@@ -63,18 +64,18 @@ public class EnumSelector extends HBox {
         return this;
     }
 
-    public void setFocus(String name){
-        enumStates.forEach((e)->{
+    public void setFocus(String name) {
+        enumStates.forEach((e) -> {
             if (e.getId().equals(name))
                 setFocus(e);
         });
     }
 
-    private void setFocus(Button enumState){
+    private void setFocus(Button enumState) {
         currentEnumState = enumState;
     }
 
-    public Button getCurrentEnumState(){
+    public Button getCurrentEnumState() {
         return currentEnumState;
     }
 }

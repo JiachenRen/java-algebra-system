@@ -93,7 +93,6 @@ public class JNode {
      * transfer mouse, key events wherever requested.
      */
     public static void run() {
-        JNode.transferInputEvents();
         parent.pushStyle();
         try {
             for (int i = displayables.size() - 1; i >= 0; i--) {
@@ -111,6 +110,7 @@ public class JNode {
             e.printStackTrace();
         }
         parent.popStyle();
+        JNode.transferInputEvents();
     }
 
     /**
@@ -362,7 +362,8 @@ public class JNode {
 
     //keyboard/mouse input action receivers. Bug fixed Jan 28th 11:26PM.
     public static void mousePressed() {
-        for (Displayable displayable : displayables) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
             if (!(displayable instanceof MenuDropdown))
                 if (!displayable.isVisible()) continue;
             displayable.mousePressed();
@@ -370,7 +371,8 @@ public class JNode {
     }
 
     public static void mouseReleased() {
-        for (Displayable displayable : displayables) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
             if (!(displayable instanceof MenuDropdown))
                 if (!displayable.isVisible()) continue;
             displayable.mouseReleased();
@@ -378,7 +380,8 @@ public class JNode {
     }
 
     public static void mouseDragged() {
-        for (Displayable displayable : displayables) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
             if (!(displayable instanceof MenuDropdown))
                 if (!displayable.isVisible()) continue;
             displayable.mouseDragged();
@@ -386,7 +389,8 @@ public class JNode {
     }
 
     public static void mouseHeld() {
-        for (Displayable displayable : displayables) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
             if (!(displayable instanceof MenuDropdown))
                 if (!displayable.isVisible()) continue;
             displayable.mouseHeld();
@@ -402,7 +406,8 @@ public class JNode {
     }
 
     public static void keyPressed() {
-        for (Displayable displayable : displayables) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
             if (!(displayable instanceof MenuDropdown))
                 if (!displayable.isVisible()) continue;
             if (displayable.getClass().getInterfaces().length != 0) {
@@ -415,7 +420,8 @@ public class JNode {
     }
 
     public static void keyReleased() {
-        for (Displayable displayable : displayables) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
             if (!(displayable instanceof MenuDropdown))
                 if (!displayable.isVisible()) continue;
             if (displayable.getClass().getInterfaces().length != 0) {
@@ -562,7 +568,7 @@ public class JNode {
             }
 
             i = 0;
-            while (drawn + PApplet.mag(xSpacing[i], ySpacing[i])< distance) {
+            while (drawn + PApplet.mag(xSpacing[i], ySpacing[i]) < distance) {
                 if (drawLine) {
                     getParent().line(x0, y0, x0 + xSpacing[i], y0 + ySpacing[i]);
                 }
