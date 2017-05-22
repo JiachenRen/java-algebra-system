@@ -1,0 +1,684 @@
+package jmc_lib;
+
+import jui_lib.*;
+import processing.core.PApplet;
+import processing.core.PConstants;
+
+import java.util.ArrayList;
+
+/**
+ * Created by Jiachen on 04/05/2017
+ * TODO Add polar & parametric graph.
+ * TODO add grids
+ */
+public class Graph extends Displayable {
+    private Range rangeX;
+    private Range rangeY;
+    private double stepLength; //in pixels. Could be sub-pixel
+    private double stepValueX;
+    private double stepValueY;
+    private float markLengthBig;
+    private float axisMarkingTextSize;
+    private int maxMarkingLength;
+    private int minMarkingLength;
+    private boolean automaticAsymptoteExtension;
+    private ArrayList<Function> functions;
+    private int asymptoteColor;
+    private int tangentLineColor;
+    private Mode mode;
+
+    public enum Mode {
+        DRAG,
+        ZOOM_IN,
+        ZOOM_OUT,
+        ZOOM_RECT,
+        CONTINUOUS_ZOOM_IN,
+        CONTINUOUS_ZOOM_OUT
+    }
+
+    {
+        functions = new ArrayList<>();
+        /*
+        default window.
+         */
+        rangeX = new Range(-10, 10);
+        rangeY = new Range(-10, 10);
+        /*
+        change the step length (in pixels) to adjust the accuracy of the graph.
+        the lesser the step length, the more accurate the graph is going to be. Nevertheless,
+        this value should remain at 1 under most circumstances as 1 is plenty for most graphing
+        situations. For more complex the graph, the lower the step length should be. Nevertheless,
+        one should be aware that as the step length comes down the the performance decrease
+        accordingly. One would find it significantly slower.
+        */
+        stepLength = 0.1; //TODO changed from 1 to 0.1. May 17th. Might cause performance issues.
+        markLengthBig = 2;
+        axisMarkingTextSize = 10;
+        setMaxMarkingLength(30);
+        setMinMarkingLength(35);
+        automaticAsymptoteExtension = true;
+
+        /*
+        colors
+         */
+        asymptoteColor = JNode.getParent().color(0, 100, 170, 190);
+        tangentLineColor = JNode.getParent().color(0, 0, 0, 100);
+
+        setMode(Mode.DRAG);
+        initEventListeners();
+    }
+
+    private void initEventListeners(){
+        this.addEventListener(new EventListener("drag", Event.MOUSE_DRAGGED).attachMethod(()->{
+            if (!isMouseOver() || !mode.equals(Mode.DRAG)) return;
+            float dmx = getParent().mouseX - getParent().pmouseX;
+            float dmy = getParent().mouseY - getParent().pmouseY;
+            float hs = Plot.map(Math.abs(dmx), 0, w, 0, rangeX.getHigh() - rangeX.getLow()) * (dmx > 0 ? -1 : 1);
+            float vs = Plot.map(Math.abs(dmy), 0, h, 0, rangeY.getHigh() - rangeY.getLow()) * (dmy > 0 ? 1 : -1);
+            double minX = rangeX.getLow() + hs;
+            double maxX = rangeX.getHigh() + hs;
+            double minY = rangeY.getLow() + vs;
+            double maxY = rangeY.getHigh() + vs;
+            this.setWindow(minX, maxX, minY, maxY);
+        }).setDisabled(false));
+    }
+
+    public Graph(String id, float relativeW, float relativeH) {
+        super(id, relativeW, relativeH);
+        init();
+    }
+
+    public Graph(String id) {
+        super(id);
+        init();
+    }
+
+    //TODO debug constructor, it would not work!!!
+    public Graph(String id, float x, float y, float w, float h) {
+        super(id, x, y, w, h);
+        init();
+    }
+
+    private void init() {
+        updateStepValue();
+        if (!isRelative) {
+            this.resize(w, h);
+        }
+    }
+
+    public void display() {
+        super.display();
+
+        this.drawAxes();
+
+        for (Function function : functions) {
+            if (function.isDynamic()) {
+                function.updatePlot(rangeX, rangeY, h);
+                function.getPlot().updateCoordinates(rangeY, w, h);
+            }
+            if (function.isVisible())
+                this.drawFunction(function);
+        }
+    }
+
+    private void drawAxesText(double val, float cx, float cy, boolean isYAxis) {
+        String text = formatForDisplay(val);
+        float textWidth = getParent().textWidth(text);
+        if (isYAxis) {
+            if (cx + markLengthBig * 2 + textWidth > w + x)
+                getParent().text(text, cx - markLengthBig * 2 - textWidth / 2, cy);
+            else getParent().text(text, cx + markLengthBig * 2 + textWidth / 2, cy);
+        } else if (cx + textWidth / 2 < x + w && cx - textWidth / 2 > x) {
+            float offset = markLengthBig * 2 + axisMarkingTextSize / 2;
+            float base = cy + offset;
+            getParent().text(text, cx, base > y + h ? cy - offset : base);
+        }
+    }
+
+    private void drawAxisMarksY(float cx, float cy) {
+        float right = cx + markLengthBig;
+        float left = cx - markLengthBig;
+        getParent().line(right > x + w ? x + w - 1 : right, cy, left < x + 1 ? x + 1 : left, cy);
+    }
+
+
+    private void drawAxisMarksX(float cx, float cy) {
+        float up = cy - markLengthBig;
+        float down = cy + markLengthBig;
+        getParent().line(cx, up < y + 1 ? y + 1 : up, cx, down > y + h - 1 ? y + h - 1 : down);
+    }
+
+
+    /**
+     * Draws the grids of the graph.
+     */
+    private void drawAxes() {
+        getParent().stroke(0, 0, 0);
+        getParent().textSize(axisMarkingTextSize);
+        getParent().fill(0);
+
+        {
+            //drawing the y axis
+            float cx = Plot.map(0, rangeX.getLow(), rangeX.getHigh(), x, x + w);
+            cx = cx > x + w - 1 ? x + w - 1 : cx;
+            cx = cx < x + 1 ? x + 1 : cx;
+            getParent().line(cx, y, cx, y + h);
+
+            float step = (float) (stepValueY / rangeY.getSpan() * h);
+            float offset = Plot.map(0, rangeY.getLow(), rangeY.getHigh(), y + h, y);
+            float upAnchor = offset - step;
+            float downAnchor = offset + step;
+
+            getParent().textAlign(PConstants.CENTER, PConstants.CENTER);
+            double current = stepValueY;
+            while (upAnchor > y || downAnchor < y + h) {
+                if (upAnchor < y + h && upAnchor > y) {
+                    drawAxesText(current, cx, upAnchor, true);
+                    drawAxisMarksY(cx, upAnchor);
+                }
+                if (downAnchor > y && downAnchor < y + h) {
+                    drawAxesText(-current, cx, downAnchor, true);
+                    drawAxisMarksY(cx, downAnchor);
+                }
+                current += stepValueY;
+                upAnchor -= step;
+                downAnchor += step;
+            }
+        }
+
+        //drawing the x axis
+        float cy = y + h - Plot.map(0, rangeY.getLow(), rangeY.getHigh(), 0, h);
+        cy = cy > y + h - 1 ? y + h - 1 : cy;
+        cy = cy < y + 1 ? y + 1 : cy;
+        getParent().line(x, cy, x + w, cy);
+        float leftAnchor = Plot.map(0, rangeX.getLow(), rangeX.getHigh(), x, x + w);
+        float rightAnchor = leftAnchor;
+        float step = (float) (stepValueX / rangeX.getSpan() * w);
+
+        double current = 0;
+        while (leftAnchor > x) {
+            if (leftAnchor < x + w) {
+                drawAxisMarksX(leftAnchor, cy);
+                drawAxesText(current, leftAnchor, cy, false);
+            }
+            current -= stepValueX;
+            leftAnchor -= step;
+        }
+
+        current = 0;
+        while (rightAnchor < x + w) {
+            if (rightAnchor > x && current != 0) {
+                drawAxisMarksX(rightAnchor, cy);
+                drawAxesText(current, rightAnchor, cy, false);
+            }
+            current += stepValueX;
+            rightAnchor += step;
+        }
+    }
+
+    /**
+     * updates the step number of markings and step length for the graph's grid.
+     *
+     * @since May 18th, alternative dividend scaling to keep a decimal scale.
+     */
+    private double calculateStepValue(Range range, int minNumMarkings, int maxNumMarkings) {
+        double valRange = range.getSpan();
+        double temp = 1.0d;
+        int markings = (int) (valRange / temp);
+        int flag = 0;
+        while (markings < minNumMarkings) {
+            temp /= flag % 3 == 1 ? 2.5d : 2.0d;
+            markings = (int) (valRange / temp);
+            flag++;
+        }
+        flag = 0;
+        while (markings > maxNumMarkings) {
+            temp *= flag % 3 == 1 ? 2.5d : 2.0d;
+            markings = (int) (valRange / temp);
+            flag++;
+        }
+        return temp;
+    }
+
+    /**
+     * zooms in according to a scale given and a point that is the center-to-be
+     *
+     * @param scale   how many times larger than original. 1.5 would be zoom out while 0.5 would be zoom in.
+     * @param centerX coordinate-x of the center on the graph
+     * @param centerY coordinate-y of the center on the graph
+     * @since May 21st
+     */
+    public void zoom(double scale, double centerX, double centerY) {
+        rangeX.rescale(scale);
+        rangeY.rescale(scale);
+        this.pointAsCenter(centerX, centerY);
+    }
+
+    /**
+     * puts the origin in the center of the graph
+     */
+    public void centerOrigin() {
+        pointAsCenter(0, 0);
+    }
+
+    /**
+     * centers the graph based on the designated point
+     */
+    public void pointAsCenter(double graphX, double graphY) {
+        double gw = rangeX.getSpan() / 2;
+        double gh = rangeY.getSpan() / 2;
+        this.setWindow(graphX - gw, graphX + gw, graphY - gh, graphY + gh);
+    }
+
+    /**
+     * equalized the axes of the graph so they look equal on the screen
+     * note: the y axis is resized according to the x axis
+     */
+    public void equalizeAxes() {
+        double xSpanOnScreen = w * stepValueX / rangeX.getSpan();
+        double yWindowSpan = h / xSpanOnScreen * stepValueX;
+        double currentSpan = rangeY.getSpan();
+        double ratio = yWindowSpan / currentSpan;
+        Range newRangeY = new Range(rangeY.getLow() * ratio, rangeY.getHigh() * ratio);
+        setWindowY(newRangeY.getLow(), newRangeY.getHigh());
+    }
+
+    /**
+     * formats the double value for display on screen, corrects floating point rounding errors.
+     * if val is larger than 1E4 or less than 1E-4 then scientific notation is applied to save space.
+     * TODO DEBUG, doesn't work if x go below 0.001.
+     *
+     * @param val the double value to be formatted for display on screen.
+     * @return formatted string from the double value
+     */
+    public static String formatForDisplay(double val) {
+        if (Math.abs(val) >= 1E4 || Math.abs(val) <= 1E-4 && val != 0) {
+            String formatted = String.format("%.2E", val);
+            int index_dot = formatted.indexOf(".");
+            int index_e = formatted.indexOf("E");
+            String inBetween = "";
+            for (int i = index_e - 1; i > index_dot; i--) {
+                if (formatted.charAt(i) != '0')
+                    inBetween += formatted.charAt(i);
+            }
+            String left = formatted.substring(0, index_dot + 1);
+            return left + inBetween + formatted.substring(index_e);
+        }
+        String exp = Double.toString(val);
+        int index = exp.indexOf(".");
+        if (index == -1) return exp;
+        if (exp.indexOf("00000") > index)
+            exp = exp.substring(0, exp.indexOf("00000"));
+        if (exp.indexOf("99999") > index) {
+            int ef = exp.indexOf("99999") - index;
+            exp = Double.toString(Math.round(val * Math.pow(10, ef)) / Math.pow(10, ef));
+        }
+        if (exp.length() >= 2) {
+            char lastChar = exp.charAt(exp.length() - 1);
+            if (lastChar == '.')
+                exp = exp.substring(0, exp.length() - 1);
+            if (exp.length() >= 3) {
+                if (exp.charAt(exp.length() - 2) == '.' && lastChar == '0')
+                    exp = exp.substring(0, exp.length() - 2);
+            }
+        }
+        return exp;
+    }
+
+    /**
+     * plots the designated function within the window scope of this graph.
+     * the function is colored and stroked with its designated style.
+     *
+     * @param function the Function instance to be plotted
+     * @since May 21st 1:26 AM function color differentiated.
+     */
+    private void drawFunction(Function function) {
+        getParent().stroke(function.getColor());
+        getParent().strokeWeight(function.getStrokeWeight());
+        getParent().noFill();
+        if (function.getStyle().equals(Function.Style.CONTINUOUS)) {
+            getParent().beginShape();
+            for (int i = 0; i < function.getPlot().getCoordinates().size(); i++) {
+                Point point = function.getPlot().getCoordinates().get(i);
+
+                float translatedX = (float) point.getX() + x;
+                float translatedY = y + h - (float) point.getY();
+
+                if (!point.isValid() || !isInScope(translatedX, translatedY)) {
+                    getParent().endShape();
+                    getParent().beginShape();
+                    continue;
+                }
+
+                if (point.isAsymptoteAnchor()) {
+                    if (automaticAsymptoteExtension) getParent().vertex(translatedX, translatedY);
+                    getParent().endShape();
+                } else if (point.isAsymptoteTail()) {
+                    getParent().beginShape();
+                    if (automaticAsymptoteExtension) getParent().vertex(translatedX, translatedY);
+                    if (function.isAsymptoteVisible()) {
+                        getParent().pushStyle();
+                        getParent().strokeWeight(1);
+                        getParent().stroke(asymptoteColor);
+                        JNode.dashLine(translatedX, y, translatedX, y + h, new float[]{4});
+                        getParent().popStyle();
+                    }
+                } else {
+                    getParent().vertex(translatedX, translatedY);
+                }
+            }
+            getParent().endShape();
+        } else if (function.getStyle().equals(Function.Style.DISCRETE)) {
+            function.getPlot().getCoordinates().forEach(point -> {
+                float translatedX = (float) point.getX() + x;
+                float translatedY = y + h - (float) point.getY();
+                if (isInScope(translatedX, translatedY))
+                    getParent().point(translatedX, translatedY);
+            });
+        }
+        if (function.isTangentLineVisible() && isMouseOver()) {
+            double x = convertToPointOnGraph(getParent().mouseX, getParent().mouseY)[0];
+            drawTangentLineToPoint(x, function.getName());
+        }
+    }
+
+    /**
+     * break through Saturday, May 20th. Accelerated.
+     * this method draws a tangent line to the designated curve.
+     *
+     * @param name the name of the function
+     * @param x    a point on the function
+     * @since May 21st, took me a while, but I fixed it!
+     */
+    public void drawTangentLineToPoint(double x, String name) {
+        Function tangentLine = tangentLineToPoint(x, getFunction(name), rangeX.getStep());
+        double y1 = rangeY.getLow(), y2 = rangeY.getHigh();
+        ArrayList<Double> fx = solveInScope(rangeY.getLow(), tangentLine);
+        ArrayList<Double> sx = solveInScope(rangeY.getHigh(), tangentLine);
+        double x1, x2;
+        if (fx.size() == 0 && sx.size() == 0) {
+            x1 = rangeX.getLow();
+            y1 = tangentLine.eval(x1);
+            x2 = rangeX.getHigh();
+            y2 = tangentLine.eval(x2);
+        } else if (fx.size() == sx.size()) {
+            x1 = fx.get(0);
+            x2 = sx.get(0);
+        } else {
+            double slope = Double.valueOf(tangentLine.getName().split(",")[0]);
+            if (fx.size() == 1) {
+                x1 = fx.get(0);
+                x2 = slope > 0 ? rangeX.getHigh() : rangeX.getLow();
+                y2 = tangentLine.eval(x2);
+            } else {
+                x2 = sx.get(0);
+                x1 = slope > 0 ? rangeX.getLow() : rangeX.getHigh();
+                y1 = tangentLine.eval(x1);
+            }
+        }
+        float p1[] = convertToCoordinateOnScreen(x1, y1);
+        float p2[] = convertToCoordinateOnScreen(x2, y2);
+        if (!isInScope(p1[0], p1[1]) || !isInScope(p2[0], p2[1])) return;
+        getParent().pushStyle();
+        getParent().stroke(tangentLineColor);
+        JNode.dashLine(p1[0], p1[1], p2[0], p2[1], new float[]{3, 5});
+        getParent().popStyle();
+    }
+
+    /**
+     * solve for graphing purposes only.
+     *
+     * @param function the function to be solved for f(x) = y.
+     * @return the numerical solutions to the designated function with an accuracy
+     * that is directly proportional to the precision of the graph and within the
+     * domain of the visible window of the graph.
+     * @since May 20th
+     */
+    public ArrayList<Double> solveInScope(double y, Function function) {
+        int precisionFactor = 5;
+        return function.numericalSolve(y, rangeX.getLow(), rangeX.getHigh(), rangeX.getStep() / precisionFactor);
+    }
+
+    /**
+     * calculates a tangent line to a function on a certain point and returns
+     * the acquired function.
+     *
+     * @param x        the point on the graph in which a tangent line is going to be derived
+     * @param function the function that the first derivative is going to be based on.
+     * @since 9:37 PM, May 17th, breakthrough, succeeded!!!
+     * May 21st: debugged floating point accuracy is now considered.
+     */
+    public static Function tangentLineToPoint(double x, Function function, double accuracy) {
+        Point init = new Point(x - accuracy, function.eval(x - accuracy));
+        Point end = new Point(x + accuracy, function.eval(x + accuracy));
+        return Graph.createLinearFunction(init, end);
+    }
+
+    /**
+     * #consider returning a interpreted function. (takes more time)
+     * this method generates a compiled function from 2 points. (for now)
+     *
+     * @param first  the first point
+     * @param second the second point
+     * @return a linear implemented function from 2 points.
+     */
+    public static Function createLinearFunction(Point first, Point second) {
+        double k = (first.getY() - second.getY()) / (first.getX() - second.getX());
+        double b = first.getY() - k * first.getX();
+        return new Function() {
+            @Override
+            public double eval(double val) {
+                return k * val + b;
+            }
+        }.setName(k + "," + b);
+    }
+
+    /**
+     * @param function the function to be added into this graph.
+     * @return this Graph instance for chained access.
+     */
+    public Graph add(Function function) {
+        this.functions.add(function);
+        if (w < 10 || h < 10) return this;
+        function.updatePlot(rangeX, rangeY, h);
+        function.getPlot().updateCoordinates(rangeY, w, h);
+        return this;
+    }
+
+    public Function remove(String name) {
+        for (int i = functions.size() - 1; i >= 0; i--) {
+            Function function = functions.get(i);
+            if (function.getName().equals(name))
+                return functions.remove(i);
+        }
+        return null;
+    }
+
+    @Override
+    public void resize(float x, float y) {
+        super.resize(x, y);
+        this.updateNumMarkings();
+        this.updateGraphs();
+    }
+
+    private void updateNumMarkings() {
+        if (w == 0 || h == 0 || minMarkingLength == 0 || maxMarkingLength == 0) return;
+        stepValueX = this.calculateStepValue(rangeX, (int) w / minMarkingLength, (int) w / maxMarkingLength);
+        stepValueY = this.calculateStepValue(rangeY, (int) h / minMarkingLength, (int) h / maxMarkingLength);
+    }
+
+    /**
+     * The method calls the updates the coordinates on screen for each of the function.
+     * This method should be called whenever the displayable is updated or plot points are altered.
+     */
+    private void updatePlotCoordinates() {
+        for (Function function : functions) {
+            if (!function.isDynamic())
+                function.getPlot().updateCoordinates(rangeY, w, h);
+        }
+    }
+
+    /**
+     * This method re-plots each of the function according to the updated window dimension.
+     * This method should be called each time when the domain or range of the graphing window is altered.
+     */
+    private void updatePlots() {
+        this.updateStepValue();
+        for (Function function : functions) {
+            if (!function.isDynamic())
+                function.updatePlot(rangeX, rangeY, h);
+        }
+    }
+
+    public void setWindow(double minX, double maxX, double minY, double maxY) {
+        rangeX = new Range(minX, maxX, rangeX.getStep());
+        rangeY = new Range(minY, maxY);
+        this.updateNumMarkings();
+        new Thread(this::updateGraphs).start(); //performance enhancement May 20th
+    }
+
+    public void setWindowX(double minX, double maxX) {
+        this.setWindow(minX, maxX, rangeY.getLow(), rangeY.getHigh());
+    }
+
+    public void setWindowY(double minY, double maxY) {
+        this.setWindow(rangeX.getLow(), rangeX.getHigh(), minY, maxY);
+    }
+
+    /**
+     * Updates the actual incremental value per plot point according to the designated step pixel length on screen
+     *
+     * @since April 7th
+     */
+    private void updateStepValue() {
+        if (rangeX == null) rangeX = new Range(-10, 10);
+        rangeX.setStep(rangeX.getSpan() / w * stepLength);
+    }
+
+    public void setStepLength(double pixels) {
+        this.stepLength = pixels;
+    }
+
+    /**
+     * Overrides an existing function with a new definition.
+     * NOTE: the overridden function would retain the original name
+     *
+     * @param name          the name of the existing function
+     * @param function      the function that is going to replace the original one.
+     * @param preserveStyle whether or not to preserve the graphics style of the original function
+     */
+    public void override(String name, Function function, boolean preserveStyle) {
+        boolean overridden = false;
+        for (int i = functions.size() - 1; i >= 0; i--) {
+            if (functions.get(i).getName().equals(name)) {
+                if (preserveStyle) function.inheritStyle(functions.get(i));
+                functions.set(i, function.setName(name));
+                overridden = true;
+            }
+        }
+        if (!overridden) functions.add(function.setName(name));
+        function.updatePlot(rangeX, rangeY, h);
+        function.getPlot().updateCoordinates(rangeY, w, h);
+    }
+
+    public void override(String name, Function function) {
+        this.override(name, function, true);
+    }
+
+    /**
+     * Comprehensive update
+     */
+    private void updateGraphs() {
+        this.updatePlots();
+        this.updatePlotCoordinates();
+    }
+
+    public Function getFunction(String name) {
+        for (Function function : functions) {
+            if (function.getName().equals(name))
+                return function;
+        }
+        return null;
+    }
+
+    public double getMinX() {
+        return rangeX.getLow();
+    }
+
+    public double getMaxX() {
+        return rangeX.getHigh();
+    }
+
+    public double getMaxY() {
+        return rangeY.getHigh();
+    }
+
+    public double getMinY() {
+        return rangeY.getLow();
+    }
+
+    /**
+     * converts an abs coordinate on screen to xy coordinate on graph.
+     *
+     * @param screenX x-coordinate on screen
+     * @param screenY y-coordinate on screen
+     * @return x-y coordinate on graph window
+     */
+    public double[] convertToPointOnGraph(float screenX, float screenY) {
+        double cx = PApplet.map(screenX, x, x + w, (float) getMinX(), (float) getMaxX());
+        double cy = PApplet.map(screenY, y, y + h, (float) getMaxY(), (float) getMinY());
+        return new double[]{cx, cy};
+    }
+
+
+    /**
+     * converts x-y coordinate graph to absolute coordinate on screen
+     *
+     * @param x x coordinate in the graph window
+     * @param y y coordinate in the graph window
+     * @return coordinate on screen
+     */
+    public float[] convertToCoordinateOnScreen(double x, double y) {
+        float cx = Plot.map(x, rangeX.getLow(), rangeX.getHigh(), 0, w);
+        float cy = Plot.map(y, rangeY.getLow(), rangeY.getHigh(), 0, h);
+        return new float[]{this.x + cx, this.y + h - cy};
+    }
+
+
+    public void setMaxMarkingLength(int temp) {
+        this.maxMarkingLength = temp;
+        updateNumMarkings();
+    }
+
+    public void setMinMarkingLength(int temp) {
+        this.minMarkingLength = temp;
+        updateNumMarkings();
+    }
+
+    /**
+     * TODO link with disable/enabling of event listeners
+     * @param mode
+     */
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    public ArrayList<Function> getFunctions() {
+        return functions;
+    }
+
+    /**
+     * TODO debug, not yet functional!
+     *
+     * @param name         the name of the function to be tested for point over
+     * @param screenX      coordinate-x on screen
+     * @param screenY      coordinate-y on screen
+     * @param allowed_diff allowed difference in pixels
+     * @return boolean that indicates whether or not the point is over the function.
+     */
+    public boolean isOverFunction(String name, float screenX, float screenY, float allowed_diff) {
+        Function function = this.getFunction(name);
+        double graph_pos[] = this.convertToPointOnGraph(screenX, screenY);
+        return function.containsPoint(graph_pos[0], graph_pos[1], allowed_diff / h * rangeX.getSpan(), 2);
+    }
+}

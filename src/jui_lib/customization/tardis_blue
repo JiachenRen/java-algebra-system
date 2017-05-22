@@ -1,0 +1,27 @@
+color_mode: RGB
+
+container_margin_x: 3
+container_margin_y: 3
+container_spacing: 3
+
+container_visible: false
+display_contour: false
+rounded: true
+
+contour_thickness: 1
+rounding: 3
+font_scalar: 1.5f
+
+background_color: 50,50,50,50
+mouse_pressed_background_color: 50,255,100,180
+mouse_over_background_color: 16,35,114,255
+
+contour_color: 0,0,0,255
+mouse_pressed_contour_color: 0,0,0,255
+mouse_over_contour_color: 0,0,0,255
+
+text_color: 0,0,0,255
+mouse_pressed_text_color: 0,0,0,255
+mouse_over_text_color: 0,0,0,255
+
+

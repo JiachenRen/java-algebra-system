@@ -1,0 +1,96 @@
+package jmc_lib;
+
+import java.util.ArrayList;
+
+/**
+ * Created by Jiachen on 16/05/2017.
+ */
+public class Constants {
+    public interface ComputedConst {
+        double compute();
+    }
+
+    private static ArrayList<Constant> constants;
+
+    static {
+        constants = new ArrayList<>();
+        define("e", () -> Math.E);
+        define("pi", () -> Math.PI);
+        define("rand", Math::random);
+    }
+
+    public static boolean contains(String symbol) {
+        for (Constant constant : constants) {
+            if (constant.name.equals(symbol))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * add or define a Constant object into the static ArrayList Constants.
+     * TODO debug
+     *
+     * @param name          the name of the constant
+     * @param computedConst the new computed const instance
+     */
+    public static void define(String name, ComputedConst computedConst) {
+        boolean defined = false;
+        for (Constant constant : constants) {
+            if (constant.name.equals(name)) {
+                constant.computedConst = computedConst;
+                defined = true;
+            }
+        }
+        if (!defined) constants.add(new Constant(name, computedConst));
+    }
+
+    public static double valueOf(String constant) {
+        for (Constant c : constants) {
+            if (c.name.equals(constant))
+                return c.computedConst.compute();
+        }
+        return 0.0;
+    }
+
+    private static class Constant implements Operable {
+        private ComputedConst computedConst;
+        private String name;
+
+        Constant(String name, ComputedConst computedConst) {
+            this.computedConst = computedConst;
+            this.name = name;
+        }
+
+        public String toString() {
+            return name;
+        }
+
+        public double eval(double x) {
+            return computedConst.compute();
+        }
+
+        public Constant replicate() {
+            return new Constant(name, computedConst);
+        }
+    }
+
+    /**
+     * prints out a list of all defined constants
+     */
+    public static void list() {
+        int count = 0;
+        for (Constant constant : constants) {
+            System.out.println(Function.coloredLine("[36;1m", "<" + count + ">\t" + constant.toString() + "\t-> " + constant.computedConst.compute(), "->", "<", ">"));
+            count++;
+        }
+    }
+
+    public static Constant getConstant(String name) {
+        for (Constant constant : constants) {
+            if (constant.name.equals(name))
+                return constant;
+        }
+        return null;
+    }
+}

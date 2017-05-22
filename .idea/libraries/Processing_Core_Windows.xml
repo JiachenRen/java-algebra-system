@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Processing Core Windows">
+    <CLASSES>
+      <root url="file://D:/Desktop/Programming/processing-3.3.3/core/library" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://D:/Desktop/Programming/processing-3.3.3/core/library" recursive="false" />
+  </library>
+</component>
