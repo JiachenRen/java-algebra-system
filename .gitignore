@@ -1,0 +1,8 @@
+.idea
+.idea/*
+hs_err*
+out
+out/*
+.DS_Store
+*/.DS_Store
+
