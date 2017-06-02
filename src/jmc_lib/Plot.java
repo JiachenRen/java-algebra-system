@@ -222,5 +222,25 @@ public class Plot {
         }
     }
 
+    public double lookUp(double x, double accuracy) {
+        return recursiveBinSearch(x, accuracy, 0, data.size());
+    }
+
+    /**
+     * this method exists for enhanced performance and avoid unnecessary calculations.
+     *
+     * @param x         the x value to be looked up
+     * @param accuracy  an allowed range of difference
+     * @param fromIndex start index of the data ArrayList
+     * @param toIndex   end index of the data ArrayList
+     * @return the double value found using the plotted data
+     */
+    private double recursiveBinSearch(double x, double accuracy, int fromIndex, int toIndex) {
+        int mid = (fromIndex + toIndex) / 2;
+        if (mid == fromIndex) return Double.MAX_VALUE;
+        if (Math.abs(data.get(mid).getX() - x) <= accuracy) return data.get(mid).getY();
+        else if (data.get(mid).getX() - x > 0) return recursiveBinSearch(x, accuracy, fromIndex, toIndex - 1);
+        else return recursiveBinSearch(x, accuracy, fromIndex + 1, toIndex);
+    }
 
 }

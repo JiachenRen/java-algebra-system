@@ -3,6 +3,7 @@ package jmc_lib;
 import jui_lib.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PImage;
 
 import java.util.ArrayList;
 
@@ -25,14 +26,23 @@ public class Graph extends Displayable {
     private float axisMarkingTextSize;
     private int maxMarkingLength;
     private int minMarkingLength;
-    private boolean automaticAsymptoteExtension;
     private ArrayList<Function> functions;
     private int asymptoteColor;
     private int tangentLineColor;
+    private int tracingLineColor;
     private Mode mode;
 
     private float initMousePosX;
     private float initMousePosY;
+
+    private boolean tracingOn;
+    private boolean evaluationOn;
+    private boolean axesVisible;
+
+    static {
+        //PImage img = JNode.getParent().loadImage("src/jmc_lib/data/images/gesture_drag.png");
+        //JNode.getParent().cursor(img);
+    }
 
     {
         functions = new ArrayList<>();
@@ -51,18 +61,27 @@ public class Graph extends Displayable {
         */
         stepLength = 0.1; //TODO changed from 1 to 0.1. May 17th. Might cause performance issues.
         markLengthBig = 2;
-        axisMarkingTextSize = 10;
+        axisMarkingTextSize = JNode.getParent().pixelDensity == 1 ? 15 : 10;
         setMaxMarkingLength(30);
         setMinMarkingLength(35);
-        automaticAsymptoteExtension = true;
         /*
         colors
          */
         asymptoteColor = JNode.getParent().color(0, 100, 170, 190);
         tangentLineColor = JNode.getParent().color(0, 0, 0, 100);
+        tracingLineColor = JNode.getParent().color(0, 0, 0, 100);
 
         initEventListeners();
-        setMode(Mode.ZOOM_RECT);
+        setMode(Mode.DRAG);
+
+        /*
+        tracing defaults to false
+         */
+        setTracingOn(false);
+        /*
+        axes visible defaults to true
+         */
+        setAxesVisible(true);
     }
 
     private void initEventListeners() {
@@ -92,9 +111,11 @@ public class Graph extends Displayable {
             initMousePosY = getParent().mouseY;
         }).setDisabled(true));
         this.addEventListener(new EventListener("ZOOM_RECT", Event.MOUSE_RELEASED).attachMethod(() -> {
+            if (Math.abs(initMousePosX - getParent().mouseX) < 1 || Math.abs(initMousePosY - getParent().mouseY) < 1)
+                return;
             double converted[] = convertToPointOnGraph(initMousePosX, initMousePosY);
             double cur[] = convertToPointOnGraph(getParent().mouseX, getParent().mouseY);
-            this.setWindow(converted[0], cur[0], converted[1], cur[1]);
+            this.setWindow(converted[0] > cur[0] ? cur[0] : converted[0], converted[0] > cur[0] ? converted[0] : cur[0], converted[1] > cur[1] ? cur[1] : converted[1], converted[1] > cur[1] ? converted[1] : cur[1]);
         }).setDisabled(true));
         this.addEventListener(new EventListener("ZOOM_RECT", Event.MOUSE_HELD).attachMethod(() -> {
             getParent().fill(0, 25);
@@ -129,7 +150,8 @@ public class Graph extends Displayable {
     public void display() {
         super.display();
 
-        this.drawAxes();
+        if (axesVisible)
+            this.drawAxes();
 
         for (Function function : functions) {
             if (function.isDynamic()) {
@@ -138,6 +160,15 @@ public class Graph extends Displayable {
             }
             if (function.isVisible())
                 this.drawFunction(function);
+        }
+
+        if (tracingIsOn() && isMouseOver()) {
+            double xPosOnGraph = this.convertToPointOnGraph(getParent().mouseX, getParent().mouseY)[0];
+            TextInput xVal = JNode.getTextInputById("#XVAL");
+            assert xVal != null;
+            xVal.setIsFocusedOn(false);
+            xVal.setContent("x = " + Double.toString(xPosOnGraph));
+            this.trace(xPosOnGraph);
         }
     }
 
@@ -312,18 +343,6 @@ public class Graph extends Displayable {
      * @return formatted string from the double value
      */
     public static String formatForDisplay(double val) {
-        if (Math.abs(val) >= 1E4 || Math.abs(val) <= 1E-4 && val != 0) {
-            String formatted = String.format("%.2E", val);
-            int index_dot = formatted.indexOf(".");
-            int index_e = formatted.indexOf("E");
-            String inBetween = "";
-            for (int i = index_e - 1; i > index_dot; i--) {
-                if (formatted.charAt(i) != '0')
-                    inBetween += formatted.charAt(i);
-            }
-            String left = formatted.substring(0, index_dot + 1);
-            return left + inBetween + formatted.substring(index_e);
-        }
         String exp = Double.toString(val);
         int index = exp.indexOf(".");
         if (index == -1) return exp;
@@ -333,6 +352,23 @@ public class Graph extends Displayable {
             int ef = exp.indexOf("99999") - index;
             exp = Double.toString(Math.round(val * Math.pow(10, ef)) / Math.pow(10, ef));
         }
+        /*
+        if (exp.length() > (val > 0 ? 4 : 5)) {
+            String formatted = String.format("%.1E", val);
+            int index_dot = formatted.indexOf(".");
+            int index_e = formatted.indexOf("E");
+            String inBetween = "";
+            for (int i = index_e - 1; i > index_dot; i--) {
+                if (formatted.charAt(i) != '0') {
+                    for (int q = index_dot + 1; q <= i; q++)
+                        inBetween += formatted.charAt(q);
+                    break;
+                }
+            }
+            String left = formatted.substring(0, index_dot + 1);
+            return (left + inBetween + formatted.substring(index_e)).replace("+0", "").replace(".E", "E").replace("-0", "-");
+        }
+        */
         if (exp.length() >= 2) {
             char lastChar = exp.charAt(exp.length() - 1);
             if (lastChar == '.')
@@ -371,11 +407,11 @@ public class Graph extends Displayable {
                 }
 
                 if (point.isAsymptoteAnchor()) {
-                    if (automaticAsymptoteExtension) getParent().vertex(translatedX, translatedY);
+                    if (function.isAutoAsymptoteExtension()) getParent().vertex(translatedX, translatedY);
                     getParent().endShape();
                 } else if (point.isAsymptoteTail()) {
                     getParent().beginShape();
-                    if (automaticAsymptoteExtension) getParent().vertex(translatedX, translatedY);
+                    if (function.isAutoAsymptoteExtension()) getParent().vertex(translatedX, translatedY);
                     if (function.isAsymptoteVisible()) {
                         getParent().pushStyle();
                         getParent().strokeWeight(1);
@@ -398,6 +434,8 @@ public class Graph extends Displayable {
         }
         if (function.isTangentLineVisible() && isMouseOver()) {
             double x = convertToPointOnGraph(getParent().mouseX, getParent().mouseY)[0];
+            getParent().stroke(tangentLineColor);
+            if (function.isMatchAuxiliaryLinesColor()) getParent().stroke(function.getColor());
             drawTangentLineToPoint(x, function.getName());
         }
     }
@@ -439,10 +477,7 @@ public class Graph extends Displayable {
         float p1[] = convertToCoordinateOnScreen(x1, y1);
         float p2[] = convertToCoordinateOnScreen(x2, y2);
         if (!isInScope(p1[0], p1[1]) || !isInScope(p2[0], p2[1])) return;
-        getParent().pushStyle();
-        getParent().stroke(tangentLineColor);
         JNode.dashLine(p1[0], p1[1], p2[0], p2[1], new float[]{3, 5});
-        getParent().popStyle();
     }
 
     /**
@@ -712,6 +747,22 @@ public class Graph extends Displayable {
         return function.containsPoint(graph_pos[0], graph_pos[1], allowed_diff / h * rangeX.getSpan(), 2);
     }
 
+    public boolean isEvaluationOn() {
+        return evaluationOn;
+    }
+
+    public void setEvaluationOn(boolean evaluationOn) {
+        this.evaluationOn = evaluationOn;
+    }
+
+    public boolean isAxesVisible() {
+        return axesVisible;
+    }
+
+    public void setAxesVisible(boolean axesVisible) {
+        this.axesVisible = axesVisible;
+    }
+
     public enum Mode {
         DRAG("DRAG"),
         ZOOM_OUT("ZOOM_OUT"),
@@ -747,5 +798,138 @@ public class Graph extends Displayable {
     public Graph setId(String id) {
         super.setId(id);
         return this;
+    }
+
+    private void trace(double xPosOnGraph) {
+        getParent().stroke(tracingLineColor);
+        getParent().fill(tracingLineColor);
+
+        float screenX = this.convertToCoordinateOnScreen(xPosOnGraph, 0)[0];
+        if (!isInScope(screenX, y + h / 2)) return;
+        JNode.dashLine(screenX, y, screenX, y + h, new float[]{3});
+
+        float[] offset = new float[]{3, 3}, dim = new float[]{w / 10, h / 25};
+        ArrayList<Float> occupied = new ArrayList<>();
+        ArrayList<Float> leftSideOccupied = new ArrayList<>();
+
+        for (Function function : functions) {
+            if (!function.isVisible() || !function.tracingEnabled()) continue;
+            double yPosOnGraph = function.getPlot().lookUp(xPosOnGraph, rangeX.getStep() / stepLength);
+            yPosOnGraph = yPosOnGraph == Double.MAX_VALUE ? function.eval(xPosOnGraph) : yPosOnGraph;
+            float y = convertToCoordinateOnScreen(xPosOnGraph, yPosOnGraph)[1];
+            if (!isInScope(x, y)) continue;
+            if (function.isMatchAuxiliaryLinesColor()) getParent().stroke(function.getColor());
+            getParent().strokeWeight(1); //is this necessary?
+            if (!isEvaluationOn()) JNode.dashLine(x, y, x + w, y, new float[]{3});
+            getParent().pushStyle();
+            getParent().stroke(function.getColor());
+            getParent().strokeWeight(function.getStrokeWeight() > 2 ? 6 : 5);
+            getParent().point(screenX, y);
+            getParent().popStyle();
+
+            if (!isEvaluationOn()) continue;
+            float[] pos = new float[]{screenX, y};
+            int overlappedIndex = overlapped(occupied, pos[1], dim[1]);
+            boolean insertedOnLeft = false;
+            if (overlappedIndex != -1) {
+                for (int i = 1; i < 5; i++) {
+                    if (-1 == overlapped(leftSideOccupied, pos[1], dim[1]) && pos[0] - dim[0] - offset[0] > x) {
+                        insertedOnLeft = true;
+                        pos[0] -= dim[0] + offset[0];
+                        pos[1] += offset[1];
+                        break;
+                    }
+                    if (-1 == overlapped(occupied, pos[1] + dim[1] * i + offset[1] * i, dim[1])) {
+                        if (pos[1] + dim[1] * i < this.y + h) {
+                            pos[1] = pos[1] + dim[1] * i + offset[1] * (i + 1);
+                            pos[0] += offset[0];
+                            break;
+                        }
+                    }
+                    if (-1 == overlapped(leftSideOccupied, pos[1] + dim[1] * i + offset[1] * i, dim[1]) && pos[0] - dim[0] - offset[0] > x) {
+                        if (pos[1] + dim[1] * i < this.y + h) {
+                            insertedOnLeft = true;
+                            pos[1] = pos[1] + dim[1] * i + offset[1] * (i + 1);
+                            pos[0] = pos[0] - dim[0] - offset[0];
+                            break;
+                        }
+                    }
+                    if (-1 == overlapped(occupied, pos[1] - dim[1] * i - offset[1] * i, dim[1])) {
+                        if (pos[1] - dim[1] * i > this.y) {
+                            pos[1] = pos[1] - dim[1] * i - offset[1] * (i);
+                            pos[0] += offset[0];
+                            break;
+                        }
+                    }
+                    if (-1 == overlapped(leftSideOccupied, pos[1] - dim[1] * i - offset[1] * i, dim[1]) && pos[0] - dim[0] - offset[0] > x) {
+                        if (pos[1] - dim[1] * i > this.y) {
+                            insertedOnLeft = true;
+                            pos[1] = pos[1] - dim[1] * i - offset[1] * (i);
+                            pos[0] = pos[0] - dim[0] - offset[0];
+                            break;
+                        }
+                    }
+                }
+            } else {
+                pos[0] += offset[0];
+                pos[1] += offset[1];
+            }
+            if (!insertedOnLeft && pos[0] + dim[0] > x + w) {
+                pos[0] -= dim[0] + offset[0] * 2;
+                insertedOnLeft = true;
+            } else if (insertedOnLeft && pos[0] < x) {
+                pos[0] += dim[0] + offset[0] * 2;
+                insertedOnLeft = false;
+            }
+
+            if (pos[1] + dim[1] > this.y + h) {
+                pos[1] -= dim[1] + offset[1] * 2;
+            }
+
+            new Label(pos[0], pos[1], dim[0], dim[1])
+                    .setTextColor(function.getColor(), 255)
+                    .setContent(function.getName() + (float) yPosOnGraph)
+                    .setContourVisible(false)
+                    .setBackgroundColor(function.getColor(), 50)
+                    .display();
+            if (insertedOnLeft) leftSideOccupied.add(pos[1]);
+            else occupied.add(pos[1]);
+        }
+    }
+
+    private int overlapped(ArrayList<Float> occupied, float currentPos, float height) {
+        for (int i = 0; i < occupied.size(); i++) {
+            Float f = occupied.get(i);
+            if (Math.abs(f - currentPos) < height) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public boolean tracingIsOn() {
+        return tracingOn;
+    }
+
+    public void setTracingOn(boolean tracingOn) {
+        this.tracingOn = tracingOn;
+        @SuppressWarnings("unchecked") ArrayList<Displayable> matching = (ArrayList<Displayable>) JNode.get("#functionInputWrapper");
+        if (matching.size() == 0) return;
+        HBox functionInputWrapper = (HBox) matching.get(0);
+        if (tracingOn) {
+            TextInput tempTextInput = (TextInput) new TextInput().setContent("x = ").setId("#XVAL");
+            tempTextInput.onFocus(() -> tempTextInput.setContent("x = "));
+            tempTextInput.onKeyTyped(() -> tempTextInput.setContent(tempTextInput.getContent().contains("x = ") ? tempTextInput.getContent() : "x = "));
+            tempTextInput.onEditing(() -> {
+                String temp = tempTextInput.getContent().substring(4);
+                try {
+                    this.trace(Double.valueOf(temp));
+                } catch (NumberFormatException ignore) {
+                }
+            });
+            functionInputWrapper.add(tempTextInput);
+        } else {
+            functionInputWrapper.remove("#XVAL");
+        }
     }
 }

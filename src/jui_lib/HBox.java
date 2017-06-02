@@ -49,6 +49,7 @@ public class HBox extends Container {
             if (shouldCollapse(displayable))
                 continue;
             num++;
+
             if (undeclaredSpace() == -1 && getWidth() >= 0) {
                 displayable.setWidth(0);
                 continue;
@@ -61,6 +62,7 @@ public class HBox extends Container {
         float w = undeclaredSpace() / (float) remaining;
         for (Displayable displayable : displayables) {
             if (!displayable.isRelative() || !displayable.isUndeclared()) continue;
+            if (shouldCollapse(displayable)) continue;
             displayable.setHeight(this.getHeight() - marginY * 2);
             displayable.setWidth(w);
         }
@@ -148,6 +150,4 @@ public class HBox extends Container {
         }
         return availableWidth() - occupied;
     }
-
-
 }

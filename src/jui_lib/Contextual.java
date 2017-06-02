@@ -16,6 +16,7 @@ public abstract class Contextual extends Displayable implements KeyControl {
     private JStyle textStyle = JStyle.CONSTANT;
     private boolean applyTextDescent;
     private float textSize;
+    private float textIndent;
     private boolean autoTextDescentCompensation = JNode.AUTO_TEXT_DESCENT_COMPENSATION;
     public float maxTextPercentage = JNode.CONTEXTUAL_INIT_TEXT_PERCENTAGE;
     public PFont font = JNode.UNI_FONT;
@@ -75,6 +76,11 @@ public abstract class Contextual extends Displayable implements KeyControl {
 
     public Contextual setTextColor(int c) {
         textColor = c;
+        return this;
+    }
+
+    public Contextual setTextColor(int color, int alpha) {
+        textColor = JNode.resetAlpha(color, alpha);
         return this;
     }
 
@@ -138,6 +144,7 @@ public abstract class Contextual extends Displayable implements KeyControl {
         content = temp;
         this.applyTextDescent = shouldApplyTextDescent(content);
         calculateTextSize();
+        super.activateEventListeners(Event.CONTENT_CHANGED);
         return this;
     }
 
@@ -148,17 +155,17 @@ public abstract class Contextual extends Displayable implements KeyControl {
         return false;
     }
 
-    public void displayText() {
+    public void displayText(String s) {
         getParent().pushMatrix();
         if (textSize > 0.0) getParent().textSize(textSize);
         if (font != null) getParent().textFont(font);
 
         applyTextColor();
-        displayRawText();
+        displayRawText(s);
         getParent().popMatrix();
     }
 
-    public void displayRawText() {
+    public void displayRawText(String textToDisplay) {
         float halfTextHeight = getTextHeight() / 2;
         float descent = getParent().textDescent();
         float ty;
@@ -175,20 +182,20 @@ public abstract class Contextual extends Displayable implements KeyControl {
         switch (alignment) {
             case LEFT:
                 getParent().textAlign(LEFT, align);
-                getParent().text(content, x, ty);
+                getParent().text(textToDisplay, x, ty);
                 break;
             case CENTER:
                 getParent().textAlign(CENTER, align);
-                getParent().text(content, x + w / 2, ty);
+                getParent().text(textToDisplay, x + w / 2, ty);
                 break;
             case RIGHT:
                 getParent().textAlign(RIGHT, align);
-                getParent().text(content, x + w, ty);
+                getParent().text(textToDisplay, x + w, ty);
                 break;
             default:
                 System.err.println(id + ": align-" + alignment + " cannot be applied to Label. Default alignment applied.");
                 getParent().textAlign(LEFT, align);
-                getParent().text(content, x, ty);
+                getParent().text(textToDisplay, x, ty);
         }
 
     }
@@ -213,11 +220,8 @@ public abstract class Contextual extends Displayable implements KeyControl {
         }
     }
 
-    public void displayText(String s) {
-        String temp = content;
-        setContent(s);
-        displayText();
-        setContent(temp);
+    public void displayText() {
+        displayText(content);
     }
 
     public Contextual setTextStyle(JStyle textStyle) {
@@ -313,7 +317,40 @@ public abstract class Contextual extends Displayable implements KeyControl {
         return mouseOverTextColor;
     }
 
-    public int getMousePressedTextColor(){
+    public int getMousePressedTextColor() {
         return mousePressedTextColor;
+    }
+
+    /**
+     * TODO: to be implemented
+     *
+     * @param textIndent
+     * @return
+     */
+    public Contextual setTextIndent(float textIndent) {
+        this.textIndent = textIndent;
+        return this;
+    }
+
+    @Override
+    public Contextual inheritStyle(Displayable other) {
+        super.inheritStyle(other);
+        if (other instanceof Contextual)
+            this.setTextStyle(((Contextual) other).textStyle);
+        return this;
+    }
+
+    @Override
+    public Contextual inheritOutlook(Displayable other) {
+        super.inheritOutlook(other);
+        if (!(other instanceof Contextual)) return this;
+        this.setTextColor(((Contextual) other).textColor);
+        this.setMouseOverTextColor(((Contextual) other).mouseOverTextColor);
+        this.setMousePressedTextColor(((Contextual) other).mousePressedTextColor);
+        this.setAutoTextDescentCompensation(((Contextual) other).autoTextDescentCompensation);
+        this.setMaxTextPercentage(((Contextual) other).maxTextPercentage);
+        this.setTextFont(((Contextual) other).font);
+        this.setAlign(((Contextual) other).alignment);
+        return this;
     }
 }

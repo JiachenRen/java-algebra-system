@@ -52,4 +52,9 @@ public class Label extends Contextual {
         super.setId(id);
         return this;
     }
+
+    @Override
+    public Label clone() {
+        return (Label) super.clone();
+    }
 }

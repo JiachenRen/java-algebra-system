@@ -33,10 +33,18 @@ public class Variable implements Operable {
     }
 
     public String toString() {
-        return name;
+        return /*(char) 27 + "[35;1m" + */name/* + (char) 27 + "[0m"*/;
     }
 
     public Variable replicate() {
         return new Variable(name);
+    }
+
+    public boolean equals(Operable other) {
+        return other instanceof Variable && ((Variable) other).getName().equals(this.name);
+    }
+
+    public Operable plugIn(Operable other) {
+        return other;
     }
 }

@@ -4,6 +4,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 
+import java.io.*;
 import java.util.ArrayList;
 
 //code refactored Jan 18,the Displayable interface is changed into a superclass. Modified by Jiachen Ren
@@ -11,12 +12,13 @@ import java.util.ArrayList;
 //modified April 22nd. Took me half an hour, I eliminated all rounding errors for containers!
 //primitive type for coordinate and dimension is changed from int to float. Proved to be helpful!
 //refresh requesting technique applied April 23rd
+//TODO: add inheritStyle(), clone();
 
 /**
  * add mousePressedTextColor(), mousePressedContourColor(), mouseOverTextColor(), mouseOverContourColor();
  * completed April 30th.
  */
-public class Displayable implements MouseControl {
+public class Displayable implements MouseControl, Serializable {
     public boolean displayContour = JNode.DISPLAY_CONTOUR;
     public boolean isVisible = true;
 
@@ -249,6 +251,11 @@ public class Displayable implements MouseControl {
 
     public Displayable setBackgroundColor(int c) {
         backgroundColor = c;
+        return this;
+    }
+
+    public Displayable setBackgroundColor(int color, int alpha) {
+        backgroundColor = getParent().color(getParent().red(color), getParent().green(color), getParent().blue(color), alpha);
         return this;
     }
 
@@ -544,7 +551,8 @@ public class Displayable implements MouseControl {
     public Displayable removeEventListeners(Event event) {
         for (int i = eventListeners.size() - 1; i >= 0; i--) {
             if (eventListeners.get(i).getEvent().equals(event))
-                eventListeners.remove(i);
+                if (!eventListeners.get(i).getId().startsWith("@"))
+                    eventListeners.remove(i);
         }
         return this;
     }
@@ -557,5 +565,55 @@ public class Displayable implements MouseControl {
     public Displayable addEventListener(EventListener eventListener) {
         this.eventListeners.add(eventListener);
         return this;
+    }
+
+    public Displayable inheritOutlook(Displayable other) {
+        this.setContourVisible(other.displayContour);
+        this.setBackgroundImg(other.backgroundImg);
+        this.setBackgroundColor(other.backgroundColor);
+        this.setMouseOverBackgroundColor(other.backgroundColor);
+        this.setContourColor(other.contourColor);
+        this.setMouseOverContourColor(other.mouseOverContourColor);
+        this.setContourThickness(other.contourThickness);
+        this.setColorMode(other.colorMode);
+        this.setRounding(other.rounding);
+        this.setRounded(other.isRounded);
+        return this;
+    }
+
+    public Displayable inheritStyle(Displayable other) {
+        this.backgroundStyle = other.backgroundStyle;
+        this.contourStyle = other.contourStyle;
+        this.imgStyle = other.imgStyle;
+        return this;
+    }
+
+    public Displayable inheritDisplayProperties(Displayable other) {
+        this.setVisible(other.isVisible);
+        this.resize(other.w, other.h);
+        this.setRelativeH(other.relativeH);
+        this.setRelativeW(other.relativeW);
+        this.setRelative(other.isRelative);
+        this.setUndeclared(other.isUndeclared);
+        return this;
+    }
+
+    /**
+     * TODO: does not work for now.
+     *
+     * @return
+     */
+    public Displayable clone() {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(this);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (Displayable) ois.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

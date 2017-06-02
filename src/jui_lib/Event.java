@@ -16,4 +16,5 @@ public enum Event {
     MOUSE_DRAGGED,
     MOUSE_HELD,//TODO
     MOUSE_CLICKED, //TODO
+    CONTENT_CHANGED,
 }

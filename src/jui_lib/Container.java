@@ -48,9 +48,9 @@ public abstract class Container extends Displayable {
             /*code cleaned up April 22nd*/
             super.display();
         }
-        Iterator<Displayable> iterator = displayables.iterator();
-        while (iterator.hasNext()) {
-            Displayable displayable = iterator.next();
+        int i = 0, displayablesSize = displayables.size();
+        while (i < displayablesSize) {
+            Displayable displayable = displayables.get(i);
             if (displayable.isVisible())
                 displayable.run();
             if (displayable.refreshRequested()) {
@@ -58,6 +58,7 @@ public abstract class Container extends Displayable {
                 syncSize();
                 arrange();
             }
+            i++;
         }
         //listen to change in the window dimension.
         if (matchWindowDimension && (h != getParent().height || w != getParent().width)) {
@@ -158,8 +159,7 @@ public abstract class Container extends Displayable {
     public abstract void arrange();
 
     public boolean contains(Displayable temp) {
-        if (displayables.contains(temp)) return true;
-        return false;
+        return displayables.contains(temp);
     }
 
     /**
@@ -425,13 +425,13 @@ public abstract class Container extends Displayable {
         for (Object obj : displayables) {
             if (!(obj instanceof Displayable))
                 throw new IllegalArgumentException("argument is not an instance of Displayable");
-            this.displayables.add((Displayable) obj);
+            this.add((Displayable) obj);
         }
         return this;
     }
 
     public Container addAll(Displayable... displayables) {
-        Arrays.stream(displayables).forEach((displayable) -> this.displayables.add(displayable));
+        Arrays.stream(displayables).forEach(this::add);
         return this;
     }
 
@@ -440,9 +440,17 @@ public abstract class Container extends Displayable {
     }
 
     @Override
-    public Container setId(String id){
+    public Container setId(String id) {
         super.setId(id);
         return this;
+    }
+
+    public void remove(String id) {
+        for (int i = displayables.size() - 1; i >= 0; i--) {
+            Displayable displayable = displayables.get(i);
+            if (displayable.getId().endsWith(id))
+                this.remove(displayable);
+        }
     }
 }
 

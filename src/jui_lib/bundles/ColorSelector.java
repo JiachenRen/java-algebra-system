@@ -19,7 +19,6 @@ import static processing.core.PConstants.UP;
  */
 public class ColorSelector extends VBox {
 
-    private PApplet parent;
     private LinkedColorVar currentColorVar;
     private VBox colorVarsWrapper;
     private HBox centralPanelWrapper;
@@ -66,7 +65,6 @@ public class ColorSelector extends VBox {
     public void init() {
         super.init();
 
-        parent = JNode.getParent();
         linkedColorVars = new ArrayList<>();
         colorSliders = new VSlider[4];
         colorSliderValues = new Label[4];
@@ -120,7 +118,7 @@ public class ColorSelector extends VBox {
 
         }
 
-        centralPanelWrapper = new HBox(1.0f, 0.8f);
+        centralPanelWrapper = new HBox();
         centralPanelWrapper.setId("centralPanelWrapper");
         centralPanelWrapper.setMargins(0, 0);
         centralPanelWrapper.setSpacing(3);
@@ -153,6 +151,8 @@ public class ColorSelector extends VBox {
             else if (index == 3) currentColorVar.setAlpha(colorSlider.getIntValue());
             colorSliderValues[index].setContent(colorSlider.getIntValue() + "");
             updateRenderedColor();
+            if (currentColorVar != null && currentColorVar.linkedMethod != null)
+                currentColorVar.linkedMethod.run();
         });
     }
 
@@ -164,12 +164,6 @@ public class ColorSelector extends VBox {
         renderedColor.setRelativeW(th / titleWrapper.getWidth());
     }
 
-    @Override
-    public void display() {
-        super.display();
-        if (currentColorVar.linkedMethod != null)
-            currentColorVar.linkedMethod.run();
-    }
 
     public ColorSelector link(String varName, Runnable runnable) {
         link(getLinkedColorVarById(varName), runnable);
@@ -235,7 +229,7 @@ public class ColorSelector extends VBox {
                 currentColorVar = linkedColorVar;
         }
 
-        int rgba[] = new int[]{
+        float rgba[] = new float[]{
                 currentColorVar.getRed(),
                 currentColorVar.getGreen(),
                 currentColorVar.getBlue(),
@@ -256,11 +250,16 @@ public class ColorSelector extends VBox {
         renderedColor.setBackgroundColor(rgba[0], rgba[1], rgba[2], rgba[3]);
     }
 
-    public ColorSelector setColorRGBA(String id, int r, int g, int b, int a) {
+    public ColorSelector setColorRGBA(String id, float r, float g, float b, float a) {
         for (LinkedColorVar linkedColorVar : linkedColorVars) {
             if (linkedColorVar.getId().equals(id))
                 linkedColorVar.setColorRGBA(r, g, b, a);
         }
+        return this;
+    }
+
+    public ColorSelector setColor(String id, int color) {
+        setColorRGBA(id, getParent().red(color), getParent().green(color), getParent().blue(color), color == 0 ? 255 : getParent().alpha(color));
         return this;
     }
 
@@ -284,8 +283,8 @@ public class ColorSelector extends VBox {
     if you want your code to word, do not forget to implement Controllable! Or it would not be recognized in JNode
      */
     class LinkedColorVar extends Button implements Controllable {
-        private int red, green, blue;
-        private int alpha;
+        private float red, green, blue;
+        private float alpha;
         private Runnable linkedMethod;
 
         LinkedColorVar(float relativeW, float relativeH) {
@@ -307,51 +306,65 @@ public class ColorSelector extends VBox {
             return getParent().color(red, green, blue, alpha);
         }
 
-        public int getColorRGB() {
+        public float getColorRGB() {
             return getParent().color(red, green, blue);
         }
 
-        void setColorRGBA(int r, int g, int b, int a) {
+        void setColorRGBA(float r, float g, float b, float a) {
             setRed(r);
             setGreen(g);
             setBlue(b);
             setAlpha(a);
         }
 
-        int getRed() {
+        float getRed() {
             return red;
         }
 
-        int getGreen() {
+        float getGreen() {
             return green;
         }
 
-        int getBlue() {
+        float getBlue() {
             return blue;
         }
 
-        int getAlpha() {
+        float getAlpha() {
             return alpha;
         }
 
-        void setRed(int r) {
+        void setRed(float r) {
             red = r;
         }
 
-        void setGreen(int g) {
+        void setGreen(float g) {
             green = g;
         }
 
-        void setBlue(int b) {
+        void setBlue(float b) {
             blue = b;
         }
 
-        void setAlpha(int a) {
+        void setAlpha(float a) {
             alpha = a;
         }
 
         void setLinkedMethod(Runnable runnable) {
             linkedMethod = runnable;
         }
+    }
+
+    /**
+     * TODO: to be improved
+     * this method should only be called once in the life cycle of the class
+     */
+    public void setAsSingleVarMode() {
+        setFocus(linkedColorVars.get(0).getId());
+        centralPanelWrapper.remove(colorVarsWrapper);
+        centralPanelWrapper.setCollapseInvisible(true);
+    }
+
+    public HBox getTitleWrapper(){
+        return titleWrapper;
     }
 }

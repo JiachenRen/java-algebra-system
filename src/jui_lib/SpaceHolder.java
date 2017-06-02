@@ -27,5 +27,4 @@ public class SpaceHolder extends Displayable {
     public void display() {
 
     }
-
 }

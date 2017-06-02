@@ -26,7 +26,6 @@ public class UnaryOperation extends Operation {
     }
 
     /**
-     *
      * @param x input, double x
      * @return the computed value from the designated unary operation
      * @since May 21st: critical bug fixed.
@@ -49,6 +48,19 @@ public class UnaryOperation extends Operation {
         if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
     }
 
+    public Operable toAdditionOnly() {
+        if (operation.getName().equals("~")) {
+            if (getLeftHand() instanceof Raw) {
+                return new Raw(-((Raw) getLeftHand()).doubleValue());
+            } else if (getLeftHand() instanceof Operation) {
+                this.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
+            }
+            //bug fixed May 26th
+            return new BinaryOperation(new Raw(-1), "*", this.getLeftHand());
+        }
+        return this;
+    }
+
     public static Operable negate(Operable operable) {
         return new BinaryOperation(new Raw(0), "-", operable);
     }
@@ -65,7 +77,7 @@ public class UnaryOperation extends Operation {
      */
     public Operable simplify() {
         if (getLeftHand() instanceof Operation) {
-            ((Operation) getLeftHand()).simplify();
+            this.setLeftHand(((Operation) getLeftHand()).simplify());
             return this;
         } else return this;
     }
@@ -98,7 +110,8 @@ public class UnaryOperation extends Operation {
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);
-            System.out.println("reserved unary operations declared");
+            define("~", x -> -x);
+            System.out.println("# reserved unary operations declared");
         }
 
         RegisteredUnaryOperation(String name) {
@@ -129,5 +142,18 @@ public class UnaryOperation extends Operation {
             }
             reservedFunctions.add(Function.implement(name, evaluable));
         }
+
+        public boolean equals(RegisteredUnaryOperation other) {
+            return other.unaryOperation.getName().equals(this.unaryOperation.getName());
+        }
     }
+
+    public boolean equals(Operable other) {
+        return other instanceof UnaryOperation && ((UnaryOperation) other).operation.equals(this.operation) && this.getLeftHand().equals(((UnaryOperation) other).getLeftHand());
+    }
+
+    public Operable plugIn(Operable nested){
+        return new UnaryOperation(getLeftHand().plugIn(nested),this.operation);
+    }
+
 }

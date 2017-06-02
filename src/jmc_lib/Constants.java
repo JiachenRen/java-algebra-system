@@ -27,6 +27,15 @@ public class Constants {
         return false;
     }
 
+
+    public static boolean startsWidthConstant(String exp) {
+        for (Constant constant : constants) {
+            if (exp.startsWith(constant.name))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * add or define a Constant object into the static ArrayList Constants.
      * TODO debug
@@ -62,6 +71,11 @@ public class Constants {
             this.name = name;
         }
 
+        Constant(Constant other) {
+            this.computedConst = other.computedConst;
+            this.name = other.name;
+        }
+
         public String toString() {
             return name;
         }
@@ -72,6 +86,14 @@ public class Constants {
 
         public Constant replicate() {
             return new Constant(name, computedConst);
+        }
+
+        public boolean equals(Operable other) {
+            return other instanceof Constant && ((Constant) other).name.equals(this.name);
+        }
+
+        public Operable plugIn(Operable nested) {
+            return new Constant(this);
         }
     }
 

@@ -20,6 +20,7 @@ public abstract class Operation implements Operable {
 
     /**
      * post operation: the operation itself is modified
+     *
      * @return modified self.
      */
     public abstract Operable simplify();
@@ -29,4 +30,10 @@ public abstract class Operation implements Operable {
     }
 
     public abstract Operation replicate();
+
+    public boolean simplifiable() {
+        Operable duplicate = this.replicate().simplify();
+        return !duplicate.equals(this);
+    }
+    public abstract Operable toAdditionOnly();
 }

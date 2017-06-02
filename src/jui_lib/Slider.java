@@ -213,7 +213,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
         roller = new Roller(x, y);
         barWidth = w;
         setScalingFactor(barScalingFactor);
-        setRounded(true);
+        //setRounded(true);
         rollerBackgroundColor = backgroundColor;
         setProgressBackgroundColor(mouseOverBackgroundColor);
         setDisplayingProgress(true); // created Feb 4th. [optional]

@@ -88,7 +88,7 @@ public class ProgressBar extends Contextual implements Scalable {
             switch (percentageTextStyle){
                 case END:
                     this.applyTextColor();
-                    percentageLabel.displayRawText();
+                    percentageLabel.displayRawText(getContent());
                     break;
                 case MIDDLE:
                     setAlign(CENTER);

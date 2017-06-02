@@ -13,6 +13,7 @@ import java.util.Objects;
 //idea, Jan 21. Chaining up the methods so they return itself, allowing syntax such as setHeight().setWidth().
 //spit into JNode instances and static back_end controls.
 //Don't forget to add Tables!!
+//TODO: add global key event listeners.
 public class JNode {
     private static ArrayList<TextInput> textInputs;
     private static ArrayList<ScrollField> scrollFields;
@@ -101,7 +102,7 @@ public class JNode {
                 if (displayable.isVisible() && !displayable.isRelative())
                     displayable.run();
             }
-            for (Displayable displayable : standbyDisplayables) {
+            for (Displayable displayable : displayables) {
                 if (displayable.getAttachedMethod() != null) {
                     displayable.getAttachedMethod().run();
                 }
@@ -110,7 +111,8 @@ public class JNode {
             e.printStackTrace();
         }
         parent.popStyle();
-        JNode.transferInputEvents();
+        if (automaticEventTransferring)
+            JNode.transferInputEvents();
     }
 
     /**
@@ -263,7 +265,7 @@ public class JNode {
     }
 
     public static void remove(String id) {
-        ArrayList<Displayable> selected = JNode.get(id);
+        ArrayList<? extends Displayable> selected = JNode.get(id);
         for (int i = selected.size() - 1; i >= 0; i--) {
             Displayable reference = selected.get(i);
             remove(reference);
@@ -301,9 +303,10 @@ public class JNode {
             if (sliders.get(i) == obj) sliders.remove(i);
 
         //removing from containers, call should be passed to every single sub-containers to remove all objects.
-        for (int i = containers.size() - 1; i >= 0; i--) {
+        for (int i = containers.size() - 1; i >= 0 && i < containers.size(); i--) {
             Container container = containers.get(i);
             if (container == obj) {
+                container.removeAll();
                 containers.remove(container);
                 for (Container c : containers) {
                     c.syncSize();
@@ -316,7 +319,7 @@ public class JNode {
         parent.loop();
     }
 
-    public static ArrayList<Displayable> get(String id) {
+    public static ArrayList<? extends Displayable> get(String id) {
         ArrayList<Displayable> selected = new ArrayList<>();
         for (Displayable displayable : displayables)
             if (Objects.equals(displayable.getId(), id))
@@ -433,7 +436,7 @@ public class JNode {
         }
     }
 
-    @Nullable
+    @SuppressWarnings("ConstantConditions")
     public static TextInput getTextInputById(String id) {
         for (TextInput textInput : textInputs)
             if (Objects.equals(textInput.getId(), id)) return textInput;
@@ -581,5 +584,9 @@ public class JNode {
                 drawLine = !drawLine;  // switch between dash and gap
             }
         }
+    }
+
+    public static void setAutomaticEventTransferring(boolean temp) {
+        JNode.automaticEventTransferring = temp;
     }
 }

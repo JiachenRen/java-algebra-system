@@ -104,8 +104,7 @@ public class Button extends Contextual implements MouseControl {
         super.mousePressed();
         if (isMouseOver() && isVisible()) {
             mousePressedOnButton = true;
-            if (mousePressedMethod != null)
-                mousePressedMethod.run();
+            this.press();
         }
     }
 
@@ -116,6 +115,12 @@ public class Button extends Contextual implements MouseControl {
                 onClickMethod.run();
         mousePressedOnButton = false;
     }
+
+    public void press() {
+        if (mousePressedMethod != null)
+            mousePressedMethod.run();
+    }
+
 
     public void keyPressed() {
         super.keyPressed();

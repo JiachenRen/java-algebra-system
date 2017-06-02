@@ -1,7 +1,5 @@
 package jmc_lib;
 
-import processing.core.PApplet;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -14,15 +12,20 @@ public abstract class Function implements Evaluable {
     private static final ScriptEngine SCRIPT_ENGINE;
     private static final String DIGITS;
     private static final String SYMBOLS;
+    private static final String VARS;
+    private static final String LETTERS;
     private String name;
     private boolean isVisible;
     private boolean asymptoteVisible;
     private boolean tangentLineVisible;
+    private boolean tracingEnabled;
     private Plot plot;
     private Style graphStyle;
     private boolean dynamic;
     private float strokeWeight;
     private int color;
+    private boolean matchAuxiliaryLinesColor;
+    private boolean autoAsymptoteExtension;
 
     public enum Style {
         CONTINUOUS, DISCRETE
@@ -34,13 +37,19 @@ public abstract class Function implements Evaluable {
         SCRIPT_ENGINE = mgr.getEngineByName("AppleScript");
         DIGITS = "0123456789.";
         SYMBOLS = "()+-*/^<>";
-
+        //noinspection SpellCheckingInspection
+        VARS = "abcdfghjklmnopqrstuvwxyz";
+        //noinspection SpellCheckingInspection
+        LETTERS = "abcdefghijklmnopqrstuvwxyz";
     }
 
     {
         isVisible = true;
         graphStyle = Style.CONTINUOUS;
         strokeWeight = 1;
+        setMatchAuxiliaryLinesColor(false);
+        setTracingEnabled(true);
+        setAutoAsymptoteExtension(true);
     }
 
     /**
@@ -79,6 +88,7 @@ public abstract class Function implements Evaluable {
      * method represents his life's work
      */
     public static InterpretedFunction interpret(String expression) {
+        if (expression.equals("")) throw new IllegalArgumentException("cannot interpret an empty string");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
             throw new IllegalArgumentException("incorrect format: '()' mismatch");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
@@ -107,8 +117,8 @@ public abstract class Function implements Evaluable {
     }
 
     public static String formatColorMathSymbols(String exp) {
-        String colored = coloredLine("[35;1m", exp, "x");
-        colored = coloredLine("[36;1m", colored, "<", ">");
+        //String colored = coloredLine("[35;1m", exp, "x");
+        String colored = coloredLine("[36;1m", exp, "<", ">");
         colored = coloredLine("[1;m", colored, "+", "-", "*", "/", "^");
         colored = coloredLine("[1;34m", colored, ")", "(");
         colored = coloredLine("[34;1m", colored, "#");
@@ -212,8 +222,8 @@ public abstract class Function implements Evaluable {
                 int bundleId = Integer.valueOf(string.substring(bundleIndex + 1));
                 operands.add(operables.get(bundleId));
             } else {
-                if (string.toLowerCase().equals("x")) {
-                    operands.add(new Variable("x"));
+                if (VARS.contains(string.toLowerCase())) {
+                    operands.add(new Variable(string.toLowerCase()));
                 } else if (Constants.contains(string)) {
                     operands.add(Constants.getConstant(string));
                 } else {
@@ -330,7 +340,7 @@ public abstract class Function implements Evaluable {
         for (int i = 0; i < exp.length() - 1; i++) {
             char digit = exp.charAt(i), x = exp.charAt(i + 1);
             if (DIGITS.contains(Character.toString(digit)) || digit == ')') {
-                if (x == 'x') {
+                if (VARS.contains(Character.toString(x)) || Constants.startsWidthConstant(exp.substring(i + 1))) {
                     exp = exp.replace(digit + "" + x, digit + "*" + x);
                 }
             }
@@ -355,7 +365,7 @@ public abstract class Function implements Evaluable {
                     continue;
                 String l = exp.substring(0, i + 1);
                 String middle = exp.substring(i + 1, q);
-                if (middle.equals("x"))
+                if (VARS.contains(middle))
                     continue;
                 middle = '(' + middle + ')';
                 exp = l + middle + exp.substring(q);
@@ -385,7 +395,7 @@ public abstract class Function implements Evaluable {
     }
 
     private static String handleParentheticalNotation(String exp) {
-        String non_operators = ")x>";
+        String non_operators = ")>"+LETTERS;
         for (int i = 1; i < exp.length(); i++) {
             char cur = exp.charAt(i);
             if (cur == '(') {
@@ -547,6 +557,9 @@ public abstract class Function implements Evaluable {
         this.color = other.color;
         this.asymptoteVisible = other.asymptoteVisible;
         this.tangentLineVisible = other.tangentLineVisible;
+        this.autoAsymptoteExtension = other.autoAsymptoteExtension;
+        this.setGraphStyle(other.getStyle());
+        this.setDynamic(other.dynamic);
         return this;
     }
 
@@ -554,8 +567,9 @@ public abstract class Function implements Evaluable {
         return asymptoteVisible;
     }
 
-    public void setAsymptoteVisible(boolean asymptoteVisible) {
+    public Function setAsymptoteVisible(boolean asymptoteVisible) {
         this.asymptoteVisible = asymptoteVisible;
+        return this;
     }
 
     public boolean isTangentLineVisible() {
@@ -591,5 +605,33 @@ public abstract class Function implements Evaluable {
                 return true;
         }
         return false;
+    }
+
+    public boolean isAutoAsymptoteExtension() {
+        return autoAsymptoteExtension;
+    }
+
+    public void setAutoAsymptoteExtension(boolean autoAsymptoteExtension) {
+        this.autoAsymptoteExtension = autoAsymptoteExtension;
+    }
+
+    public boolean tracingEnabled() {
+        return tracingEnabled;
+    }
+
+    public void setTracingEnabled(boolean tracingEnabled) {
+        this.tracingEnabled = tracingEnabled;
+    }
+
+    public boolean isMatchAuxiliaryLinesColor() {
+        return matchAuxiliaryLinesColor;
+    }
+
+    public void setMatchAuxiliaryLinesColor(boolean matchAuxiliaryLinesColor) {
+        this.matchAuxiliaryLinesColor = matchAuxiliaryLinesColor;
+    }
+
+    public boolean equals(Function other){
+        return this.getName().equals(other.getName());
     }
 }

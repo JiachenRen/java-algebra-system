@@ -58,6 +58,7 @@ public class VBox extends Container {
         float h = undeclaredSpace() / (float) remaining;
         for (Displayable displayable : displayables) {
             if (!displayable.isRelative() || !displayable.isUndeclared()) continue;
+            if (shouldCollapse(displayable)) continue;
             displayable.setWidth(this.getWidth() - marginX * 2);
             displayable.setHeight(h);
         }

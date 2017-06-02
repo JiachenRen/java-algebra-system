@@ -1,5 +1,6 @@
 package jui_lib;
 
+import processing.core.PApplet;
 import processing.core.PConstants;
 
 import java.awt.*;
@@ -8,16 +9,18 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 //code refactored Jan 27th, class name changed to TextInput
 //refactored Feb 4th. Debugged the issue where the textSize won't refresh, which is caused by the abstracting of the displayText() method.
-public class TextInput extends Contextual implements MouseControl, KeyControl {
-    //add setAlign and shift down. Done. Jan 21.
-    //add onEditing method. Idea Jan 26th. Resolved.
-    //considering allowing the user to change textSize with a ratio that factors into the total height. No. discouraged. Jan 26th.
-    //using event listeners instead of Runnable? Resolved May 21st.
+//add setAlign and shift down. Done. Jan 21.
+//add onEditing method. Idea Jan 26th. Resolved.
+//considering allowing the user to change textSize with a ratio that factors into the total height. No. discouraged. Jan 26th.
+//using event listeners instead of Runnable? Resolved May 21st.
+//TODO: add key event listeners idea May 24th, last night before last day of class
+public class TextInput extends Contextual implements MouseControl, KeyControl, Serializable {
     private boolean isFocusedOn;
     private boolean isLockedOn;
     private boolean displayCursor;
@@ -101,6 +104,8 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
                     cursor.display();
                 else
                     displayCursor();
+            if (onEditingMethod != null)
+                onEditingMethod.run();
         }
 
         super.displayText(contentOnScreen);
@@ -116,7 +121,7 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
     private void updateContentOnScreen() {
         contentOnScreen = getContent();
         for (int i = 0; i < getContent().length(); i++) {
-            contentOnScreen = getContent().substring(getContent().length() - i - 1, getContent().length());
+            contentOnScreen = (alignment == PApplet.LEFT ? " " : "") + getContent().substring(getContent().length() - i - 1, getContent().length());
             if (getTextWidth(contentOnScreen) > w) {
                 contentOnScreen = getContent().substring(getContent().length() - i, getContent().length());
                 break;
@@ -175,7 +180,7 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
                     getParent().line(x + tw, y, x + tw, y2);
                     break;
                 case PConstants.CENTER:
-                    getParent().line(xv1 + tw / 2, y, tw / 2, y2);
+                    getParent().line(xv1 + tw / 2, y, xv1 + tw / 2, y2);
                     break;
                 case PConstants.RIGHT:
                     getParent().line(xv2, y, xv2, y2);
@@ -474,7 +479,17 @@ public class TextInput extends Contextual implements MouseControl, KeyControl {
         return this;
     }
 
+    public TextInput setIsFocusedOn(boolean temp) {
+        this.isFocusedOn = temp;
+        return this;
+    }
+
     public Runnable getSubmitMethod() {
         return submitMethod;
+    }
+
+    @Override
+    public TextInput clone() {
+        return (TextInput) super.clone();
     }
 }

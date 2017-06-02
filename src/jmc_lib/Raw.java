@@ -20,11 +20,23 @@ public class Raw implements Operable {
 
     public String toString() {
         double extracted = raw.doubleValue();
-        String formatted = Graph.formatForDisplay(extracted);
+        String formatted = /*(char) 27 + "[32m" + */Graph.formatForDisplay(extracted)/* + (char) 27 + "[0m"*/;
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
     public Raw replicate() {
         return new Raw(raw);
+    }
+
+    public double doubleValue() {
+        return raw.doubleValue();
+    }
+
+    public boolean equals(Operable other) {
+        return other instanceof Raw && ((Raw) other).doubleValue() == this.doubleValue();
+    }
+
+    public Operable plugIn(Operable nested) {
+        return new Raw(this);
     }
 }

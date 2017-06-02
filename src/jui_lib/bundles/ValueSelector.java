@@ -77,7 +77,7 @@ public class ValueSelector extends VBox {
                 titleLabel.setContent("Var");
                 wrapper.add(titleLabel);
 
-                textInput = new TextInput( 0.1f, 1.0f);
+                textInput = new TextInput(0.1f, 1.0f);
                 wrapper.add(textInput);
 
                 valueSlider = new HSlider();
@@ -132,6 +132,7 @@ public class ValueSelector extends VBox {
 
     public ValueSelector setTitlePercentage(float temp) {
         titlePercentage = temp;
+        titleLabel.setRelativeW(temp);
         return this;
     }
 
@@ -207,6 +208,14 @@ public class ValueSelector extends VBox {
     public ValueSelector link(Runnable runnable) {
         linkedMethod = runnable;
         return this;
+    }
+
+    public TextInput getTextInput() {
+        return textInput;
+    }
+
+    public Label getTitleLabel() {
+        return titleLabel;
     }
 
 }
