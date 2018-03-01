@@ -287,7 +287,7 @@ public class JGrapher extends PApplet {
             parent.arrange();
         }).setAlign(CENTER).setVisible(false);
         std.add(button);
-        std.add(new Button("Exit").onClick(()->Runtime.getRuntime().exit(0)));
+        std.add(new Button("Exit").onClick(() -> Runtime.getRuntime().exit(0)));
 
         adv.add(new Label().setAlign(CENTER).setContent("Advanced").inheritOutlook(modelLabel));
 
@@ -392,7 +392,9 @@ public class JGrapher extends PApplet {
 
         UnaryOperation.define("~", Function.interpret("x*x"));
         BinaryOperation.define("%", 2, (a, b) -> a % b);
-        Constants.define("c", () -> 1);
+        Constants.define("$C", () -> 1);
+
+        Element.getList().forEach(e -> Constants.define("$" + e, e::getAtomicMass));
 
         Constants.list();
 
