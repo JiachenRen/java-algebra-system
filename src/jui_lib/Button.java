@@ -2,7 +2,9 @@ package jui_lib;
 
 
 import jui_lib.bundles.ValueSelector;
+import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PVector;
 
 import static processing.core.PConstants.CENTER;
 

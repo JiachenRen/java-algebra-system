@@ -40,11 +40,11 @@ public class CasSimplifyTest {
     private static ArrayList<Operable> operables;
 
     public static void main(String args[]) {
-        // synopticDiagnosis();
-        Operable operable = Function.interpret("(x+3)(x-sin<x>)/(x-1)*x(x+2)").getOperable();
-        operable = Operable.getFirstDerivative(operable);
-        //operable = Operable.expand(operable); TODO: debug
-        System.out.println(operable);
+         synopticDiagnosis();
+//        Operable operable = Function.interpret("(x+3)(x-sin<x>)/(x-1)*x(x+2)").getOperable();
+//        operable = Operable.getFirstDerivative(operable);
+//        //operable = Operable.expand(operable); TODO: debug
+//        System.out.println(operable);
     }
 
     private static void synopticDiagnosis() {
