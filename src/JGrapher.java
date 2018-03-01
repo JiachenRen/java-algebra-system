@@ -94,12 +94,13 @@ public class JGrapher extends PApplet {
 
         Button modelButton = new Button();
 
-        graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
+//        graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
-        graph = new Graph(1.0f, 0.93f).setId("graph");
+        graph = new Graph(1.0f, 0.965f).setId("graph");
         graph.setTextColor(modelLabel.backgroundColor);
         graph.setBackgroundColor(0, 0, 0, 200);
         graphWrapper.add(graph);
+
 
         HBox functionInputWrapper = new HBox();
         functionInputWrapper.setMargins(0, 0).setId("#functionInputWrapper");
@@ -172,7 +173,7 @@ public class JGrapher extends PApplet {
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;34m" + "simplification failed -> incomplete input" + (char) 27 + "[0m");
             }
-        }).setDefaultContent(" type your function in here").setId("f(x)");
+        }).setDefaultContent(" type in your function  here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
             try {
                 graph.override(funcNameTextInput.getContent(), Function.interpret(funcTextInput.getContent()));
