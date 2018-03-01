@@ -118,6 +118,18 @@ public class Button extends Contextual implements MouseControl {
             mousePressedMethod.run();
     }
 
+    @Override
+    public Button inheritOutlook(Displayable other) {
+        super.inheritOutlook(other);
+        return this;
+    }
+
+    @Override
+    public Button inheritMode(Displayable other) {
+        super.inheritMode(other);
+        return this;
+    }
+
 
     public void keyPressed() {
         super.keyPressed();

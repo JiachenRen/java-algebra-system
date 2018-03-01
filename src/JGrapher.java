@@ -86,6 +86,8 @@ public class JGrapher extends PApplet {
 //                .setTextColor(230)
 //                .setBackgroundColor(50);
 
+        Button modelButton = (Button) new Button().setMouseOverBackgroundColor(255, 0, 0);
+
         graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
         graph = new Graph(1.0f, 0.93f).setId("graph");
@@ -232,19 +234,27 @@ public class JGrapher extends PApplet {
 
         std.add(new Button()
                 .setContent("Equalize Axis")
-                .onClick(graph::equalizeAxes));
+                .onClick(graph::equalizeAxes)
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton));
         std.add(new Button()
                 .setContent("Center Origin")
-                .onClick(graph::centerOrigin));
+                .onClick(graph::centerOrigin)
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton));
         std.add(new SpaceHolder());
         std.add(new Label("Graph")
                 .inheritOutlook(modelLabel));
         std.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
                 .setContentOff("Trace Off")
                 .setContentOn("Trace On")
                 .setState(graph.tracingIsOn())
                 .onClick(() -> graph.setTracingOn(!graph.tracingIsOn())));
         std.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
                 .setContentOff("Axes Off")
                 .setContentOn("Axes On")
                 .setState(graph.isAxesVisible())
@@ -253,6 +263,8 @@ public class JGrapher extends PApplet {
         std.add(new Label("Evaluation")
                 .inheritOutlook(modelLabel));
         std.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
                 .setContentOff("Off")
                 .setContentOn("On")
                 .setState(graph.isEvaluationOn())
@@ -261,6 +273,8 @@ public class JGrapher extends PApplet {
         std.add(new Label("CAS")
                 .inheritOutlook(modelLabel));
         std.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
                 .setContentOff("Disabled")
                 .setContentOn("Enabled")
                 .setState(casEnabled)
@@ -270,22 +284,33 @@ public class JGrapher extends PApplet {
                 .inheritOutlook(modelLabel));
         std.add(new Button()
                 .setContent("Drag")
-                .onClick(() -> graph.setMode(Graph.Mode.DRAG)));
+                .onClick(() -> graph.setMode(Graph.Mode.DRAG))
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton));
         std.add(new Button()
                 .setContent("Zoom In")
-                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_IN)));
+                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_IN))
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton));
         std.add(new Button()
                 .setContent("Zoom Out")
-                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_OUT)));
+                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_OUT))
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton));
         std.add(new Button()
                 .setContent("Zoom Rect")
-                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_RECT)));
+                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_RECT))
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton));
 
         std.add(new SpaceHolder());
         VBox funcsWrapper = new VBox(1.0f, 0.15f);
         funcsWrapper.setMargins(0, 0);
         for (int i = 0; i < 5; i++) {
-            funcsWrapper.add(new Button().setVisible(false));
+            funcsWrapper.add(new Button()
+                    .setVisible(false)
+                    .inheritOutlook(modelButton)
+                    .inheritMode(modelButton));
         }
 
 
@@ -297,43 +322,43 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelInput)
                 .setDefaultContent("Name")
                 .onKeyTyped(() -> {
-            TextInput self = JNode.getTextInputById("filterer");
-            if (self == null) return;
-            ArrayList<Function> functions = graph.getFunctions();
-            ArrayList<Function> filtered = new ArrayList<>();
-            functions.forEach(function -> {
-                if (filtered.size() < 5 && function.getName().startsWith(self.getContent()))
-                    if (!filtered.contains(function))
-                        filtered.add(function);
-            });
-            functions.forEach(function -> {
-                if (filtered.size() < 5 && function.getName().contains(self.getContent()))
-                    if (!filtered.contains(function))
-                        filtered.add(function);
-            });
-            functions.forEach(function -> {
-                if (filtered.size() < 5 && containsAllChars(function.getName(), self.getContent()))
-                    if (!filtered.contains(function))
-                        filtered.add(function);
-            });
-            if (filtered.size() == 0) return;
-            for (int i = 0; i < 5; i++) {
-                if (i < filtered.size()) {
-                    InterpretedFunction func = (InterpretedFunction) filtered.get(i);
-                    final String funcName = func.getName();
-                    final String operable = func.getOperable().toString();
-                    Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
-                    tmp.setContent(funcName).setVisible(true);
-                    tmp.onClick(() -> {
-                        funcNameTextInput.setContent(funcName);
-                        //noinspection ConstantConditions
-                        JNode.getTextInputById("f(x)").setContent(operable);
+                    TextInput self = JNode.getTextInputById("filterer");
+                    if (self == null) return;
+                    ArrayList<Function> functions = graph.getFunctions();
+                    ArrayList<Function> filtered = new ArrayList<>();
+                    functions.forEach(function -> {
+                        if (filtered.size() < 5 && function.getName().startsWith(self.getContent()))
+                            if (!filtered.contains(function))
+                                filtered.add(function);
                     });
-                } else {
-                    funcsWrapper.getDisplayables().get(i).setVisible(false);
-                }
-            }
-        }).setId("filterer"));
+                    functions.forEach(function -> {
+                        if (filtered.size() < 5 && function.getName().contains(self.getContent()))
+                            if (!filtered.contains(function))
+                                filtered.add(function);
+                    });
+                    functions.forEach(function -> {
+                        if (filtered.size() < 5 && containsAllChars(function.getName(), self.getContent()))
+                            if (!filtered.contains(function))
+                                filtered.add(function);
+                    });
+                    if (filtered.size() == 0) return;
+                    for (int i = 0; i < 5; i++) {
+                        if (i < filtered.size()) {
+                            InterpretedFunction func = (InterpretedFunction) filtered.get(i);
+                            final String funcName = func.getName();
+                            final String operable = func.getOperable().toString();
+                            Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
+                            tmp.setContent(funcName).setVisible(true);
+                            tmp.onClick(() -> {
+                                funcNameTextInput.setContent(funcName);
+                                //noinspection ConstantConditions
+                                JNode.getTextInputById("f(x)").setContent(operable);
+                            });
+                        } else {
+                            funcsWrapper.getDisplayables().get(i).setVisible(false);
+                        }
+                    }
+                }).setId("filterer"));
         std.add(funcsWrapper);
 
 
@@ -344,7 +369,9 @@ public class JGrapher extends PApplet {
         adv.setVisible(false);
         parent.add(adv);
 
-        Button button = new Button("Show Advanced");
+        Button button = new Button("Show Advanced")
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton);
         button.attachMethod(() -> button.setVisible(graph.getFunctions().size() > 0));
         button.onClick(() -> {
             button.setContent(button.getContent().equals("Show Advanced") ? "Hide Advanced" : "Show Advanced");
@@ -353,19 +380,32 @@ public class JGrapher extends PApplet {
             parent.arrange();
         }).setAlign(CENTER).setVisible(false);
         std.add(button);
-        std.add(new Button("Exit").onClick(() -> Runtime.getRuntime().exit(0)));
+        std.add(new Button("Exit")
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .onClick(() -> Runtime.getRuntime().exit(0)));
 
         adv.add(new Label().setAlign(CENTER).setContent("Advanced").inheritOutlook(modelLabel));
 
 
         adv.add(new SpaceHolder());
-        adv.add(new Label().setContent("Attributes").inheritOutlook(modelLabel));
-        adv.add(new Switch().setContentOn("Tracing Enabled").setContentOff("Tracing Disabled").onClick(() -> {
-            Switch self = (Switch) JNode.get("#8").get(0);
-            getCurrentFunction().setTracingEnabled(self.isOn());
-        }).setId("#8"));
+        adv.add(new Label()
+                .setContent("Attributes")
+                .inheritOutlook(modelLabel));
+        adv.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContentOn("Tracing Enabled")
+                .setContentOff("Tracing Disabled")
+                .onClick(() -> {
+                    Switch self = (Switch) JNode.get("#8").get(0);
+                    getCurrentFunction().setTracingEnabled(self.isOn());
+                }).setId("#8"));
 
-        Button showAsymptotes = new Button().setContent("Show Asymptotes");
+        Button showAsymptotes = new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContent("Show Asymptotes");
         showAsymptotes.onClick(() -> {
             Function function = getCurrentFunction();
             if (function != null)
@@ -374,7 +414,10 @@ public class JGrapher extends PApplet {
         }).setId("#1");
         adv.add(showAsymptotes);
 
-        Button showTangentLine = new Button().setContent("Show f'(x)");
+        Button showTangentLine = new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContent("Show f'(x)");
         showTangentLine.onClick(() -> {
             Function function = getCurrentFunction();
             if (function != null)
@@ -383,7 +426,10 @@ public class JGrapher extends PApplet {
         }).setId("#2");
         adv.add(showTangentLine);
 
-        Button visibility = new Button().setContent("Visible");
+        Button visibility = new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContent("Visible");
         visibility.onClick(() -> {
             Function function = getCurrentFunction();
             if (function != null)
@@ -392,7 +438,10 @@ public class JGrapher extends PApplet {
         }).setId("#3");
         adv.add(visibility);
 
-        Button continuous = new Button().setContent("Continuous");
+        Button continuous = new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContent("Continuous");
         continuous.onClick(() -> {
             Function function = getCurrentFunction();
             if (function != null)
@@ -401,7 +450,10 @@ public class JGrapher extends PApplet {
         }).setId("#4");
         adv.add(continuous);
 
-        Button dynamic = new Button().setContent("Static");
+        Button dynamic = new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContent("Static");
         dynamic.onClick(() -> {
             Function function = getCurrentFunction();
             if (function != null)
@@ -413,7 +465,10 @@ public class JGrapher extends PApplet {
         adv.add(new SpaceHolder());
         adv.add(new Label().setContent("VA Extension")
                 .inheritOutlook(modelLabel));
-        Button extensionOn = new Button().setContent("On");
+        Button extensionOn = new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContent("On");
         extensionOn.onClick(() -> {
             Function function = getCurrentFunction();
             if (function != null)
@@ -438,6 +493,8 @@ public class JGrapher extends PApplet {
                 .setContent("Additional")
                 .inheritOutlook(modelLabel));
         adv.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
                 .setContentOn("Differentiate")
                 .setContentOff("Uniform").onClick(() -> {
                     Switch self = (Switch) JNode.get("#9").get(0);
@@ -454,6 +511,8 @@ public class JGrapher extends PApplet {
         adv.add(strokeWeight);
         adv.add(new SpaceHolder());
         adv.add(new Button()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
                 .setContent(JNode.ROUNDED ? "Rounded" : "Rectangular")
                 .onClick(() -> {
                     JNode.getDisplayables().forEach(displayable -> displayable.setRounded(!displayable.isRounded));

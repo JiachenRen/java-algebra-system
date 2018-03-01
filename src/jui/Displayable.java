@@ -572,6 +572,8 @@ public class Displayable implements MouseControl, Serializable {
         this.setBackgroundImg(other.backgroundImg);
         this.setBackgroundColor(other.backgroundColor);
         this.setMouseOverBackgroundColor(other.mouseOverBackgroundColor);
+        this.setMousePressedBackgroundColor(other.mousePressedBackgroundColor);
+        this.setMousePressedContourColor(other.mousePressedContourColor);
         this.setContourColor(other.contourColor);
         this.setMouseOverContourColor(other.mouseOverContourColor);
         this.setContourThickness(other.contourThickness);

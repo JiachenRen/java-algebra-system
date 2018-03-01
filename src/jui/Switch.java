@@ -81,6 +81,18 @@ public class Switch extends Button {
         return this;
     }
 
+    @Override
+    public Switch inheritOutlook(Displayable other) {
+        super.inheritOutlook(other);
+        return this;
+    }
+
+    @Override
+    public Switch inheritMode(Displayable other) {
+        super.inheritMode(other);
+        return this;
+    }
+
     @Deprecated
     public Switch setContent(String s) {
         super.setContent(s);
