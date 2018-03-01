@@ -53,6 +53,7 @@ public class JNode {
     public static int TEXT_COLOR;
     public static int MOUSE_PRESSED_TEXT_COLOR;
     public static int MOUSE_OVER_TEXT_COLOR;
+    public static int PROGRESS_BAR_BACKGROUND_COLOR;
 
     private static int recordedMousePos[];
     private static boolean mouseIsPressed;

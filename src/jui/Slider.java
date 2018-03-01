@@ -215,7 +215,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
         setScalingFactor(barScalingFactor);
         //setRounded(true);
         rollerBackgroundColor = backgroundColor;
-        setProgressBackgroundColor(mouseOverBackgroundColor);
+        setProgressBackgroundColor(JNode.PROGRESS_BAR_BACKGROUND_COLOR);
         setDisplayingProgress(true); // created Feb 4th. [optional]
     }
 

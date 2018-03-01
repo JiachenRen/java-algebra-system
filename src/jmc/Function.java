@@ -23,7 +23,7 @@ public abstract class Function implements Evaluable {
     private Style graphStyle;
     private boolean dynamic;
     private float strokeWeight;
-    private int color;
+    private int color = -1;
     private boolean matchAuxiliaryLinesColor;
     private boolean autoAsymptoteExtension;
 

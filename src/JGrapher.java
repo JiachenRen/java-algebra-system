@@ -61,7 +61,12 @@ public class JGrapher extends PApplet {
         JNode.DISPLAY_CONTOUR = true;
         JNode.CONTOUR_THICKNESS = 0.1f;
 //        JNode.CONTOUR_COLOR = color(0, 0, 100);
-        JNode.BACKGROUND_COLOR = color(255);
+        JNode.BACKGROUND_COLOR = color(255, 255, 255, 50);
+        JNode.TEXT_COLOR = color(255, 255, 255, 255);
+        JNode.MOUSE_OVER_TEXT_COLOR = color(255, 255, 255, 255);
+        JNode.MOUSE_PRESSED_TEXT_COLOR = color(255, 255, 255, 255);
+        JNode.MOUSE_OVER_BACKGROUND_COLOR = color(255, 255, 255, 100);
+        JNode.MOUSE_PRESSED_BACKGROUND_COLOR = color(255, 255, 255, 75);
         JNode.ROUNDED = false;
 
         HBox parent = new HBox(0, 0, width, height);
@@ -76,21 +81,24 @@ public class JGrapher extends PApplet {
         parent.add(graphWrapper);
 
         Displayable modelLabel = new Label()
+                .setTextColor(0, 0, 0, 255)
                 .setAlign(CENTER)
                 .setContourVisible(false)
-                .setBackgroundColor(0, 0, 0, 25);
+                .setBackgroundColor(255, 255, 255, 200);
 
-        Displayable modelInput = new TextInput();
+        TextInput modelInput = (TextInput) new TextInput();
 //                .setCursorColor(255)
 //                .setCursorThickness(1)
 //                .setTextColor(230)
 //                .setBackgroundColor(50);
 
-        Button modelButton = (Button) new Button();
+        Button modelButton = new Button();
 
         graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
         graph = new Graph(1.0f, 0.93f).setId("graph");
+        graph.setTextColor(modelLabel.backgroundColor);
+        graph.setBackgroundColor(0, 0, 0, 200);
         graphWrapper.add(graph);
 
         HBox functionInputWrapper = new HBox();
@@ -536,7 +544,7 @@ public class JGrapher extends PApplet {
 
     @SuppressWarnings("ConstantConditions")
     private Function getCurrentFunction() {
-        return graph.getFunction(JNode.getTextInputById("functionNameLabel").getContent());
+        return graph.getFunction(JNode.getTextInputById("funcNameTextInput").getContent());
     }
 
     private static Set<Character> stringToCharacterSet(String s) {
@@ -553,7 +561,7 @@ public class JGrapher extends PApplet {
     }
 
     public void draw() {
-        background(255);
+        background(50);
         JNode.run();
     }
 

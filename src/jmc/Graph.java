@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * TODO: Add polar & parametric graph.
  * TODO: add grids
  */
-public class Graph extends Displayable {
+public class Graph extends Contextual {
     private Range rangeX;
     private Range rangeY;
     private double stepLength; //in pixels. Could be sub-pixel
@@ -60,7 +60,7 @@ public class Graph extends Displayable {
         */
         stepLength = 0.1; //TODO changed from 1 to 0.1. May 17th. Might cause performance issues.
         markLengthBig = 2;
-        axisMarkingTextSize = JNode.getParent().pixelDensity == 1 ? 15 : 10;
+        axisMarkingTextSize = JNode.getParent().pixelDensity == 1 ? 10 : 5;
         setMaxMarkingLength(30);
         setMinMarkingLength(35);
         /*
@@ -203,9 +203,9 @@ public class Graph extends Displayable {
      * Draws the grids of the graph.
      */
     private void drawAxes() {
-        getParent().stroke(0, 0, 0);
+        getParent().stroke(getTextColor());
+        getParent().fill(getTextColor());
         getParent().textSize(axisMarkingTextSize);
-        getParent().fill(0);
 
         {
             //drawing the y axis
@@ -435,6 +435,7 @@ public class Graph extends Displayable {
             double x = convertToPointOnGraph(getParent().mouseX, getParent().mouseY)[0];
             getParent().stroke(tangentLineColor);
             if (function.isMatchAuxiliaryLinesColor()) getParent().stroke(function.getColor());
+            else getParent().stroke(getTextColor());
             drawTangentLineToPoint(x, function.getName());
         }
     }
