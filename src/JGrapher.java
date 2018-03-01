@@ -17,6 +17,9 @@ import java.util.Set;
  */
 public class JGrapher extends PApplet {
     private Graph graph;
+    private HBox parent;
+    private HBox functionInputWrapper;
+    private VBox graphWrapper;
     private boolean casEnabled = false;
 
     public static void main(String args[]) {
@@ -69,15 +72,18 @@ public class JGrapher extends PApplet {
         JNode.MOUSE_PRESSED_BACKGROUND_COLOR = color(255, 255, 255, 75);
         JNode.ROUNDED = false;
 
-        HBox parent = new HBox(0, 0, width, height);
+        parent = new HBox(0, 0, width, height);
         parent.setCollapseInvisible(true)
                 .setId("parent")
                 .setMargins(1, 0)
                 .matchWindowDimension(true);
 
+        VBox std = new VBox(0.1f, 1.0f);
+        std.setMarginX(0);
+        parent.add(std);
 
-        VBox graphWrapper = new VBox();
-        graphWrapper.setId("graphWrapper");
+        graphWrapper = new VBox();
+        graphWrapper.setId("graphWrapper").setCollapseInvisible(true);
         parent.add(graphWrapper);
 
         Displayable modelLabel = new Label()
@@ -96,13 +102,13 @@ public class JGrapher extends PApplet {
 
 //        graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
-        graph = new Graph(1.0f, 0.965f).setId("graph");
+        graph = (Graph) new Graph().setRelative(true).setId("graph");
         graph.setTextColor(modelLabel.backgroundColor);
-        graph.setBackgroundColor(0, 0, 0, 200);
+        graph.setBackgroundColor(0, 0, 0, 100);
         graphWrapper.add(graph);
 
 
-        HBox functionInputWrapper = new HBox();
+        functionInputWrapper = new HBox(1.0f, 0.035f);
         functionInputWrapper.setMargins(0, 0).setId("#functionInputWrapper");
         graphWrapper.add(functionInputWrapper);
 
@@ -184,9 +190,11 @@ public class JGrapher extends PApplet {
         });
         functionInputWrapper.add(funcTextInput);
 
-        VBox std = new VBox(0.1f, 1.0f);
-        std.setMarginX(0);
-        parent.add(std);
+        VBox adv = new VBox(0.1f, 1f);
+        adv.setMarginX(0);
+        adv.setVisible(false);
+        parent.add(adv);
+
 
         std.add(new Label().setContent("Window").inheritOutlook(modelLabel));
 
@@ -373,10 +381,6 @@ public class JGrapher extends PApplet {
 
         std.add(new SpaceHolder());
 
-        VBox adv = new VBox(0.1f, 1f);
-        adv.setMarginX(0);
-        adv.setVisible(false);
-        parent.add(adv);
 
         Button button = new Button("Show Advanced")
                 .inheritOutlook(modelButton)
@@ -562,13 +566,28 @@ public class JGrapher extends PApplet {
     }
 
     public void draw() {
-        background(50);
+        background(52, 61, 70);
         JNode.run();
     }
 
     public void keyPressed() {
-        if (keyCode == ESC) key = (char) 0;
+        switch (keyCode) {
+            case 0x30:
+                break;
+            case ESC:
+                key = (char) 0;
+                break;
+        }
+
+        switch (key) {
+            case TAB:
+                functionInputWrapper.setVisible(!functionInputWrapper.isVisible());
+                graphWrapper.syncSize();
+                graphWrapper.arrange();
+        }
+
         JNode.keyPressed();
+
     }
 
     public void keyReleased() {

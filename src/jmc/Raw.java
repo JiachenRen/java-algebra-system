@@ -21,6 +21,7 @@ public class Raw implements Operable {
     public String toString() {
         double extracted = raw.doubleValue();
         String formatted = /*(char) 27 + "[32m" + */Graph.formatForDisplay(extracted)/* + (char) 27 + "[0m"*/;
+        if (formatted.endsWith(".0")) formatted = formatted.substring(0, formatted.length() - 2);
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 

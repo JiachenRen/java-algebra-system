@@ -69,8 +69,8 @@ public class Graph extends Contextual {
         colors
          */
         asymptoteColor = JNode.getParent().color(255, 255, 255, 200);
-        tangentLineColor = JNode.getParent().color(0, 0, 0, 100);
-        tracingLineColor = JNode.getParent().color(0, 0, 0, 100);
+        tangentLineColor = JNode.getParent().color(255, 255, 255, 200);
+        tracingLineColor = JNode.getParent().color(255, 255, 255, 200);
 
         initEventListeners();
         setMode(Mode.DRAG);
