@@ -59,7 +59,7 @@ public class JGrapher extends PApplet {
         if (!JNode.OS.contains("windows")) JGrapher.enableCoreDump();
 
         JNode.DISPLAY_CONTOUR = true;
-        JNode.CONTOUR_THICKNESS = 0.5f;
+        JNode.CONTOUR_THICKNESS = 0.1f;
 //        JNode.CONTOUR_COLOR = color(0, 0, 100);
         JNode.BACKGROUND_COLOR = color(255);
         JNode.ROUNDED = false;
@@ -67,7 +67,7 @@ public class JGrapher extends PApplet {
         HBox parent = new HBox(0, 0, width, height);
         parent.setCollapseInvisible(true)
                 .setId("parent")
-                .setMargins(1,0)
+                .setMargins(1, 0)
                 .matchWindowDimension(true);
 
 
@@ -75,7 +75,16 @@ public class JGrapher extends PApplet {
         graphWrapper.setId("graphWrapper");
         parent.add(graphWrapper);
 
-        Displayable modelLabel = new Label().setAlign(CENTER).setContourVisible(false).setBackgroundColor(0, 0, 0, 25);
+        Displayable modelLabel = new Label()
+                .setAlign(CENTER)
+                .setContourVisible(false)
+                .setBackgroundColor(0, 0, 0, 25);
+
+        Displayable modelInput = new TextInput();
+//                .setCursorColor(255)
+//                .setCursorThickness(1)
+//                .setTextColor(230)
+//                .setBackgroundColor(50);
 
         graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
@@ -86,9 +95,11 @@ public class JGrapher extends PApplet {
         functionInputWrapper.setMargins(0, 0).setId("#functionInputWrapper");
         graphWrapper.add(functionInputWrapper);
 
-        TextInput funcNameLabel = new TextInput();
+        TextInput funcNameTextInput = new TextInput();
+        funcNameTextInput.inheritOutlook(modelInput)
+                .inheritMode(modelInput);
         Runnable updateAdvPanel = () -> {
-            String name = funcNameLabel.getContent();
+            String name = funcNameTextInput.getContent();
             Function func = graph.getFunction(name);
             if (func == null) return;
             ValueSelector strokeWeight = (ValueSelector) JNode.get("#0").get(0);
@@ -125,15 +136,16 @@ public class JGrapher extends PApplet {
             match.setState(func.isMatchAuxiliaryLinesColor());
 
         };
-        TextInput funcTextInput = new TextInput();
-        funcNameLabel.setContent("f(x)=").setAlign(CENTER).setId("funcNameLabel").setRelativeW(0.13f).addEventListener(Event.CONTENT_CHANGED, () -> {
-            String name = funcNameLabel.getContent();
+        TextInput funcTextInput = new TextInput().inheritOutlook(modelInput)
+                .inheritMode(modelInput);
+        funcNameTextInput.setContent("f(x)=").setAlign(CENTER).setId("funcNameTextInput").setRelativeW(0.13f).addEventListener(Event.CONTENT_CHANGED, () -> {
+            String name = funcNameTextInput.getContent();
             Function func = graph.getFunction(name);
             if (func == null) return;
             updateAdvPanel.run();
             funcTextInput.setContent(((InterpretedFunction) func).getOperable().toString());
         });
-        functionInputWrapper.add(funcNameLabel);
+        functionInputWrapper.add(funcNameTextInput);
 
 
         //Dynamic function interpretation
@@ -153,7 +165,7 @@ public class JGrapher extends PApplet {
         }).setDefaultContent(" type your function in here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
             try {
-                graph.override(funcNameLabel.getContent(), Function.interpret(funcTextInput.getContent()));
+                graph.override(funcNameTextInput.getContent(), Function.interpret(funcTextInput.getContent()));
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;31m" + "interpretation incomplete -> pending..." + (char) 27 + "[0m");
@@ -177,8 +189,10 @@ public class JGrapher extends PApplet {
                 .inheritOutlook(modelLabel)
                 .setRelativeW(0.3f);
 
-        TextInput modelTextInput = new TextInput();
-        modelTextInput.onSubmit(window)
+        TextInput windowModelTextInput = new TextInput();
+        windowModelTextInput.inheritOutlook(modelInput)
+                .inheritMode(modelInput)
+                .onSubmit(window)
                 .setDefaultContent("10.0")
                 .setId("$window");
 
@@ -186,16 +200,20 @@ public class JGrapher extends PApplet {
                 .setContent("Min X")
                 .inheritOutlook(windowModelLabel)
                 .inheritDisplayProperties(windowModelLabel)).add(new TextInput()
+                .inheritOutlook(modelInput)
+                .inheritMode(modelInput)
                 .onSubmit(window)
                 .setDefaultContent("-10.0")
                 .setId("$window")).setMargins(0, 0)
         );
-        std.add(new HBox().add(windowModelLabel).add(modelTextInput).setMargins(0, 0));
+        std.add(new HBox().add(windowModelLabel).add(windowModelTextInput).setMargins(0, 0));
 
         std.add(new HBox().add(new Label()
                 .setContent("Min Y")
                 .inheritOutlook(windowModelLabel)
                 .inheritDisplayProperties(windowModelLabel)).add(new TextInput()
+                .inheritOutlook(modelInput)
+                .inheritMode(modelInput)
                 .onSubmit(window)
                 .setDefaultContent("-10.0")
                 .setId("$window")).setMargins(0, 0)
@@ -204,6 +222,8 @@ public class JGrapher extends PApplet {
                 .setContent("Max Y")
                 .inheritOutlook(windowModelLabel)
                 .inheritDisplayProperties(windowModelLabel)).add(new TextInput()
+                .inheritOutlook(modelInput)
+                .inheritMode(modelInput)
                 .onSubmit(window)
                 .setDefaultContent("10.0")
                 .setId("$window")).setMargins(0, 0)
@@ -269,8 +289,14 @@ public class JGrapher extends PApplet {
         }
 
 
-        std.add(new Label().setContent("Filter").inheritOutlook(modelLabel));
-        std.add(new TextInput().setDefaultContent("Name").onKeyTyped(() -> {
+        std.add(new Label()
+                .setContent("Filter")
+                .inheritOutlook(modelLabel));
+        std.add(new TextInput()
+                .inheritOutlook(modelInput)
+                .inheritMode(modelInput)
+                .setDefaultContent("Name")
+                .onKeyTyped(() -> {
             TextInput self = JNode.getTextInputById("filterer");
             if (self == null) return;
             ArrayList<Function> functions = graph.getFunctions();
@@ -299,7 +325,7 @@ public class JGrapher extends PApplet {
                     Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
                     tmp.setContent(funcName).setVisible(true);
                     tmp.onClick(() -> {
-                        funcNameLabel.setContent(funcName);
+                        funcNameTextInput.setContent(funcName);
                         //noinspection ConstantConditions
                         JNode.getTextInputById("f(x)").setContent(operable);
                     });

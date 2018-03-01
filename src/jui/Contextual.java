@@ -12,7 +12,7 @@ public abstract class Contextual extends Displayable implements KeyControl {
     private int textColor = JNode.TEXT_COLOR;
     private int mouseOverTextColor = JNode.MOUSE_OVER_TEXT_COLOR;
     private int mousePressedTextColor = JNode.MOUSE_PRESSED_TEXT_COLOR;
-    private JStyle textStyle = JStyle.CONSTANT;
+    private Mode textMode = Mode.CONSTANT;
     private boolean applyTextDescent;
     private float textSize;
     private float textIndent;
@@ -203,13 +203,13 @@ public abstract class Contextual extends Displayable implements KeyControl {
      * @since April 27th an absolutely ridiculous error has been fixed. It appears to
      * me that the error happened inside of processing's PApplet. It keeps throwing a bug
      * where the pushMatrix() call has been called more than 32 times... Nevertheless, the
-     * bug is actually caused by a null pointer exception as the JStyle instance's not yet
+     * bug is actually caused by a null pointer exception as the Mode instance's not yet
      * being initialized.
      */
     public void applyTextColor() {
-        if (textStyle.equals(JStyle.CONSTANT)) {
+        if (textMode.equals(Mode.CONSTANT)) {
             getParent().fill(textColor);
-        } else if (textStyle.equals(JStyle.VOLATILE)) {
+        } else if (textMode.equals(Mode.VOLATILE)) {
             if (isMouseOver()) {
                 int color = getParent().mousePressed ? mousePressedTextColor : mouseOverTextColor;
                 getParent().fill(color);
@@ -223,8 +223,8 @@ public abstract class Contextual extends Displayable implements KeyControl {
         displayText(content);
     }
 
-    public Contextual setTextStyle(JStyle textStyle) {
-        this.textStyle = textStyle;
+    public Contextual setTextMode(Mode textMode) {
+        this.textMode = textMode;
         return this;
     }
 
@@ -332,10 +332,10 @@ public abstract class Contextual extends Displayable implements KeyControl {
     }
 
     @Override
-    public Contextual inheritStyle(Displayable other) {
-        super.inheritStyle(other);
+    public Contextual inheritMode(Displayable other) {
+        super.inheritMode(other);
         if (other instanceof Contextual)
-            this.setTextStyle(((Contextual) other).textStyle);
+            this.setTextMode(((Contextual) other).textMode);
         return this;
     }
 

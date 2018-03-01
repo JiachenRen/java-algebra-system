@@ -66,8 +66,8 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
     }
 
     private void init() {
-        setBackgroundStyle(JStyle.VOLATILE);
-        setTextStyle(JStyle.VOLATILE);
+        setBackgroundMode(Mode.VOLATILE);
+        setTextMode(Mode.VOLATILE);
         setDefaultContent("text");
         setContent(defaultContent);
         staticContent = "";
@@ -129,6 +129,17 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
         }
     }
 
+    @Override public TextInput inheritOutlook(Displayable other) {
+        super.inheritOutlook(other);
+        if (other instanceof TextInput) {
+            TextInput ti = ((TextInput) other);
+            this.displayCursor = ti.displayCursor;
+            this.cursorColor = ti.cursorColor;
+            this.cursorThickness = ti.cursorThickness;
+        }
+        return this;
+    }
+
     public TextInput onSubmit(Runnable temp_method) {
         submitMethod = temp_method;
         return this;
@@ -151,6 +162,11 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
 
     public TextInput setCursorThickness(int strokeWeight) {
         cursorThickness = strokeWeight;
+        return this;
+    }
+
+    @Override public TextInput inheritMode(Displayable textInput) {
+        super.inheritMode(textInput);
         return this;
     }
 

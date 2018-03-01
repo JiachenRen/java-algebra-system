@@ -3,11 +3,11 @@ package jui;
 /**
  * Style Control for background/contour/text color
  */
-public enum JStyle {
+public enum Mode {
     CONSTANT(0), VOLATILE(1), DISABLED(2);
     private int val;
 
-    JStyle(int i) {
+    Mode(int i) {
         val = i;
     }
 

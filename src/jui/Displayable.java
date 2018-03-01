@@ -12,7 +12,7 @@ import java.util.ArrayList;
 //modified April 22nd. Took me half an hour, I eliminated all rounding errors for containers!
 //primitive type for coordinate and dimension is changed from int to float. Proved to be helpful!
 //refresh requesting technique applied April 23rd
-//TODO: add inheritStyle(), clone();
+//TODO: add inheritMode(), clone();
 
 /**
  * add mousePressedTextColor(), mousePressedContourColor(), mouseOverTextColor(), mouseOverContourColor();
@@ -36,9 +36,9 @@ public class Displayable implements MouseControl, Serializable {
     public float x, y, w, h;
     public float relativeW = 1, relativeH = 1;
 
-    public JStyle backgroundStyle = JStyle.CONSTANT;
-    public JStyle contourStyle = JStyle.CONSTANT;
-    public ImgStyle imgStyle = ImgStyle.RESERVED;
+    public Mode backgroundMode = Mode.CONSTANT;
+    public Mode contourMode = Mode.CONSTANT;
+    public ImgStyle imgMode = ImgStyle.RESERVED;
 
     public PImage backgroundImg;
     private Runnable attachedMethod;
@@ -370,7 +370,7 @@ public class Displayable implements MouseControl, Serializable {
 
     public void applyContourStyle() {
         getParent().strokeWeight(contourThickness);
-        switch (contourStyle) {
+        switch (contourMode) {
             case VOLATILE:
                 if (displayContour) {
                     if (isMouseOver()) {
@@ -388,7 +388,7 @@ public class Displayable implements MouseControl, Serializable {
     }
 
     public void applyBackgroundStyle() {
-        switch (backgroundStyle) {
+        switch (backgroundMode) {
             case CONSTANT:
                 getParent().fill(backgroundColor);
                 break;
@@ -417,7 +417,7 @@ public class Displayable implements MouseControl, Serializable {
         if (backgroundImg != null) {
             getParent().imageMode(PConstants.CENTER);
             float tx = x + w / 2, ty = y + h / 2;
-            switch (imgStyle) {
+            switch (imgMode) {
                 case RESERVED:
                     float imgWidth = backgroundImg.width;
                     float imgHeight = backgroundImg.height;
@@ -470,13 +470,13 @@ public class Displayable implements MouseControl, Serializable {
         refreshRequested = false;
     }
 
-    public Displayable setBackgroundStyle(JStyle backgroundStyle) {
-        this.backgroundStyle = backgroundStyle;
+    public Displayable setBackgroundMode(Mode backgroundMode) {
+        this.backgroundMode = backgroundMode;
         return this;
     }
 
-    public Displayable setContourStyle(JStyle contourStyle) {
-        this.contourStyle = contourStyle;
+    public Displayable setContourMode(Mode contourMode) {
+        this.contourMode = contourMode;
         return this;
     }
 
@@ -571,7 +571,7 @@ public class Displayable implements MouseControl, Serializable {
         this.setContourVisible(other.displayContour);
         this.setBackgroundImg(other.backgroundImg);
         this.setBackgroundColor(other.backgroundColor);
-        this.setMouseOverBackgroundColor(other.backgroundColor);
+        this.setMouseOverBackgroundColor(other.mouseOverBackgroundColor);
         this.setContourColor(other.contourColor);
         this.setMouseOverContourColor(other.mouseOverContourColor);
         this.setContourThickness(other.contourThickness);
@@ -581,10 +581,10 @@ public class Displayable implements MouseControl, Serializable {
         return this;
     }
 
-    public Displayable inheritStyle(Displayable other) {
-        this.backgroundStyle = other.backgroundStyle;
-        this.contourStyle = other.contourStyle;
-        this.imgStyle = other.imgStyle;
+    public Displayable inheritMode(Displayable other) {
+        this.backgroundMode = other.backgroundMode;
+        this.contourMode = other.contourMode;
+        this.imgMode = other.imgMode;
         return this;
     }
 

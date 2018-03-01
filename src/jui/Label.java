@@ -28,7 +28,7 @@ public class Label extends Contextual {
     }
 
     public void init() {
-        setTextStyle(JStyle.CONSTANT);
+        setTextMode(Mode.CONSTANT);
         setAlign(PConstants.LEFT);
     }
 

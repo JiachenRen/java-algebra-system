@@ -35,8 +35,8 @@ public class Button extends Contextual implements MouseControl {
     public void init() {
         setContent("button");
         setAlign(CENTER);
-        setTextStyle(JStyle.VOLATILE);
-        setBackgroundStyle(JStyle.VOLATILE);
+        setTextMode(Mode.VOLATILE);
+        setBackgroundMode(Mode.VOLATILE);
     }
 
     public void display() {
