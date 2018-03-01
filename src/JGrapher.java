@@ -21,7 +21,9 @@ public class JGrapher extends PApplet {
     private boolean casEnabled = false;
 
     public static void main(String args[]) {
-        System.out.println("Function Interpretation Test May 16th");
+        System.out.println("Welcome to JGrapher, an extensive graphing/calculation system using original CAS and UI library. \n" +
+                "Copyright (c) 2018, Jiachen Ren. \n" +
+                "MIT license applies. \n");
         String sketch = Thread.currentThread().getStackTrace()[1].getClassName();
         Thread proc = new Thread(() -> PApplet.main(sketch));
         proc.start();
