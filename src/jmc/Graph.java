@@ -63,8 +63,8 @@ public class Graph extends Contextual {
         stepLength = 0.1; //TODO changed from 1 to 0.1. May 17th. Might cause performance issues.
         markLengthBig = 2;
         axisMarkingTextSize = JNode.getParent().pixelDensity == 1 ? 10 : 5;
-        setMaxMarkingLength(30);
-        setMinMarkingLength(35);
+        setMaxMarkingLength(50);
+        setMinMarkingLength(50);
         /*
         colors
          */
