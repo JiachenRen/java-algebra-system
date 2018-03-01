@@ -1,8 +1,7 @@
 package tests;
 
-import jmc_lib.Function;
-import jmc_lib.Operable;
-import jmc_lib.Operation;
+import jmc.Function;
+import jmc.Operable;
 
 /**
  * Created by Jiachen on 27/05/2017.

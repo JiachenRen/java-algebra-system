@@ -1,8 +1,8 @@
 package tests;
 
-import jmc_lib.Function;
-import jmc_lib.Graph;
-import jui_lib.JNode;
+import jmc.Function;
+import jmc.Graph;
+import jui.JNode;
 import processing.core.PApplet;
 
 /**

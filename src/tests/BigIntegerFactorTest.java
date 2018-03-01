@@ -1,6 +1,6 @@
 package tests;
 
-import jmc_lib.MathContext;
+import jmc.MathContext;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

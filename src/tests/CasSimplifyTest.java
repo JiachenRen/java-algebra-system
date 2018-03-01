@@ -1,7 +1,7 @@
 package tests;
 
-import jmc_lib.Function;
-import jmc_lib.Operable;
+import jmc.Function;
+import jmc.Operable;
 
 import java.util.ArrayList;
 

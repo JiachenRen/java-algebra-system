@@ -1,7 +1,7 @@
 package tests;
 
-import jmc_lib.*;
-import jui_lib.*;
+import jmc.*;
+import jui.*;
 import processing.core.PApplet;
 
 /**

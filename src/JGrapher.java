@@ -1,7 +1,7 @@
-import jmc_lib.*;
-import jui_lib.*;
-import jui_lib.bundles.ColorSelector;
-import jui_lib.bundles.ValueSelector;
+import jmc.*;
+import jui.*;
+import jui.bundles.ColorSelector;
+import jui.bundles.ValueSelector;
 import processing.core.PApplet;
 
 import java.io.BufferedReader;

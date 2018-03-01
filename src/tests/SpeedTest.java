@@ -1,6 +1,6 @@
 package tests;
 
-import jmc_lib.Function;
+import jmc.Function;
 
 /**
  * Created by Jiachen on 04/05/2017.

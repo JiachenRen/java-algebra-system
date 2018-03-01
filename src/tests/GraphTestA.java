@@ -1,10 +1,10 @@
 package tests;
 
-import jmc_lib.Function;
-import jmc_lib.Graph;
-import jui_lib.HSlider;
-import jui_lib.JNode;
-import jui_lib.VBox;
+import jmc.Function;
+import jmc.Graph;
+import jui.HSlider;
+import jui.JNode;
+import jui.VBox;
 import processing.core.PApplet;
 
 /**
