@@ -4,6 +4,8 @@ import jui.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 /**
@@ -66,7 +68,7 @@ public class Graph extends Contextual {
         /*
         colors
          */
-        asymptoteColor = JNode.getParent().color(0, 100, 170, 190);
+        asymptoteColor = JNode.getParent().color(255, 255, 255, 200);
         tangentLineColor = JNode.getParent().color(0, 0, 0, 100);
         tracingLineColor = JNode.getParent().color(0, 0, 0, 100);
 
@@ -206,7 +208,7 @@ public class Graph extends Contextual {
         getParent().stroke(getTextColor());
         getParent().fill(getTextColor());
         getParent().textSize(axisMarkingTextSize);
-
+        getParent().strokeWeight(0.2f);
         {
             //drawing the y axis
             float cx = Plot.map(0, rangeX.getLow(), rangeX.getHigh(), x, x + w);
@@ -334,50 +336,13 @@ public class Graph extends Contextual {
     }
 
     /**
-     * formats the double value for display on screen, corrects floating point rounding errors.
-     * if val is larger than 1E4 or less than 1E-4 then scientific notation is applied to save space.
-     * TODO DEBUG, doesn't work if x go below 0.001.
-     *
      * @param val the double value to be formatted for display on screen.
      * @return formatted string from the double value
      */
     public static String formatForDisplay(double val) {
-        String exp = Double.toString(val);
-        int index = exp.indexOf(".");
-        if (index == -1) return exp;
-        if (exp.indexOf("00000") > index)
-            exp = exp.substring(0, exp.indexOf("00000"));
-        if (exp.indexOf("99999") > index) {
-            int ef = exp.indexOf("99999") - index;
-            exp = Double.toString(Math.round(val * Math.pow(10, ef)) / Math.pow(10, ef));
-        }
-        /*
-        if (exp.length() > (val > 0 ? 4 : 5)) {
-            String formatted = String.format("%.1E", val);
-            int index_dot = formatted.indexOf(".");
-            int index_e = formatted.indexOf("E");
-            String inBetween = "";
-            for (int i = index_e - 1; i > index_dot; i--) {
-                if (formatted.charAt(i) != '0') {
-                    for (int q = index_dot + 1; q <= i; q++)
-                        inBetween += formatted.charAt(q);
-                    break;
-                }
-            }
-            String left = formatted.substring(0, index_dot + 1);
-            return (left + inBetween + formatted.substring(index_e)).replace("+0", "").replace(".E", "E").replace("-0", "-");
-        }
-        */
-        if (exp.length() >= 2) {
-            char lastChar = exp.charAt(exp.length() - 1);
-            if (lastChar == '.')
-                exp = exp.substring(0, exp.length() - 1);
-            if (exp.length() >= 3) {
-                if (exp.charAt(exp.length() - 2) == '.' && lastChar == '0')
-                    exp = exp.substring(0, exp.length() - 2);
-            }
-        }
-        return exp;
+        if (Double.toString(val).length() <= 4) return Double.toString(val);
+        NumberFormat formatter = new DecimalFormat("0.###E0");
+        return formatter.format(val);
     }
 
     /**
