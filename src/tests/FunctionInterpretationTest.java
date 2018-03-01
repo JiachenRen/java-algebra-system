@@ -13,8 +13,7 @@ public class FunctionInterpretationTest extends PApplet {
     public static void main(String args[]) {
         System.out.println("Function Interpretation Test May 16th");
         String sketch = Thread.currentThread().getStackTrace()[1].getClassName();
-        Thread proc = new Thread(() -> PApplet.main(sketch));
-        proc.start();
+        PApplet.main(sketch);
     }
 
     public void settings() {
