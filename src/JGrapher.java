@@ -18,6 +18,7 @@ import java.util.Set;
  */
 public class JGrapher extends PApplet {
     private Graph graph;
+    private boolean casEnabled = false;
 
     public static void main(String args[]) {
         System.out.println("Function Interpretation Test May 16th");
@@ -59,7 +60,7 @@ public class JGrapher extends PApplet {
 
         JNode.DISPLAY_CONTOUR = true;
         JNode.CONTOUR_THICKNESS = 0.5f;
-        //JNode.CONTOUR_COLOR = color(0, 0, 100);
+//        JNode.CONTOUR_COLOR = color(0, 0, 100);
         JNode.BACKGROUND_COLOR = color(255);
         JNode.ROUNDED = false;
 
@@ -135,15 +136,18 @@ public class JGrapher extends PApplet {
         });
         functionInputWrapper.add(functionNameLabel);
 
-        /*
-        dynamic function interpretation designed by Jiachen Ren
-         */
 
+        //Dynamic function interpretation
         functionTextInput.onSubmit(() -> {
             try {
                 Operable original = Function.interpret(functionTextInput.getStaticContent()).getOperable();
-                Operable simplified = ((BinaryOperation) original).simplify();
-                functionTextInput.setContent(simplified.toString());
+                if (casEnabled) {
+                    if (original instanceof BinaryOperation)
+                        original = ((BinaryOperation) original).simplify();
+                    else if (original instanceof UnaryOperation)
+                        original = ((UnaryOperation) original).simplify();
+                }
+                functionTextInput.setContent(original.toString());
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;34m" + "simplification failed -> incomplete input" + (char) 27 + "[0m");
             }
@@ -234,6 +238,14 @@ public class JGrapher extends PApplet {
                 .setContentOn("On")
                 .setState(graph.isEvaluationOn())
                 .onClick(() -> graph.setEvaluationOn(!graph.isEvaluationOn())));
+        std.add(new SpaceHolder());
+        std.add(new Label("CAS")
+                .inheritOutlook(modelLabel));
+        std.add(new Switch()
+                .setContentOff("Disabled")
+                .setContentOn("Enabled")
+                .setState(casEnabled)
+                .onClick(() -> casEnabled = !casEnabled));
         std.add(new SpaceHolder());
         std.add(new Label("Control")
                 .inheritOutlook(modelLabel));
@@ -419,12 +431,12 @@ public class JGrapher extends PApplet {
         adv.add(new Button()
                 .setContent(JNode.ROUNDED ? "Rounded" : "Rectangular")
                 .onClick(() -> {
-            JNode.getDisplayables().forEach(displayable -> {
-                displayable.setRounded(!displayable.isRounded);
-            });
-            Button self = (Button) JNode.get("UI-ROUNDING").get(0);
-            self.setContent(self.getContent().equals("Rounded") ? "Rectangular" : "Rounded");
-        }).setId("UI-ROUNDING"));
+                    JNode.getDisplayables().forEach(displayable -> {
+                        displayable.setRounded(!displayable.isRounded);
+                    });
+                    Button self = (Button) JNode.get("UI-ROUNDING").get(0);
+                    self.setContent(self.getContent().equals("Rounded") ? "Rectangular" : "Rounded");
+                }).setId("UI-ROUNDING"));
 
 
         JNode.add(parent);
