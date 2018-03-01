@@ -141,7 +141,9 @@ public class JGrapher extends PApplet {
 
         functionTextInput.onSubmit(() -> {
             try {
-                functionTextInput.setContent(Function.interpret(functionTextInput.getStaticContent()).getOperable().toString());
+                Operable original = Function.interpret(functionTextInput.getStaticContent()).getOperable();
+                Operable simplified = ((BinaryOperation) original).simplify();
+                functionTextInput.setContent(simplified.toString());
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;34m" + "simplification failed -> incomplete input" + (char) 27 + "[0m");
             }
@@ -205,21 +207,48 @@ public class JGrapher extends PApplet {
         );
 
 
-        std.add(new Button().setContent("Equalize Axis").onClick(graph::equalizeAxes));
-        std.add(new Button().setContent("Center Origin").onClick(graph::centerOrigin));
+        std.add(new Button()
+                .setContent("Equalize Axis")
+                .onClick(graph::equalizeAxes));
+        std.add(new Button()
+                .setContent("Center Origin")
+                .onClick(graph::centerOrigin));
         std.add(new SpaceHolder());
-        std.add(new Label("Graph").inheritOutlook(modelLabel));
-        std.add(new Switch().setContentOff("Trace Off").setContentOn("Trace On").setState(graph.tracingIsOn()).onClick(() -> graph.setTracingOn(!graph.tracingIsOn())));
-        std.add(new Switch().setContentOff("Axes Off").setContentOn("Axes On").setState(graph.isAxesVisible()).onClick(() -> graph.setAxesVisible(!graph.isAxesVisible())));
+        std.add(new Label("Graph")
+                .inheritOutlook(modelLabel));
+        std.add(new Switch()
+                .setContentOff("Trace Off")
+                .setContentOn("Trace On")
+                .setState(graph.tracingIsOn())
+                .onClick(() -> graph.setTracingOn(!graph.tracingIsOn())));
+        std.add(new Switch()
+                .setContentOff("Axes Off")
+                .setContentOn("Axes On")
+                .setState(graph.isAxesVisible())
+                .onClick(() -> graph.setAxesVisible(!graph.isAxesVisible())));
         std.add(new SpaceHolder());
-        std.add(new Label("Evaluation").inheritOutlook(modelLabel));
-        std.add(new Switch().setContentOff("Off").setContentOn("On").setState(graph.isEvaluationOn()).onClick(() -> graph.setEvaluationOn(!graph.isEvaluationOn())));
+        std.add(new Label("Evaluation")
+                .inheritOutlook(modelLabel));
+        std.add(new Switch()
+                .setContentOff("Off")
+                .setContentOn("On")
+                .setState(graph.isEvaluationOn())
+                .onClick(() -> graph.setEvaluationOn(!graph.isEvaluationOn())));
         std.add(new SpaceHolder());
-        std.add(new Label("Control").inheritOutlook(modelLabel));
-        std.add(new Button().setContent("Drag").onClick(() -> graph.setMode(Graph.Mode.DRAG)));
-        std.add(new Button().setContent("Zoom In").onClick(() -> graph.setMode(Graph.Mode.ZOOM_IN)));
-        std.add(new Button().setContent("Zoom Out").onClick(() -> graph.setMode(Graph.Mode.ZOOM_OUT)));
-        std.add(new Button().setContent("Zoom Rect").onClick(() -> graph.setMode(Graph.Mode.ZOOM_RECT)));
+        std.add(new Label("Control")
+                .inheritOutlook(modelLabel));
+        std.add(new Button()
+                .setContent("Drag")
+                .onClick(() -> graph.setMode(Graph.Mode.DRAG)));
+        std.add(new Button()
+                .setContent("Zoom In")
+                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_IN)));
+        std.add(new Button()
+                .setContent("Zoom Out")
+                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_OUT)));
+        std.add(new Button()
+                .setContent("Zoom Rect")
+                .onClick(() -> graph.setMode(Graph.Mode.ZOOM_RECT)));
 
         std.add(new SpaceHolder());
         VBox functionsWrapper = new VBox(1.0f, 0.15f);
@@ -345,7 +374,8 @@ public class JGrapher extends PApplet {
         adv.add(dynamic);
 
         adv.add(new SpaceHolder());
-        adv.add(new Label().setContent("VA Extension").inheritOutlook(modelLabel));
+        adv.add(new Label().setContent("VA Extension")
+                .inheritOutlook(modelLabel));
         Button extensionOn = new Button().setContent("On");
         extensionOn.onClick(() -> {
             Function function = getCurrentFunction();
@@ -357,7 +387,8 @@ public class JGrapher extends PApplet {
 
         adv.add(new SpaceHolder());
         adv.add(new SpaceHolder());
-        adv.add(new Label().setContent("Color").inheritOutlook(modelLabel));
+        adv.add(new Label().setContent("Color")
+                .inheritOutlook(modelLabel));
 
         ColorSelector functionColor = new ColorSelector(1.0f, 0.3f);
         functionColor.setId("#6");
@@ -366,20 +397,28 @@ public class JGrapher extends PApplet {
 
         adv.add(new SpaceHolder());
 
-        adv.add(new Label().setContent("Additional").inheritOutlook(modelLabel));
-        adv.add(new Switch().setContentOn("Differentiate").setContentOff("Uniform").onClick(() -> {
-            Switch self = (Switch) JNode.get("#9").get(0);
-            getCurrentFunction().setMatchAuxiliaryLinesColor(self.isOn());
-        }).setId("#9"));
+        adv.add(new Label()
+                .setContent("Additional")
+                .inheritOutlook(modelLabel));
+        adv.add(new Switch()
+                .setContentOn("Differentiate")
+                .setContentOff("Uniform").onClick(() -> {
+                    Switch self = (Switch) JNode.get("#9").get(0);
+                    getCurrentFunction().setMatchAuxiliaryLinesColor(self.isOn());
+                }).setId("#9"));
         ValueSelector strokeWeight = new ValueSelector(1.0f, 0.057f);
         strokeWeight.setTitlePercentage(0.7f);
-        strokeWeight.getTitleLabel().setAlign(CENTER);
-        strokeWeight.setRange(0.1f, 3).setTitle("Stroke Weight").setValue(1f).link(() -> {
-            getCurrentFunction().setStrokeWeight(strokeWeight.getFloatValue());
-        }).setId("#0");
+        strokeWeight.getTitleLabel()
+                .setAlign(CENTER);
+        strokeWeight.setRange(0.1f, 3)
+                .setTitle("Stroke Weight")
+                .setValue(1f)
+                .link(() -> getCurrentFunction().setStrokeWeight(strokeWeight.getFloatValue())).setId("#0");
         adv.add(strokeWeight);
         adv.add(new SpaceHolder());
-        adv.add(new Button().setContent(JNode.ROUNDED ? "Rounded" : "Rectangular").onClick(() -> {
+        adv.add(new Button()
+                .setContent(JNode.ROUNDED ? "Rounded" : "Rectangular")
+                .onClick(() -> {
             JNode.getDisplayables().forEach(displayable -> {
                 displayable.setRounded(!displayable.isRounded);
             });
