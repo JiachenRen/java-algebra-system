@@ -3,7 +3,6 @@ import jui_lib.*;
 import jui_lib.bundles.ColorSelector;
 import jui_lib.bundles.ValueSelector;
 import processing.core.PApplet;
-import processing.core.PImage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,9 +41,9 @@ public class JGrapher extends PApplet {
         try {
             Process process = Runtime.getRuntime().exec("ulimit -c -l");
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String incrementer = "", temp;
-            while ((temp = input.readLine()) != null) incrementer += temp;
-            if (incrementer.contains("(blocks, -c) 0")) {
+            String response = "", temp;
+            while ((temp = input.readLine()) != null) response += temp;
+            if (response.contains("(blocks, -c) 0")) {
                 System.err.println("# Fatal Error: Core Dump Failed --> Resurrecting... Failed");
                 //enableCoreDump();
                 //exit();
@@ -56,7 +55,6 @@ public class JGrapher extends PApplet {
 
 
     public void setup() {
-        sketchRenderer();
         JNode.init(this);
         if (!JNode.OS.contains("windows")) JGrapher.enableCoreDump();
 
@@ -67,10 +65,11 @@ public class JGrapher extends PApplet {
         JNode.ROUNDED = false;
 
         HBox parent = new HBox(0, 0, width, height);
-        parent.setCollapseInvisible(true);
-        parent.setId("parent");
-        parent.setMargins(1, 0);
-        parent.matchWindowDimension(true);
+        parent.setCollapseInvisible(true)
+                .setId("parent")
+                .setMargins(1,0)
+                .matchWindowDimension(true);
+
 
         VBox graphWrapper = new VBox();
         graphWrapper.setId("graphWrapper");
@@ -80,89 +79,87 @@ public class JGrapher extends PApplet {
 
         graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
-        graph = new Graph(1.0f, 0.93f);
-        graph.setId("graph");
+        graph = new Graph(1.0f, 0.93f).setId("graph");
         graphWrapper.add(graph);
 
         HBox functionInputWrapper = new HBox();
         functionInputWrapper.setMargins(0, 0).setId("#functionInputWrapper");
         graphWrapper.add(functionInputWrapper);
 
-        TextInput functionNameLabel = new TextInput();
-        Runnable updateAdvancedPanel = () -> {
-            String name = functionNameLabel.getContent();
-            Function function = graph.getFunction(name);
-            if (function == null) return;
+        TextInput funcNameLabel = new TextInput();
+        Runnable updateAdvPanel = () -> {
+            String name = funcNameLabel.getContent();
+            Function func = graph.getFunction(name);
+            if (func == null) return;
             ValueSelector strokeWeight = (ValueSelector) JNode.get("#0").get(0);
-            strokeWeight.setValue(function.getStrokeWeight());
+            strokeWeight.setValue(func.getStrokeWeight());
 
             Button showAsymptotes = (Button) JNode.get("#1").get(0);
-            showAsymptotes.setContent(function.isAsymptoteVisible() ? "Hide Asymptote" : "Show Asymptote");
+            showAsymptotes.setContent(func.isAsymptoteVisible() ? "Hide Asymptote" : "Show Asymptote");
 
             Button showTangentLine = (Button) JNode.get("#2").get(0);
-            showTangentLine.setContent(function.isTangentLineVisible() ? "Hide f'(x)" : "Show f'(x)");
+            showTangentLine.setContent(func.isTangentLineVisible() ? "Hide f'(x)" : "Show f'(x)");
 
             Button visibility = (Button) JNode.get("#3").get(0);
-            visibility.setContent(function.isVisible() ? "Visible" : "Invisible");
+            visibility.setContent(func.isVisible() ? "Visible" : "Invisible");
 
             Button continuous = (Button) JNode.get("#4").get(0);
-            continuous.setContent(function.getStyle().equals(Function.Style.CONTINUOUS) ? "Continuous" : "Discrete");
+            continuous.setContent(func.getStyle().equals(Function.Style.CONTINUOUS) ? "Continuous" : "Discrete");
 
             Button dynamic = (Button) JNode.get("#5").get(0);
-            dynamic.setContent(function.isDynamic() ? "Dynamic" : "Static");
+            dynamic.setContent(func.isDynamic() ? "Dynamic" : "Static");
 
             ColorSelector functionColor = (ColorSelector) JNode.get("#6").get(0);
             functionColor.setLinkedColorVars(name);
-            functionColor.setColor(name, function.getColor());
+            functionColor.setColor(name, func.getColor());
             functionColor.link(name, () -> graph.getFunction(name).setColor(functionColor.getColorRGBA(name)));
             functionColor.setAsSingleVarMode(); //in lambda, the original function became immutable, thus it needs to be reacquired.
 
             Button extensionOn = (Button) JNode.get("#7").get(0);
-            extensionOn.setContent(function.isAutoAsymptoteExtension() ? "On" : "Off");
+            extensionOn.setContent(func.isAutoAsymptoteExtension() ? "On" : "Off");
 
             Switch tracingOn = (Switch) JNode.get("#8").get(0);
-            tracingOn.setState(function.tracingEnabled());
+            tracingOn.setState(func.tracingEnabled());
 
             Switch match = (Switch) JNode.get("#9").get(0);
-            match.setState(function.isMatchAuxiliaryLinesColor());
+            match.setState(func.isMatchAuxiliaryLinesColor());
 
         };
-        TextInput functionTextInput = new TextInput();
-        functionNameLabel.setContent("f(x)=").setAlign(CENTER).setId("functionNameLabel").setRelativeW(0.13f).addEventListener(Event.CONTENT_CHANGED, () -> {
-            String name = functionNameLabel.getContent();
-            Function function = graph.getFunction(name);
-            if (function == null) return;
-            updateAdvancedPanel.run();
-            //noinspection ConstantConditions
-            functionTextInput.setContent(((InterpretedFunction) function).getOperable().toString());
+        TextInput funcTextInput = new TextInput();
+        funcNameLabel.setContent("f(x)=").setAlign(CENTER).setId("funcNameLabel").setRelativeW(0.13f).addEventListener(Event.CONTENT_CHANGED, () -> {
+            String name = funcNameLabel.getContent();
+            Function func = graph.getFunction(name);
+            if (func == null) return;
+            updateAdvPanel.run();
+            funcTextInput.setContent(((InterpretedFunction) func).getOperable().toString());
         });
-        functionInputWrapper.add(functionNameLabel);
+        functionInputWrapper.add(funcNameLabel);
 
 
         //Dynamic function interpretation
-        functionTextInput.onSubmit(() -> {
+        funcTextInput.onSubmit(() -> {
             try {
-                Operable original = Function.interpret(functionTextInput.getStaticContent()).getOperable();
+                Operable original = Function.interpret(funcTextInput.getStaticContent()).getOperable();
                 if (casEnabled) {
                     if (original instanceof BinaryOperation)
                         original = ((BinaryOperation) original).simplify();
                     else if (original instanceof UnaryOperation)
                         original = ((UnaryOperation) original).simplify();
                 }
-                functionTextInput.setContent(original.toString());
+                funcTextInput.setContent(original.toString());
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;34m" + "simplification failed -> incomplete input" + (char) 27 + "[0m");
             }
         }).setDefaultContent(" type your function in here").setId("f(x)");
-        functionTextInput.onKeyTyped(() -> {
+        funcTextInput.onKeyTyped(() -> {
             try {
-                graph.override(functionNameLabel.getContent(), Function.interpret(functionTextInput.getContent()));
-                updateAdvancedPanel.run();
+                graph.override(funcNameLabel.getContent(), Function.interpret(funcTextInput.getContent()));
+                updateAdvPanel.run();
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;31m" + "interpretation incomplete -> pending..." + (char) 27 + "[0m");
             }
         });
-        functionInputWrapper.add(functionTextInput);
+        functionInputWrapper.add(funcTextInput);
 
         VBox std = new VBox(0.1f, 1.0f);
         std.setMarginX(0);
@@ -265,10 +262,10 @@ public class JGrapher extends PApplet {
                 .onClick(() -> graph.setMode(Graph.Mode.ZOOM_RECT)));
 
         std.add(new SpaceHolder());
-        VBox functionsWrapper = new VBox(1.0f, 0.15f);
-        functionsWrapper.setMargins(0, 0);
+        VBox funcsWrapper = new VBox(1.0f, 0.15f);
+        funcsWrapper.setMargins(0, 0);
         for (int i = 0; i < 5; i++) {
-            functionsWrapper.add(new Button().setVisible(false));
+            funcsWrapper.add(new Button().setVisible(false));
         }
 
 
@@ -296,22 +293,22 @@ public class JGrapher extends PApplet {
             if (filtered.size() == 0) return;
             for (int i = 0; i < 5; i++) {
                 if (i < filtered.size()) {
-                    InterpretedFunction function = (InterpretedFunction) filtered.get(i);
-                    final String functionName = function.getName();
-                    final String operable = function.getOperable().toString();
-                    Button temp = (Button) functionsWrapper.getDisplayables().get(i);
-                    temp.setContent(functionName).setVisible(true);
-                    temp.onClick(() -> {
-                        functionNameLabel.setContent(functionName);
+                    InterpretedFunction func = (InterpretedFunction) filtered.get(i);
+                    final String funcName = func.getName();
+                    final String operable = func.getOperable().toString();
+                    Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
+                    tmp.setContent(funcName).setVisible(true);
+                    tmp.onClick(() -> {
+                        funcNameLabel.setContent(funcName);
                         //noinspection ConstantConditions
                         JNode.getTextInputById("f(x)").setContent(operable);
                     });
                 } else {
-                    functionsWrapper.getDisplayables().get(i).setVisible(false);
+                    funcsWrapper.getDisplayables().get(i).setVisible(false);
                 }
             }
         }).setId("filterer"));
-        std.add(functionsWrapper);
+        std.add(funcsWrapper);
 
 
         std.add(new SpaceHolder());
@@ -433,9 +430,7 @@ public class JGrapher extends PApplet {
         adv.add(new Button()
                 .setContent(JNode.ROUNDED ? "Rounded" : "Rectangular")
                 .onClick(() -> {
-                    JNode.getDisplayables().forEach(displayable -> {
-                        displayable.setRounded(!displayable.isRounded);
-                    });
+                    JNode.getDisplayables().forEach(displayable -> displayable.setRounded(!displayable.isRounded));
                     Button self = (Button) JNode.get("UI-ROUNDING").get(0);
                     self.setContent(self.getContent().equals("Rounded") ? "Rectangular" : "Rounded");
                 }).setId("UI-ROUNDING"));
@@ -459,7 +454,7 @@ public class JGrapher extends PApplet {
         return graph.getFunction(JNode.getTextInputById("functionNameLabel").getContent());
     }
 
-    public static Set<Character> stringToCharacterSet(String s) {
+    private static Set<Character> stringToCharacterSet(String s) {
         Set<Character> set = new HashSet<>();
         for (char c : s.toCharArray()) {
             set.add(c);
@@ -467,7 +462,7 @@ public class JGrapher extends PApplet {
         return set;
     }
 
-    public static boolean containsAllChars(String container, String contained) {
+    private static boolean containsAllChars(String container, String contained) {
         return stringToCharacterSet(container).containsAll
                 (stringToCharacterSet(contained));
     }
