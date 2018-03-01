@@ -66,7 +66,7 @@ public class ColorSelector extends VBox {
         linkedColorVars = new ArrayList<>();
         colorSliders = new VSlider[4];
         colorSliderValues = new Label[4];
-        String colorVarNames[] = new String[]{"R", "G", "B", "Alpha"};
+        String colorVarNames[] = new String[]{"R", "G", "B", "A"};
 
         title = new Label();
         title.setContent("Color Selector");

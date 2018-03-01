@@ -104,7 +104,7 @@ public class JGrapher extends PApplet {
 
         graph = (Graph) new Graph().setRelative(true).setId("graph");
         graph.setTextColor(modelLabel.backgroundColor);
-        graph.setBackgroundColor(0, 0, 0, 100);
+        graph.setBackgroundColor(0, 0, 0, 150);
         graphWrapper.add(graph);
 
 
@@ -123,7 +123,7 @@ public class JGrapher extends PApplet {
             strokeWeight.setValue(func.getStrokeWeight());
 
             Button showAsymptotes = (Button) JNode.get("#1").get(0);
-            showAsymptotes.setContent(func.isAsymptoteVisible() ? "Hide Asymptote" : "Show Asymptote");
+            showAsymptotes.setContent(func.isAsymptoteVisible() ? "Hide Asymptotes" : "Show Asymptotes");
 
             Button showTangentLine = (Button) JNode.get("#2").get(0);
             showTangentLine.setContent(func.isTangentLineVisible() ? "Hide f'(x)" : "Show f'(x)");
@@ -423,7 +423,7 @@ public class JGrapher extends PApplet {
             Function function = getCurrentFunction();
             if (function != null)
                 function.setAsymptoteVisible(!function.isAsymptoteVisible());
-            showAsymptotes.setContent(showAsymptotes.getContent().equals("Show Asymptotes") ? "Hide Asymptotes" : "Show Asymptotes");
+            showAsymptotes.setContent(showAsymptotes.getContent().equals("Hide Asymptotes") ? "Show Asymptotes" : "Hide Asymptotes");
         }).setId("#1");
         adv.add(showAsymptotes);
 
@@ -566,7 +566,7 @@ public class JGrapher extends PApplet {
     }
 
     public void draw() {
-        background(52, 61, 70);
+        background(65);
         JNode.run();
     }
 

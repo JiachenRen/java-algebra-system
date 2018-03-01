@@ -23,7 +23,7 @@ public abstract class Function implements Evaluable {
     private Style graphStyle;
     private boolean dynamic;
     private float strokeWeight;
-    private int color = -1;
+    private int color;
     private boolean matchAuxiliaryLinesColor;
     private boolean autoAsymptoteExtension;
 
@@ -46,7 +46,8 @@ public abstract class Function implements Evaluable {
     {
         isVisible = true;
         graphStyle = Style.CONTINUOUS;
-        strokeWeight = 1;
+        strokeWeight = 1.5f;
+        color = -1;
         setMatchAuxiliaryLinesColor(false);
         setTracingEnabled(true);
         setAutoAsymptoteExtension(true);
