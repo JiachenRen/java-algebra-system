@@ -129,7 +129,8 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
         }
     }
 
-    @Override public TextInput inheritOutlook(Displayable other) {
+    @Override
+    public TextInput inheritOutlook(Displayable other) {
         super.inheritOutlook(other);
         if (other instanceof TextInput) {
             TextInput ti = ((TextInput) other);
@@ -165,7 +166,8 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
         return this;
     }
 
-    @Override public TextInput inheritMode(Displayable textInput) {
+    @Override
+    public TextInput inheritMode(Displayable textInput) {
         super.inheritMode(textInput);
         return this;
     }
@@ -173,7 +175,8 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
     public void displayCursor() {
         getParent().stroke(cursorColor);
         getParent().strokeWeight(cursorThickness);
-        float y2 = y + h - 1;
+        float y2 = y + h - 2;
+        float y1 = y + 1;
         float xv1 = x + w / 2;
         float xv2 = x + w - 2;
         float xv3 = x + 2;
@@ -181,25 +184,25 @@ public class TextInput extends Contextual implements MouseControl, KeyControl, S
         if (contentOnScreen.equals("")) {
             switch (alignment) {
                 case PConstants.LEFT:
-                    getParent().line(xv3, y, xv3, y2);
+                    getParent().line(xv3, y1, xv3, y2);
                     break;
                 case PConstants.CENTER:
-                    getParent().line(xv1, y, xv1, y2);
+                    getParent().line(xv1, y1, xv1, y2);
                     break;
                 case PConstants.RIGHT:
-                    getParent().line(xv2, y, xv2, y2);
+                    getParent().line(xv2, y1, xv2, y2);
                     break;
             }
         } else {
             switch (alignment) {
                 case PConstants.LEFT:
-                    getParent().line(x + tw, y, x + tw, y2);
+                    getParent().line(x + tw, y1, x + tw, y2);
                     break;
                 case PConstants.CENTER:
-                    getParent().line(xv1 + tw / 2, y, xv1 + tw / 2, y2);
+                    getParent().line(xv1 + tw / 2, y1, xv1 + tw / 2, y2);
                     break;
                 case PConstants.RIGHT:
-                    getParent().line(xv2, y, xv2, y2);
+                    getParent().line(xv2, y1, xv2, y2);
                     break;
             }
         }

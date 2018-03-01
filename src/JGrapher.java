@@ -86,9 +86,9 @@ public class JGrapher extends PApplet {
                 .setContourVisible(false)
                 .setBackgroundColor(255, 255, 255, 200);
 
-        TextInput modelInput = (TextInput) new TextInput();
-//                .setCursorColor(255)
-//                .setCursorThickness(1)
+        TextInput modelInput = (TextInput) new TextInput()
+                .setCursorColor(255)
+                .setCursorThickness(1);
 //                .setTextColor(230)
 //                .setBackgroundColor(50);
 
