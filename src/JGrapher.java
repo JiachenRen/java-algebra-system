@@ -86,7 +86,7 @@ public class JGrapher extends PApplet {
 //                .setTextColor(230)
 //                .setBackgroundColor(50);
 
-        Button modelButton = (Button) new Button().setMouseOverBackgroundColor(255, 0, 0);
+        Button modelButton = (Button) new Button();
 
         graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
 
