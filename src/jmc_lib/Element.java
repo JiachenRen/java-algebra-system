@@ -19,7 +19,7 @@ public enum Element {
     ;
 
     private static class Holder {
-        static Map<Integer, Element> map = new HashMap<Integer, Element>();
+        static Map<Integer, Element> map = new HashMap<>();
     }
 
     private final int atomicNumber;
