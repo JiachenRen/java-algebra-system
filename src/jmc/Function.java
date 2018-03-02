@@ -9,7 +9,6 @@ import java.util.ArrayList;
  * Function class,
  */
 public abstract class Function implements Evaluable {
-    private static final ScriptEngine SCRIPT_ENGINE;
     private static final String DIGITS;
     private static final String SYMBOLS;
     private static final String VARS;
@@ -34,7 +33,6 @@ public abstract class Function implements Evaluable {
     //Initialization of Apple Script SCRIPT_ENGINE
     static {
         ScriptEngineManager mgr = new ScriptEngineManager();
-        SCRIPT_ENGINE = mgr.getEngineByName("AppleScript");
         DIGITS = "0123456789.";
         SYMBOLS = "()+-*/^<>";
         //noinspection SpellCheckingInspection
@@ -326,34 +324,6 @@ public abstract class Function implements Evaluable {
             count++;
         }
         return count;
-    }
-
-    /**
-     * Reconstruct Function instance with Apple Script. Efficient, but only compatible with Mac.
-     *
-     * @param exp the expression to be converted to a sensible Function stance with AppleScript.
-     * @return the Function instance constructed with Apple's scripting SCRIPT_ENGINE.
-     */
-    public static Function evalOsaScript(String exp) {
-        final String expression = Function.formatCoefficients(exp);
-        return new Function() {
-            @Override
-            public double eval(double val) {
-                String script = Function.formatExpForOsa(expression, val);
-                try {
-                    return new Double(SCRIPT_ENGINE.eval(script).toString());
-                } catch (ScriptException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException e) {
-                    throw new UnsupportedOperationException("osa script only supported on Macintosh OS");
-                }
-                return 0;
-            }
-        };
-    }
-
-    private static String formatExpForOsa(String expression, double val) {
-        return expression.toLowerCase().replace("x", Double.toString(val));
     }
 
     /**

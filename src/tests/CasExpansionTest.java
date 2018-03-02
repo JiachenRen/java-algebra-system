@@ -56,7 +56,7 @@ public class CasExpansionTest {
         }
         for (int i = 0; i < operables.size(); i++) {
             l("original:\t" + f(testSubjects[i]));
-            l("simplified:\t" + f(operables.get(i).toString()));
+            l("expanded:\t" + f(operables.get(i).toString()));
         }
     }
 
