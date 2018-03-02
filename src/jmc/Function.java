@@ -94,7 +94,7 @@ public abstract class Function implements Evaluable {
             throw new IllegalArgumentException("incorrect format: '()' mismatch");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
             throw new IllegalArgumentException("incorrect format: '<>' mismatch");
-        expression = formatUnaryOperations(expression.replace(" ", ""));
+        expression = formatUnaryOperations(expression.replace(" ", "").replace("(-","(0-"));
         String exp = Function.formatCoefficients(expression);
         exp = handleParentheticalNotation(Function.handleCalcPriority(exp));
         System.out.println((char) 27 + "[1m" + "formatted input: " + (char) 27 + "[0m" + exp);

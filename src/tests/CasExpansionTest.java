@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * x^2*(-20)+(-9)*x^2
  * "x+h-x" -doesn't work yet!
  */
-public class CasSimplifyTest {
+public class CasExpansionTest {
     private static String testSubjects[] = new String[]{
             "ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)",
             "(x+3)(x-3)",
