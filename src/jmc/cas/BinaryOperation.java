@@ -29,6 +29,7 @@ public class BinaryOperation extends Operation {
 
     /**
      * Remove unnecessary parenthesis
+     *
      * @since May 19th, 2017
      */
     private void processParentheticalNotation(Operable operable, boolean isRightHand) {
@@ -44,6 +45,11 @@ public class BinaryOperation extends Operation {
         }
     }
 
+    /**
+     * @param name      name of the new binary operation
+     * @param priority  1 is the most prioritized
+     * @param evaluable (a,b) -> a [operation] b
+     */
     public static void define(String name, int priority, BinEvaluable evaluable) {
         RegisteredBinaryOperation.define(name, priority, evaluable);
     }
@@ -59,7 +65,7 @@ public class BinaryOperation extends Operation {
         return omitParenthesis ? temp : "(" + temp + ")";
     }
 
-    public void setOmitParenthesis(boolean temp) {
+    void setOmitParenthesis(boolean temp) {
         omitParenthesis = temp;
     }
 
@@ -72,22 +78,14 @@ public class BinaryOperation extends Operation {
     }
 
     /**
-     * @return the list of operations (with corresponding symbols)
+     * @return a complete list of binary operations (with corresponding priority)
      */
     public static String binaryOperations(int priority) {
-        return RegisteredBinaryOperation.list(priority);
+        return RegisteredBinaryOperation.listAsString(priority);
     }
 
     public static String binaryOperations() {
         return binaryOperations(1) + binaryOperations(2) + binaryOperations(3);
-    }
-
-    public static boolean containsBinaryOperation(String exp) {
-        for (int i = 0; i < exp.length(); i++) {
-            if (binaryOperations().contains(exp.substring(i, i + 1)))
-                return true;
-        }
-        return false;
     }
 
     /**
@@ -426,13 +424,13 @@ public class BinaryOperation extends Operation {
     }
 
     private static class RegisteredBinaryOperation implements BinEvaluable {
-        private static ArrayList<RegisteredBinaryOperation> reservedBinOps;
+        private static ArrayList<RegisteredBinaryOperation> registeredBinOps;
         private BinEvaluable binEvaluable;
         private String name;
-        private int priority; //1 being the most prioritized
+        private int priority; //1 is the most prioritized
 
         static {
-            reservedBinOps = new ArrayList<>();
+            registeredBinOps = new ArrayList<>();
             define("+", 3, (a, b) -> a + b);
             define("-", 3, (a, b) -> a - b);
             define("*", 2, (a, b) -> a * b);
@@ -452,17 +450,17 @@ public class BinaryOperation extends Operation {
         }
 
         public static void define(String name, int priority, BinEvaluable evaluable) {
-            for (int i = 0; i < reservedBinOps.size(); i++) {
-                RegisteredBinaryOperation function = reservedBinOps.get(i);
+            for (int i = 0; i < registeredBinOps.size(); i++) {
+                RegisteredBinaryOperation function = registeredBinOps.get(i);
                 if (function.name.equals(name))
-                    reservedBinOps.remove(i);
+                    registeredBinOps.remove(i);
             }
-            reservedBinOps.add(new RegisteredBinaryOperation(name, priority, evaluable));
+            registeredBinOps.add(new RegisteredBinaryOperation(name, priority, evaluable));
         }
 
-        private static String list(int priority) {
+        private static String listAsString(int priority) {
             String incrementer = "";
-            for (RegisteredBinaryOperation operation : reservedBinOps) {
+            for (RegisteredBinaryOperation operation : registeredBinOps) {
                 if (operation.priority == priority)
                     incrementer += operation.name;
             }
@@ -470,7 +468,7 @@ public class BinaryOperation extends Operation {
         }
 
         private static RegisteredBinaryOperation extract(String name) {
-            for (RegisteredBinaryOperation binaryOperation : reservedBinOps)
+            for (RegisteredBinaryOperation binaryOperation : registeredBinOps)
                 if (binaryOperation.name.equals(name))
                     return binaryOperation;
             throw new RuntimeException("undefined binary operator \"" + name + "\"");
@@ -490,13 +488,14 @@ public class BinaryOperation extends Operation {
     }
 
     public Operable toAdditionOnly() {
-        if (getLeftHand() instanceof Operation) setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
-        this.rightHand = rightHand instanceof Operation ? ((Operation) rightHand).toAdditionOnly() : rightHand;
-        if (this.operation.name.equals("-")) {
-            this.operation = RegisteredBinaryOperation.extract("+");
-            this.rightHand = new UnaryOperation(rightHand, "~").toAdditionOnly();
+        BinaryOperation newInstance = this.replicate();
+        if (getLeftHand() instanceof Operation) newInstance.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
+        newInstance.rightHand = rightHand instanceof Operation ? ((Operation) newInstance.rightHand).toAdditionOnly() : newInstance.rightHand;
+        if (newInstance.operation.name.equals("-")) {
+            newInstance.operation = RegisteredBinaryOperation.extract("+");
+            newInstance.rightHand = UnaryOperation.negate(newInstance.rightHand);
         }
-        return this;
+        return newInstance;
     }
 
     private static ArrayList<Operable> toArrayList(Operable... operables) {
