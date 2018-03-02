@@ -19,18 +19,17 @@ public class BinaryOperation extends Operation {
     }
 
     public BinaryOperation(Operable leftHand, RegisteredBinaryOperation operation, Operable rightHand) {
-        super(leftHand);
+        super(leftHand.replicate());
         this.operation = operation;
-        this.rightHand = rightHand;
+        this.rightHand = rightHand.replicate();
         omitParenthesis = true;
-        processParentheticalNotation(leftHand, false);
-        processParentheticalNotation(rightHand, true);
+        processParentheticalNotation(getLeftHand(), false);
+        processParentheticalNotation(this.rightHand, true);
     }
 
     /**
-     * breakthrough.
-     *
-     * @since May 19th
+     * Remove unnecessary parenthesis
+     * @since May 19th, 2017
      */
     private void processParentheticalNotation(Operable operable, boolean isRightHand) {
         if (operable instanceof BinaryOperation) {
@@ -96,21 +95,31 @@ public class BinaryOperation extends Operation {
      * "(x-4)(x-5)(x-3/(x-6))^-1", and then recursively reduced to
      * "(x-4)(x-5)(x-3*(x-6)^-1)^-1"
      * basic CAS capabilities. Implementation began: May 19th.
+     * Note: does not change self.
      */
     @Override
-    public void toExponentialForm() {
-        if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
-        if (rightHand instanceof Operation) ((Operation) rightHand).toExponentialForm();
-        if (!this.operation.equals("/")) return;
-        if (rightHand.equals(new RawValue(0))) throw new ArithmeticException("division by zero: jmc");
-        if (rightHand instanceof BinaryOperation && ((BinaryOperation) rightHand).operation.equals("*")) {
-            BinaryOperation enclosed = ((BinaryOperation) rightHand);
+    public Operable toExponentialForm() {
+        Operation newInstance = this.replicate();
+        if (getLeftHand() instanceof Operation) {
+            newInstance.setLeftHand(((Operation) getLeftHand()).toExponentialForm());
+        }
+        if (rightHand instanceof Operation) {
+            ((BinaryOperation) newInstance).rightHand = (((Operation) rightHand).toExponentialForm());
+        }
+        if (!this.operation.equals("/")) return newInstance;
+        BinaryOperation binOp = (BinaryOperation) newInstance;
+        if (binOp.rightHand.equals(new RawValue(0))) throw new ArithmeticException("division by zero: jmc");
+        if (binOp.rightHand instanceof BinaryOperation && ((BinaryOperation) binOp.rightHand).operation.equals("*")) {
+            BinaryOperation enclosed = ((BinaryOperation) binOp.rightHand);
             enclosed.setLeftHand(new BinaryOperation(enclosed.getLeftHand(), "^", new RawValue(-1)));
             enclosed.rightHand = new BinaryOperation(enclosed.rightHand, "^", new RawValue(-1));
-        } else this.rightHand = new BinaryOperation(rightHand, "^", new RawValue(-1));
-        operation = RegisteredBinaryOperation.extract("*");
-        processParentheticalNotation(getLeftHand(), false);
-        processParentheticalNotation(rightHand, true);
+        } else {
+            binOp.rightHand = new BinaryOperation(binOp.rightHand, "^", new RawValue(-1));
+        }
+        binOp.operation = RegisteredBinaryOperation.extract("*");
+        processParentheticalNotation(binOp.getLeftHand(), false);
+        processParentheticalNotation(binOp.rightHand, true);
+        return binOp;
     }
 
     /**
@@ -498,5 +507,13 @@ public class BinaryOperation extends Operation {
 
     public Operable plugIn(Operable nested) {
         return new BinaryOperation(getLeftHand().plugIn(nested), operation, rightHand.plugIn(nested));
+    }
+
+    public Operable getRightHand() {
+        return rightHand;
+    }
+
+    public void setRightHand(Operable operable) {
+        this.rightHand = operable;
     }
 }

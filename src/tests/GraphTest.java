@@ -10,7 +10,7 @@ import processing.core.PApplet;
  * Created by Jiachen on 21/05/2017.
  * Graph UI Test
  */
-public class GraphIndependenceTest extends PApplet {
+public class GraphTest extends PApplet {
     public static void main(String args[]) {
         String sketch = Thread.currentThread().getStackTrace()[1].getClassName();
         Thread main = new Thread(() -> PApplet.main(sketch));
