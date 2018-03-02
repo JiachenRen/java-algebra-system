@@ -257,7 +257,7 @@ public abstract class Function implements Evaluable {
                 } else {
                     if (string.equals("")) throw new RuntimeException("missing operand(s)");
                     try {
-                        operands.add(new Raw(Double.valueOf(string)));
+                        operands.add(new RawValue(Double.valueOf(string)));
                     } catch (NumberFormatException e) {
                         throw new NumberFormatException("undefined operand \"" + string + "\"");
                     }

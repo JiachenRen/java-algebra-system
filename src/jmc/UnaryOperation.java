@@ -59,9 +59,11 @@ public class UnaryOperation extends Operation {
 
     @Override
     public Operable toExponentialForm() {
-        if (getLeftHand() instanceof Operation)
-            return this.replicate().setLeftHand(((Operation) getLeftHand()).toExponentialForm());
-        else return this.replicate();
+        if (getLeftHand() instanceof Operation) {
+            UnaryOperation newInstance = this.replicate();
+            newInstance.setLeftHand(((Operation) getLeftHand()).toExponentialForm());
+            return newInstance;
+        } else return this.replicate();
     }
 
     /**
@@ -84,7 +86,7 @@ public class UnaryOperation extends Operation {
      * @return a new Operable instance that represents the negated version of the original
      */
     public static Operable negate(Operable operable) {
-        return new BinaryOperation(new Raw(-1), "*", operable);
+        return new BinaryOperation(new RawValue(-1), "*", operable);
     }
 
 

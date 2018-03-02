@@ -52,7 +52,7 @@ public interface Operable extends Evaluable {
         operable = operable.replicate(); //is this necessary?
         Operable f1 = operable.plugIn(Function.interpret("x+h").getOperable());
         BinaryOperation subtraction = new BinaryOperation(f1, "-", operable);
-        BinaryOperation exp = new BinaryOperation(new Variable("h"), "^", new Raw(-1));
+        BinaryOperation exp = new BinaryOperation(new Variable("h"), "^", new RawValue(-1));
         return new BinaryOperation(subtraction, "*", exp);
     }
 }

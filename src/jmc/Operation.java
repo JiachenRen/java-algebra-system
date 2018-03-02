@@ -23,7 +23,7 @@ public abstract class Operation implements Operable {
         return leftHand;
     }
 
-    public abstract void toExponentialForm();
+    public abstract Operable toExponentialForm();
 
     /**
      * post operation: the operation itself is modified
