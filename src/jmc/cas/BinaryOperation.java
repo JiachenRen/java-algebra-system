@@ -398,7 +398,7 @@ public class BinaryOperation extends Operation {
                         return new BinaryOperation(left, operator, simplified);
                     }
                 }
-                //System.out.println("identical: " + Function.colorMathSymbols(left + "; " + right));
+                //System.out.println("identical: " + GraphFunction.colorMathSymbols(left + "; " + right));
             }
         }
         //bug identified May 26th

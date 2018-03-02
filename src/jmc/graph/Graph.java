@@ -1,6 +1,7 @@
 package jmc.graph;
 
-import jmc.Function;
+import jmc.GraphFunction;
+import jmc.cas.Expression;
 import jui.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -28,7 +29,7 @@ public class Graph extends Contextual {
     private float axisMarkingTextSize;
     private int maxMarkingLength;
     private int minMarkingLength;
-    private ArrayList<Function> functions;
+    private ArrayList<GraphFunction> functions;
     private int asymptoteColor;
     private int tangentLineColor;
     private int tracingLineColor;
@@ -40,11 +41,6 @@ public class Graph extends Contextual {
     private boolean tracingOn;
     private boolean evaluationOn;
     private boolean axesVisible;
-
-    static {
-        //PImage img = JNode.getParent().loadImage("src/jmc/data/images/gesture_drag.png");
-        //JNode.getParent().cursor(img);
-    }
 
     {
         functions = new ArrayList<>();
@@ -155,7 +151,7 @@ public class Graph extends Contextual {
         if (axesVisible)
             this.drawAxes();
 
-        for (Function function : functions) {
+        for (GraphFunction function : functions) {
             if (function.isDynamic()) {
                 function.updatePlot(rangeX, rangeY, h);
                 function.getPlot().updateCoordinates(rangeY, w, h);
@@ -350,14 +346,14 @@ public class Graph extends Contextual {
      * plots the designated function within the window scope of this graph.
      * the function is colored and stroked with its designated style.
      *
-     * @param function the Function instance to be plotted
+     * @param function the GraphFunction instance to be plotted
      * @since May 21st 1:26 AM function color differentiated.
      */
-    private void drawFunction(Function function) {
+    private void drawFunction(GraphFunction function) {
         getParent().stroke(function.getColor());
         getParent().strokeWeight(function.getStrokeWeight());
         getParent().noFill();
-        if (function.getStyle().equals(Function.Style.CONTINUOUS)) {
+        if (function.getStyle().equals(GraphFunction.Style.CONTINUOUS)) {
             getParent().beginShape();
             for (int i = 0; i < function.getPlot().getCoordinates().size(); i++) {
                 Point point = function.getPlot().getCoordinates().get(i);
@@ -389,7 +385,7 @@ public class Graph extends Contextual {
                 }
             }
             getParent().endShape();
-        } else if (function.getStyle().equals(Function.Style.DISCRETE)) {
+        } else if (function.getStyle().equals(GraphFunction.Style.DISCRETE)) {
             function.getPlot().getCoordinates().forEach(point -> {
                 float translatedX = (float) point.getX() + x;
                 float translatedY = y + h - (float) point.getY();
@@ -415,7 +411,7 @@ public class Graph extends Contextual {
      * @since May 21st, took me a while, but I fixed it!
      */
     public void drawTangentLineToPoint(double x, String name) {
-        Function tangentLine = tangentLineToPoint(x, getFunction(name), rangeX.getStep());
+        GraphFunction tangentLine = tangentLineToPoint(x, getFunction(name), rangeX.getStep());
         double y1 = rangeY.getLow(), y2 = rangeY.getHigh();
         ArrayList<Double> fx = solveInScope(rangeY.getLow(), tangentLine);
         ArrayList<Double> sx = solveInScope(rangeY.getHigh(), tangentLine);
@@ -455,7 +451,7 @@ public class Graph extends Contextual {
      * domain of the visible window of the graph.
      * @since May 20th
      */
-    public ArrayList<Double> solveInScope(double y, Function function) {
+    public ArrayList<Double> solveInScope(double y, GraphFunction function) {
         int precisionFactor = 5;
         return function.numericalSolve(y, rangeX.getLow(), rangeX.getHigh(), rangeX.getStep() / precisionFactor);
     }
@@ -469,7 +465,7 @@ public class Graph extends Contextual {
      * @since 9:37 PM, May 17th, breakthrough, succeeded!!!
      * May 21st: debugged floating point accuracy is now considered.
      */
-    public static Function tangentLineToPoint(double x, Function function, double accuracy) {
+    public static GraphFunction tangentLineToPoint(double x, GraphFunction function, double accuracy) {
         Point init = new Point(x - accuracy, function.eval(x - accuracy));
         Point end = new Point(x + accuracy, function.eval(x + accuracy));
         return Graph.createLinearFunction(init, end);
@@ -483,22 +479,17 @@ public class Graph extends Contextual {
      * @param second the second point
      * @return a linear implemented function from 2 points.
      */
-    public static Function createLinearFunction(Point first, Point second) {
+    public static GraphFunction createLinearFunction(Point first, Point second) {
         double k = (first.getY() - second.getY()) / (first.getX() - second.getX());
         double b = first.getY() - k * first.getX();
-        return new Function() {
-            @Override
-            public double eval(double val) {
-                return k * val + b;
-            }
-        }.setName(k + "," + b);
+        return new GraphFunction(Expression.interpret(k +"*x+" +b)).setName(k + "," + b);
     }
 
     /**
      * @param function the function to be added into this graph.
      * @return this Graph instance for chained access.
      */
-    public Graph add(Function function) {
+    public Graph add(GraphFunction function) {
         this.functions.add(function);
         if (w < 10 || h < 10) return this;
         function.updatePlot(rangeX, rangeY, h);
@@ -506,9 +497,9 @@ public class Graph extends Contextual {
         return this;
     }
 
-    public Function remove(String name) {
+    public GraphFunction remove(String name) {
         for (int i = functions.size() - 1; i >= 0; i--) {
-            Function function = functions.get(i);
+            GraphFunction function = functions.get(i);
             if (function.getName().equals(name))
                 return functions.remove(i);
         }
@@ -533,7 +524,7 @@ public class Graph extends Contextual {
      * This method should be called whenever the displayable is updated or plot points are altered.
      */
     private void updatePlotCoordinates() {
-        for (Function function : functions) {
+        for (GraphFunction function : functions) {
             if (!function.isDynamic())
                 function.getPlot().updateCoordinates(rangeY, w, h);
         }
@@ -545,7 +536,7 @@ public class Graph extends Contextual {
      */
     private void updatePlots() {
         this.updateStepValue();
-        for (Function function : functions) {
+        for (GraphFunction function : functions) {
             if (!function.isDynamic())
                 function.updatePlot(rangeX, rangeY, h);
         }
@@ -588,7 +579,7 @@ public class Graph extends Contextual {
      * @param function      the function that is going to replace the original one.
      * @param preserveStyle whether or not to preserve the graphics style of the original function
      */
-    public void override(String name, Function function, boolean preserveStyle) {
+    public void override(String name, GraphFunction function, boolean preserveStyle) {
         boolean overridden = false;
         for (int i = functions.size() - 1; i >= 0; i--) {
             if (functions.get(i).getName().equals(name)) {
@@ -602,7 +593,7 @@ public class Graph extends Contextual {
         function.getPlot().updateCoordinates(rangeY, w, h);
     }
 
-    public void override(String name, Function function) {
+    public void override(String name, GraphFunction function) {
         this.override(name, function, true);
     }
 
@@ -614,8 +605,8 @@ public class Graph extends Contextual {
         this.updatePlotCoordinates();
     }
 
-    public Function getFunction(String name) {
-        for (Function function : functions) {
+    public GraphFunction getFunction(String name) {
+        for (GraphFunction function : functions) {
             if (function.getName().equals(name))
                 return function;
         }
@@ -694,7 +685,7 @@ public class Graph extends Contextual {
         return mode;
     }
 
-    public ArrayList<Function> getFunctions() {
+    public ArrayList<GraphFunction> getFunctions() {
         return functions;
     }
 
@@ -708,7 +699,7 @@ public class Graph extends Contextual {
      * @return boolean that indicates whether or not the point is over the function.
      */
     public boolean isOverFunction(String name, float screenX, float screenY, float allowed_diff) {
-        Function function = this.getFunction(name);
+        GraphFunction function = this.getFunction(name);
         double graph_pos[] = this.convertToPointOnGraph(screenX, screenY);
         return function.containsPoint(graph_pos[0], graph_pos[1], allowed_diff / h * rangeX.getSpan(), 2);
     }
@@ -778,7 +769,7 @@ public class Graph extends Contextual {
         ArrayList<Float> occupied = new ArrayList<>();
         ArrayList<Float> leftSideOccupied = new ArrayList<>();
 
-        for (Function function : functions) {
+        for (GraphFunction function : functions) {
             if (!function.isVisible() || !function.tracingEnabled()) continue;
             double yPosOnGraph = function.getPlot().lookUp(xPosOnGraph, rangeX.getStep() / stepLength);
             yPosOnGraph = yPosOnGraph == Double.MAX_VALUE ? function.eval(xPosOnGraph) : yPosOnGraph;

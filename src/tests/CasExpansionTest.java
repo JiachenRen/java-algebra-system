@@ -37,20 +37,18 @@ public class CasExpansionTest {
 
     };
 
-    private static ArrayList<Operable> operables;
-
     public static void main(String args[]) {
          synopticDiagnosis();
-//        Operable operable = Function.interpret("(x+3)(x-sin<x>)/(x-1)*x(x+2)").getOperable();
+//        Operable operable = GraphFunction.interpret("(x+3)(x-sin<x>)/(x-1)*x(x+2)").getOperable();
 //        operable = Operable.getFirstDerivative(operable);
 //        //operable = Operable.expand(operable); TODO: debug
 //        System.out.println(operable);
     }
 
     private static void synopticDiagnosis() {
-        operables = new ArrayList<>();
+        ArrayList<Operable> operables = new ArrayList<>();
         for (String expression : testSubjects) {
-            Operable extracted = Expression.interpret(expression).getOperable();
+            Operable extracted = Expression.interpret(expression);
             extracted = Operable.expand(extracted);
             operables.add(extracted);
         }
@@ -68,9 +66,9 @@ public class CasExpansionTest {
         return Expression.colorMathSymbols(s);
     }
 
-    private static void inspect(String s) {
-        Operable extracted = Expression.interpret(s).getOperable();
-        extracted = Operable.expand(extracted);
-        l((char) 27 + "[31;1m" + "expanded: " + (char) 27 + "[0m" + f(extracted.toString()));
-    }
+//    private static void inspect(String s) {
+//        Operable extracted = Expression.interpret(s);
+//        extracted = Operable.expand(extracted);
+//        l((char) 27 + "[31;1m" + "expanded: " + (char) 27 + "[0m" + f(extracted.toString()));
+//    }
 }

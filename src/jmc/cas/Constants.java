@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Jiachen on 16/05/2017.
+ * Constants
  */
 public class Constants {
     public interface ComputedConst {
@@ -30,13 +31,7 @@ public class Constants {
     }
 
 
-    public static boolean startsWidthConstant(String exp) {
-        for (Constant constant : constants) {
-            if (exp.startsWith(constant.name))
-                return true;
-        }
-        return false;
-    }
+
 
     /**
      * add or define a Constant object into the static ArrayList Constants.
@@ -64,7 +59,7 @@ public class Constants {
         return 0.0;
     }
 
-    private static class Constant implements Operable {
+    static class Constant implements Operable {
         private ComputedConst computedConst;
         private String name;
 
@@ -99,16 +94,11 @@ public class Constants {
         }
     }
 
-    /**
-     * prints out a list of all defined constants
-     */
-    public static void list() {
-        int count = 0;
-        for (Constant constant : constants) {
-            System.out.println(ColorFormatter.coloredLine("[36;1m", "<" + count + ">\t" + constant.toString() + "\t-> " + constant.computedConst.compute(), "->", "<", ">"));
-            count++;
-        }
-    }
+   public static ArrayList<Constant> list() {
+        return constants;
+   }
+
+
 
     public static Constant getConstant(String name) {
         for (Constant constant : constants) {

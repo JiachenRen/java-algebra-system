@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Jiachen on 03/05/2017.
+ * Math Context
  */
 public class MathContext {
     private final static BigInteger ZERO = new BigInteger("0");

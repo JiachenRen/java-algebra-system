@@ -5,12 +5,13 @@ import jmc.cas.Operable;
 
 /**
  * Created by Jiachen on 27/05/2017.
+ * CAS plug in test
  */
 public class CasPlugInTest {
     public static void main(String args[]) {
-        Operable operable = Expression.interpret("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)").getOperable();
+        Operable operable = Expression.interpret("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
         //operable =Operable.expand(operable);
-        //operable = operable.plugIn(Function.interpret("x+h").getOperable());
+        //operable = operable.plugIn(GraphFunction.interpret("x+h").getOperable());
         //operable = Operable.expand(operable);
         operable = Operable.getFirstDerivative(operable);
 //        operable = Operable.expand(operable);

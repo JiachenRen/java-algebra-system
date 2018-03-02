@@ -2,6 +2,7 @@ package jmc.cas;
 
 /**
  * Created by Jiachen on 03/05/2017.
+ * Operable
  */
 public interface Operable extends Evaluable {
     String toString();
@@ -48,7 +49,7 @@ public interface Operable extends Evaluable {
 
     static Operable getFirstDerivative(Operable operable) {
         operable = operable.replicate(); //is this necessary?
-        Operable f1 = operable.plugIn(Expression.interpret("x+h").getOperable());
+        Operable f1 = operable.plugIn(Expression.interpret("x+h"));
         BinaryOperation subtraction = new BinaryOperation(f1, "-", operable);
         BinaryOperation exp = new BinaryOperation(new Variable("h"), "^", new RawValue(-1));
         return new BinaryOperation(subtraction, "*", exp);

@@ -1,6 +1,6 @@
 package jmc.graph;
 
-import jmc.Function;
+import jmc.GraphFunction;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class Plot {
      *
      * @param rangeY the valid range of the y values in which a certain point is going to be visible.
      */
-    public void insertVerticalAsymptote(Range rangeY, Function function) {
+    public void insertVerticalAsymptote(Range rangeY, GraphFunction function) {
         outer:
         for (int i = APL - 1; i < data.size() - APL; i++) {
             for (int q = i - (APL - 1); q <= i + APL; q++) {

@@ -8,10 +8,11 @@ import processing.core.PApplet;
 
 /**
  * Created by Jiachen on 16/05/2017.
+ * toExponentialForm test
  */
 public class ExponentialFormatTest extends PApplet {
     public static void main(String args[]) {
-        System.out.println("Function Interpretation Test May 16th");
+        System.out.println("GraphFunction Interpretation Test May 16th");
         String sketch = Thread.currentThread().getStackTrace()[1].getClassName();
         Thread proc = new Thread(() -> PApplet.main(sketch));
         proc.start();
@@ -24,7 +25,7 @@ public class ExponentialFormatTest extends PApplet {
 
     public void setup() {
         JNode.init(this);
-        Operable operable = Expression.interpret("x/(x-1)/(x+1/(x-1))").getOperable();
+        Operable operable = Expression.interpret("x/(x-1)/(x+1/(x-1))");
         ((Operation) operable).toExponentialForm();
         System.out.println(Expression.colorMathSymbols(operable.toString()));
     }

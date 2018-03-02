@@ -95,7 +95,7 @@ public class JGrapher extends PApplet {
                 .setContourVisible(false)
                 .setBackgroundColor(255, 255, 255, 200);
 
-        TextInput modelInput = (TextInput) new TextInput()
+        TextInput modelInput = new TextInput()
                 .setCursorColor(255)
                 .setCursorThickness(1);
 //                .setTextColor(230)
@@ -120,7 +120,7 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelInput);
         Runnable updateAdvPanel = () -> {
             String name = funcNameTextInput.getContent();
-            Function func = graph.getFunction(name);
+            GraphFunction func = graph.getFunction(name);
             if (func == null) return;
             ValueSelector strokeWeight = (ValueSelector) JNode.get("#0").get(0);
             strokeWeight.setValue(func.getStrokeWeight());
@@ -135,7 +135,7 @@ public class JGrapher extends PApplet {
             visibility.setContent(func.isVisible() ? "Visible" : "Invisible");
 
             Button continuous = (Button) JNode.get("#4").get(0);
-            continuous.setContent(func.getStyle().equals(Function.Style.CONTINUOUS) ? "Continuous" : "Discrete");
+            continuous.setContent(func.getStyle().equals(GraphFunction.Style.CONTINUOUS) ? "Continuous" : "Discrete");
 
             Button dynamic = (Button) JNode.get("#5").get(0);
             dynamic.setContent(func.isDynamic() ? "Dynamic" : "Static");
@@ -160,10 +160,10 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelInput);
         funcNameTextInput.setContent("f(x)=").setAlign(CENTER).setId("funcNameTextInput").setRelativeW(0.13f).addEventListener(Event.CONTENT_CHANGED, () -> {
             String name = funcNameTextInput.getContent();
-            Function func = graph.getFunction(name);
+            GraphFunction func = graph.getFunction(name);
             if (func == null) return;
             updateAdvPanel.run();
-            funcTextInput.setContent(((Expression) func).getOperable().toString());
+            funcTextInput.setContent(func.getOperable().toString());
         });
         functionInputWrapper.add(funcNameTextInput);
 
@@ -171,7 +171,7 @@ public class JGrapher extends PApplet {
         //Dynamic function interpretation
         funcTextInput.onSubmit(() -> {
             try {
-                Operable original = Expression.interpret(funcTextInput.getStaticContent()).getOperable();
+                Operable original = Expression.interpret(funcTextInput.getStaticContent());
                 if (casEnabled) {
                     if (original instanceof BinaryOperation)
                         original = ((BinaryOperation) original).simplify();
@@ -185,7 +185,9 @@ public class JGrapher extends PApplet {
         }).setDefaultContent(" type in your function  here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
             try {
-                graph.override(funcNameTextInput.getContent(), Expression.interpret(funcTextInput.getContent()));
+                Operable interpreted = Expression.interpret(funcTextInput.getContent());
+                GraphFunction func = new GraphFunction(interpreted);
+                graph.override(funcNameTextInput.getContent(), func);
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;31m" + "interpretation incomplete -> pending..." + (char) 27 + "[0m");
@@ -345,8 +347,8 @@ public class JGrapher extends PApplet {
                 .onKeyTyped(() -> {
                     TextInput self = JNode.getTextInputById("filterer");
                     if (self == null) return;
-                    ArrayList<Function> functions = graph.getFunctions();
-                    ArrayList<Function> filtered = new ArrayList<>();
+                    ArrayList<GraphFunction> functions = graph.getFunctions();
+                    ArrayList<GraphFunction> filtered = new ArrayList<>();
                     functions.forEach(function -> {
                         if (filtered.size() < 5 && function.getName().startsWith(self.getContent()))
                             if (!filtered.contains(function))
@@ -365,7 +367,7 @@ public class JGrapher extends PApplet {
                     if (filtered.size() == 0) return;
                     for (int i = 0; i < 5; i++) {
                         if (i < filtered.size()) {
-                            Expression func = (Expression) filtered.get(i);
+                            GraphFunction func = filtered.get(i);
                             final String funcName = func.getName();
                             final String operable = func.getOperable().toString();
                             Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
@@ -424,7 +426,7 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelButton)
                 .setContent("Show Asymptotes");
         showAsymptotes.onClick(() -> {
-            Function function = getCurrentFunction();
+            GraphFunction function = getCurrentFunction();
             if (function != null)
                 function.setAsymptoteVisible(!function.isAsymptoteVisible());
             showAsymptotes.setContent(showAsymptotes.getContent().equals("Hide Asymptotes") ? "Show Asymptotes" : "Hide Asymptotes");
@@ -436,7 +438,7 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelButton)
                 .setContent("Show f'(x)");
         showTangentLine.onClick(() -> {
-            Function function = getCurrentFunction();
+            GraphFunction function = getCurrentFunction();
             if (function != null)
                 function.setTangentLineVisible(!function.isTangentLineVisible());
             showTangentLine.setContent(showTangentLine.getContent().equals("Show f'(x)") ? "Hide f'(x)" : "Show f'(x)");
@@ -448,7 +450,7 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelButton)
                 .setContent("Visible");
         visibility.onClick(() -> {
-            Function function = getCurrentFunction();
+            GraphFunction function = getCurrentFunction();
             if (function != null)
                 function.setVisible(!function.isVisible());
             visibility.setContent(visibility.getContent().equals("Visible") ? "Invisible" : "Visible");
@@ -460,9 +462,9 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelButton)
                 .setContent("Continuous");
         continuous.onClick(() -> {
-            Function function = getCurrentFunction();
+            GraphFunction function = getCurrentFunction();
             if (function != null)
-                function.setGraphStyle(function.getStyle().equals(Function.Style.CONTINUOUS) ? Function.Style.DISCRETE : Function.Style.CONTINUOUS);
+                function.setGraphStyle(function.getStyle().equals(GraphFunction.Style.CONTINUOUS) ? GraphFunction.Style.DISCRETE : GraphFunction.Style.CONTINUOUS);
             continuous.setContent(continuous.getContent().equals("Continuous") ? "Discrete" : "Continuous");
         }).setId("#4");
         adv.add(continuous);
@@ -472,7 +474,7 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelButton)
                 .setContent("Static");
         dynamic.onClick(() -> {
-            Function function = getCurrentFunction();
+            GraphFunction function = getCurrentFunction();
             if (function != null)
                 function.setDynamic(!function.isDynamic());
             dynamic.setContent(dynamic.getContent().equals("Static") ? "Dynamic" : "Static");
@@ -487,7 +489,7 @@ public class JGrapher extends PApplet {
                 .inheritMode(modelButton)
                 .setContent("On");
         extensionOn.onClick(() -> {
-            Function function = getCurrentFunction();
+            GraphFunction function = getCurrentFunction();
             if (function != null)
                 function.setAutoAsymptoteExtension(!function.isAutoAsymptoteExtension());
             extensionOn.setContent(extensionOn.getContent().equals("On") ? "Off" : "On");
@@ -552,7 +554,7 @@ public class JGrapher extends PApplet {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private Function getCurrentFunction() {
+    private GraphFunction getCurrentFunction() {
         return graph.getFunction(JNode.getTextInputById("funcNameTextInput").getContent());
     }
 

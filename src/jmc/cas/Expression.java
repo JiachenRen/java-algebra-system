@@ -12,20 +12,13 @@ import static jmc.cas.Assets.*;
  * Expression class that programmatically interprets mathematical expressions like "ln(x)^2/e*pi" into binary code.
  */
 public class Expression extends Function {
+
+
     private Operable operable;
 
-    public Expression(Operable operable) {
-        this(operable, "");
-    }
-
-
-    public Expression(Operable operable, String name) {
-        this(operable, name, false);
-    }
-
-    public Expression(Operable operable, String name, boolean dynamic) {
-        super(name, dynamic);
-        this.operable = operable;
+    Expression(String exp) {
+        super();
+        this.operable = interpret(exp);
     }
 
     /**
@@ -34,7 +27,7 @@ public class Expression extends Function {
      * @since May 19th. This method is the core of JMC. Took Jiachen tremendous effort. This system of
      * method represents his life's work
      */
-    public static Expression interpret(String expression) {
+    public static Operable interpret(String expression) {
         if (expression.equals("")) throw new IllegalArgumentException("cannot interpret an empty string");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
             throw new IllegalArgumentException("incorrect format: '()' mismatch");
@@ -60,7 +53,7 @@ public class Expression extends Function {
         if (operable instanceof BinaryOperation) ((BinaryOperation) operable).setOmitParenthesis(true);
         String colored = colorMathSymbols(operable.toString());
         System.out.println(boldRed("output:\t") + colored);
-        return new Expression(operable);
+        return operable;
     }
 
 
@@ -272,7 +265,7 @@ public class Expression extends Function {
         for (int i = 0; i < exp.length() - 1; i++) {
             char digit = exp.charAt(i), x = exp.charAt(i + 1);
             if (DIGITS.contains(Character.toString(digit)) || digit == ')') {
-                if (VARS.contains(Character.toString(x)) || Constants.startsWidthConstant(exp.substring(i + 1))) {
+                if (VARS.contains(Character.toString(x)) || startsWithConstant(exp.substring(i + 1))) {
                     exp = exp.replace(digit + "" + x, digit + "*" + x);
                 }
             }
@@ -287,6 +280,14 @@ public class Expression extends Function {
             }
         }
         return exp;
+    }
+
+    private static boolean startsWithConstant(String exp) {
+        for (Constants.Constant constant : Constants.list()) {
+            if (exp.startsWith(constant.toString()))
+                return true;
+        }
+        return false;
     }
 
     private static String handleCalcPriority(String exp) {
@@ -340,16 +341,16 @@ public class Expression extends Function {
         return exp;
     }
 
-    @Override
-    public double eval(double val) {
-        return operable.eval(val);
-    }
-
     public Operable getOperable() {
         return operable;
     }
 
     public void setOperable(Operable operable) {
         this.operable = operable;
+    }
+
+    @Override
+    public double eval(double val) {
+        return this.operable.eval(val);
     }
 }

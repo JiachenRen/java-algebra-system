@@ -11,14 +11,10 @@ import jmc.cas.Expression;
 public class SpeedTest {
     private final static double start = 0, end = 1000000, step = 0.1;
     private final static String expStr = "sin(cos(x^(x+sec(x)^3))+12x)";
-    private static Function interpretedFunc = Expression.interpret(expStr);
-    private static Function javaCompiledFunction = new Function() {
-        @Override
-        public double eval(double val) {
-            //Java compiled function that is the same as "sin(cos(x^(x+sec(x)^3))+12x)"
-            return Math.sin(Math.cos(Math.pow(val, val + Math.pow(1 / Math.cos(val), 3)) + 12 * val));
-        }
-    };
+    private static Function interpretedFunc = Function.implement(Expression.interpret(expStr));
+    private static Function javaCompiledFunction = Function.implement(val -> Math.sin(Math.cos(Math.pow(val, val + Math.pow(1 / Math.cos(val), 3)) + 12 * val)));
+
+    //Java compiled function that is the same as "sin(cos(x^(x+sec(x)^3))+12x)"
 
     //Java compiled function eval thread
     private static Thread trd1 = new Thread(() -> {
@@ -41,7 +37,7 @@ public class SpeedTest {
     private static Thread trd3 = new Thread(() -> {
         final long initAbsMillis = System.currentTimeMillis();
         for (double i = start; i <= end; i += step)
-            Function.interpret(expStr).eval(i);
+            GraphFunction.interpret(expStr).eval(i);
         System.out.print("RIF: ");
         System.out.println(System.currentTimeMillis() - initAbsMillis);
     });
