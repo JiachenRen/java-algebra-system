@@ -58,7 +58,7 @@ public class Variable implements Operable {
      * @param other the replacing variable
      * @return new instance of the replacing variable
      */
-    public Operable plugIn(Operable other) {
-        return other.replicate();
+    public Operable plugIn(Variable var, Operable other) {
+        return other;
     }
 }

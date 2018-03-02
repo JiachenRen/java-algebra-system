@@ -62,6 +62,7 @@ public class UnaryOperation extends Operation {
 
     /**
      * Note: modifies self
+     *
      * @return exponential form of self
      */
     @Override
@@ -198,11 +199,13 @@ public class UnaryOperation extends Operation {
      * Creates a new Operable with its variable replaced with {nested}
      * Note: modifies
      *
-     * @param nested the operable to be plugged in
+     * @param replacement the operable to be plugged in
      * @return a new instance with its original variable replaced with {nested}
      */
-    public Operable plugIn(Operable nested) {
-        this.getLeftHand().plugIn(nested);
+    public Operable plugIn(Variable var, Operable replacement) {
+        if (this.getLeftHand().equals(var))
+            this.setLeftHand(replacement);
+        else this.getLeftHand().plugIn(var, replacement);
         return this;
     }
 

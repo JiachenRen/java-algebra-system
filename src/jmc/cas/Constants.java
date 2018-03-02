@@ -31,8 +31,6 @@ public class Constants {
     }
 
 
-
-
     /**
      * add or define a Constant object into the static ArrayList Constants.
      * TODO debug
@@ -89,15 +87,14 @@ public class Constants {
             return other instanceof Constant && ((Constant) other).name.equals(this.name);
         }
 
-        public Operable plugIn(Operable nested) {
+        public Operable plugIn(Variable var, Operable nested) {
             return new Constant(this);
         }
     }
 
-   public static ArrayList<Constant> list() {
+    public static ArrayList<Constant> list() {
         return constants;
-   }
-
+    }
 
 
     public static Constant getConstant(String name) {

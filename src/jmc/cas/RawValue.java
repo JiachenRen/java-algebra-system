@@ -51,7 +51,7 @@ public class RawValue implements Operable {
      * @param nested the operable to be plugged in
      * @return new instance of self
      */
-    public Operable plugIn(Operable nested) {
+    public Operable plugIn(Variable var, Operable nested) {
         return this;
     }
 }
