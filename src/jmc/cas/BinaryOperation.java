@@ -1,7 +1,8 @@
 package jmc.cas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import static jmc.utils.ColorFormatter.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -119,8 +120,7 @@ public class BinaryOperation extends Operation {
      */
     public Operable simplify() {
         if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
-            System.out.print((char) 27 + "[1m" + "primitive calc:" + (char) 27 + "[0m");
-            System.out.println(Expression.colorMathSymbols(this.toString()));
+            System.out.println(boldBlack("primitive calc: ") + Expression.colorMathSymbols(this.toString()));
             RawValue calculated = new RawValue(operation.eval(((RawValue) getLeftHand()).doubleValue(), ((RawValue) rightHand).doubleValue()));
             //TODO: add a fraction class.
             return calculated;
