@@ -1,4 +1,4 @@
-package jmc;
+package jmc.cas;
 
 /**
  * Created by Jiachen on 16/05/2017.

@@ -1,6 +1,8 @@
 package tests;
 
 import jmc.*;
+import jmc.cas.*;
+import jmc.graph.Graph;
 import jui.*;
 import processing.core.PApplet;
 
@@ -41,7 +43,7 @@ public class FunctionInterpretationTest extends PApplet {
         graph.setId("graph");
         graphWrapper.add(graph);
 
-        Function test1 = Function.interpret("((sin<x>*(x+3.0))/((cos<x>*tan<x>)-x))*x").setName("test1").setColor(color(0, 150, 50));
+        Function test1 = Expression.interpret("((sin<x>*(x+3.0))/((cos<x>*tan<x>)-x))*x").setName("test1").setColor(color(0, 150, 50));
         test1.setAsymptoteVisible(true);
         test1.setTangentLineVisible(true);
         graph.add(test1);
@@ -53,8 +55,8 @@ public class FunctionInterpretationTest extends PApplet {
             TextInput temp = JNode.getTextInputById("f(x)");
             try {
                 if (temp != null) {
-                    graph.override("test1", Function.interpret(temp.getStaticContent()));
-                    InterpretedFunction function = ((InterpretedFunction) graph.getFunction("test1"));
+                    graph.override("test1", Expression.interpret(temp.getStaticContent()));
+                    Expression function = ((Expression) graph.getFunction("test1"));
                     Operable extracted = function.getOperable();
                     if (extracted instanceof Operation) ((Operation) extracted).toExponentialForm();
                     temp.setStaticContent(extracted.toString());
@@ -71,7 +73,7 @@ public class FunctionInterpretationTest extends PApplet {
         if (textInput != null) {
             textInput.onKeyTyped(() -> {
                 try {
-                    textInput.setStaticContent(Function.interpret(textInput.getContent()).getOperable().toString());
+                    textInput.setStaticContent(Expression.interpret(textInput.getContent()).getOperable().toString());
                     textInput.getSubmitMethod().run();
                 } catch (RuntimeException e) {
                     System.out.println((char) 27 + "[1;31m" + "interpretation incomplete -> pending..." + (char) 27 + "[0m");
@@ -87,8 +89,8 @@ public class FunctionInterpretationTest extends PApplet {
             TextInput temp = JNode.getTextInputById("g(x)");
             try {
                 if (temp != null) {
-                    graph.override("test2", Function.interpret(temp.getStaticContent()).setColor(color(100, 0, 200)));
-                    InterpretedFunction function = ((InterpretedFunction) graph.getFunction("test2"));
+                    graph.override("test2", Expression.interpret(temp.getStaticContent()).setColor(color(100, 0, 200)));
+                    Expression function = ((Expression) graph.getFunction("test2"));
                     Operable extracted = function.getOperable();
                     temp.setStaticContent(extracted.toString());
                 }
@@ -143,7 +145,7 @@ public class FunctionInterpretationTest extends PApplet {
 
         JNode.add(parent);
 
-        UnaryOperation.define("~", Function.interpret("x*x"));
+        UnaryOperation.define("~", Expression.interpret("x*x"));
         BinaryOperation.define("%", 2, (a, b) -> a % b);
         Constants.define("c", () -> 1);
         Constants.list();

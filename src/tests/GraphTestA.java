@@ -1,7 +1,7 @@
 package tests;
 
 import jmc.Function;
-import jmc.Graph;
+import jmc.graph.Graph;
 import jui.HSlider;
 import jui.JNode;
 import jui.VBox;

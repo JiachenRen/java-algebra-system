@@ -1,7 +1,7 @@
 package tests;
 
-import jmc.Function;
-import jmc.Operable;
+import jmc.cas.Expression;
+import jmc.cas.Operable;
 
 import java.util.ArrayList;
 
@@ -50,7 +50,7 @@ public class CasExpansionTest {
     private static void synopticDiagnosis() {
         operables = new ArrayList<>();
         for (String expression : testSubjects) {
-            Operable extracted = Function.interpret(expression).getOperable();
+            Operable extracted = Expression.interpret(expression).getOperable();
             extracted = Operable.expand(extracted);
             operables.add(extracted);
         }
@@ -65,11 +65,11 @@ public class CasExpansionTest {
     }
 
     private static String f(String s) {
-        return Function.colorMathSymbols(s);
+        return Expression.colorMathSymbols(s);
     }
 
     private static void inspect(String s) {
-        Operable extracted = Function.interpret(s).getOperable();
+        Operable extracted = Expression.interpret(s).getOperable();
         extracted = Operable.expand(extracted);
         l((char) 27 + "[31;1m" + "expanded: " + (char) 27 + "[0m" + f(extracted.toString()));
     }

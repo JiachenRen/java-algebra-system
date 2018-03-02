@@ -1,4 +1,7 @@
-package jmc;
+package jmc.cas;
+
+import jmc.Function;
+import jmc.MathContext;
 
 import java.util.ArrayList;
 
@@ -40,7 +43,7 @@ public class UnaryOperation extends Operation {
 
 
     public static void define(String name, String expression) {
-        UnaryOperation.define(name, Function.interpret(expression));
+        UnaryOperation.define(name, Expression.interpret(expression));
     }
 
     public static void define(String name, Evaluable evaluable) {

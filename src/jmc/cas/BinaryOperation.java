@@ -1,4 +1,4 @@
-package jmc;
+package jmc.cas;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,7 +121,7 @@ public class BinaryOperation extends Operation {
     public Operable simplify() {
         if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
             System.out.print((char) 27 + "[1m" + "primitive calc:" + (char) 27 + "[0m");
-            System.out.println(Function.colorMathSymbols(this.toString()));
+            System.out.println(Expression.colorMathSymbols(this.toString()));
             RawValue calculated = new RawValue(operation.eval(((RawValue) getLeftHand()).doubleValue(), ((RawValue) rightHand).doubleValue()));
             //TODO: add a fraction class.
             return calculated;
@@ -208,16 +208,16 @@ public class BinaryOperation extends Operation {
     private static Operable crossSimplify(ArrayList<Operable> operables, String operator) {
         System.out.println((char) 27 + "[31;1m" + "applying commutative property: " + operator + (char) 27 + "[0m");
         for (Operable operable : operables)
-            System.out.print(Function.colorMathSymbols(operable.toString()) + ", ");
+            System.out.print(Expression.colorMathSymbols(operable.toString()) + ", ");
         System.out.println();
         for (int i = 0; i < operables.size(); i++) {
             for (int q = i + 1; q < operables.size(); q++) {
                 BinaryOperation pending = new BinaryOperation(operables.get(i), operator, operables.get(q));
-                System.out.println((char) 27 + "[34;1m" + "checking: " + (char) 27 + "[0m" + Function.colorMathSymbols(pending.toString()));
+                System.out.println((char) 27 + "[34;1m" + "checking: " + (char) 27 + "[0m" + Expression.colorMathSymbols(pending.toString()));
                 if (pending.simplifiable()) {
                     System.out.println(" -> qualified");
                     operables.set(i, pending.simplify());
-                    String temp = Function.colorMathSymbols(operables.get(i).toString());
+                    String temp = Expression.colorMathSymbols(operables.get(i).toString());
                     System.out.println((char) 27 + "[1;32m" + "simplified: " + (char) 27 + "[0m" + temp);
                     operables.remove(q);
                     i = 0;

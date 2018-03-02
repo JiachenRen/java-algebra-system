@@ -1,7 +1,7 @@
 package tests;
 
-import jmc.Function;
-import jmc.Graph;
+import jmc.cas.Expression;
+import jmc.graph.Graph;
 import jui.JNode;
 import processing.core.PApplet;
 
@@ -23,7 +23,7 @@ public class GraphIndependenceTest extends PApplet {
         JNode.init(this);
         JNode.add(new Graph(0, 0, width, height));
         Graph graph = ((Graph) JNode.getDisplayables().get(0));
-        graph.add(Function.interpret("x"));
+        graph.add(Expression.interpret("x"));
 
     }
 

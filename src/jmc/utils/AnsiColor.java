@@ -1,4 +1,4 @@
-package jmc;
+package jmc.utils;
 
 /**
  * Created by Jiachen on 3/2/18.

@@ -1,9 +1,7 @@
-package jmc;
+package jmc.cas;
 
 /**
  * Created by Jiachen on 03/05/2017.
- * TODO: plugIn(String... vars, Operable... operables);
- * TODO: eval(String... vars, double... values);
  */
 public interface Operable extends Evaluable {
     String toString();
@@ -33,9 +31,9 @@ public interface Operable extends Evaluable {
         if (operable instanceof Operation) {
             Operation replica = ((Operation) operable).replicate();
             replica.toExponentialForm();
-            System.out.println((char) 27 + "[1m" + "converted to exponential form: " + (char) 27 + "[0m" + Function.colorMathSymbols(replica.toString()));
+            System.out.println((char) 27 + "[1m" + "converted to exponential form: " + (char) 27 + "[0m" + Expression.colorMathSymbols(replica.toString()));
             Operable potentialOperation = replica.toAdditionOnly();
-            System.out.println((char) 27 + "[1m" + "converted to \"+\" only: " + (char) 27 + "[0m" + Function.colorMathSymbols(potentialOperation.toString()));
+            System.out.println((char) 27 + "[1m" + "converted to \"+\" only: " + (char) 27 + "[0m" + Expression.colorMathSymbols(potentialOperation.toString()));
             if (potentialOperation instanceof Operation) {
                 Operable simplified = ((Operation) potentialOperation).simplify(); //recursion removed May 26th.
                 if (simplified instanceof Operation && ((Operation) simplified).simplifiable()) {
@@ -50,7 +48,7 @@ public interface Operable extends Evaluable {
 
     static Operable getFirstDerivative(Operable operable) {
         operable = operable.replicate(); //is this necessary?
-        Operable f1 = operable.plugIn(Function.interpret("x+h").getOperable());
+        Operable f1 = operable.plugIn(Expression.interpret("x+h").getOperable());
         BinaryOperation subtraction = new BinaryOperation(f1, "-", operable);
         BinaryOperation exp = new BinaryOperation(new Variable("h"), "^", new RawValue(-1));
         return new BinaryOperation(subtraction, "*", exp);

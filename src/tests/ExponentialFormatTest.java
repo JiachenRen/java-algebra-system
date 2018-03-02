@@ -1,6 +1,8 @@
 package tests;
 
-import jmc.*;
+import jmc.cas.Expression;
+import jmc.cas.Operable;
+import jmc.cas.Operation;
 import jui.*;
 import processing.core.PApplet;
 
@@ -22,9 +24,9 @@ public class ExponentialFormatTest extends PApplet {
 
     public void setup() {
         JNode.init(this);
-        Operable operable = Function.interpret("x/(x-1)/(x+1/(x-1))").getOperable();
+        Operable operable = Expression.interpret("x/(x-1)/(x+1/(x-1))").getOperable();
         ((Operation) operable).toExponentialForm();
-        System.out.println(Function.colorMathSymbols(operable.toString()));
+        System.out.println(Expression.colorMathSymbols(operable.toString()));
     }
 
     public void draw() {

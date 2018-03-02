@@ -1,4 +1,6 @@
-package jmc;
+package jmc.cas;
+
+import jmc.utils.ColorFormatter;
 
 import java.util.ArrayList;
 

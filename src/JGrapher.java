@@ -1,4 +1,7 @@
 import jmc.*;
+import jmc.cas.*;
+import jmc.extras.Element;
+import jmc.graph.Graph;
 import jui.*;
 import jui.bundles.ColorSelector;
 import jui.bundles.ValueSelector;
@@ -160,7 +163,7 @@ public class JGrapher extends PApplet {
             Function func = graph.getFunction(name);
             if (func == null) return;
             updateAdvPanel.run();
-            funcTextInput.setContent(((InterpretedFunction) func).getOperable().toString());
+            funcTextInput.setContent(((Expression) func).getOperable().toString());
         });
         functionInputWrapper.add(funcNameTextInput);
 
@@ -168,7 +171,7 @@ public class JGrapher extends PApplet {
         //Dynamic function interpretation
         funcTextInput.onSubmit(() -> {
             try {
-                Operable original = Function.interpret(funcTextInput.getStaticContent()).getOperable();
+                Operable original = Expression.interpret(funcTextInput.getStaticContent()).getOperable();
                 if (casEnabled) {
                     if (original instanceof BinaryOperation)
                         original = ((BinaryOperation) original).simplify();
@@ -182,7 +185,7 @@ public class JGrapher extends PApplet {
         }).setDefaultContent(" type in your function  here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
             try {
-                graph.override(funcNameTextInput.getContent(), Function.interpret(funcTextInput.getContent()));
+                graph.override(funcNameTextInput.getContent(), Expression.interpret(funcTextInput.getContent()));
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
                 System.out.println((char) 27 + "[1;31m" + "interpretation incomplete -> pending..." + (char) 27 + "[0m");
@@ -362,7 +365,7 @@ public class JGrapher extends PApplet {
                     if (filtered.size() == 0) return;
                     for (int i = 0; i < 5; i++) {
                         if (i < filtered.size()) {
-                            InterpretedFunction func = (InterpretedFunction) filtered.get(i);
+                            Expression func = (Expression) filtered.get(i);
                             final String funcName = func.getName();
                             final String operable = func.getOperable().toString();
                             Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
@@ -537,7 +540,7 @@ public class JGrapher extends PApplet {
 
         JNode.add(parent);
 
-        UnaryOperation.define("~", Function.interpret("x*x"));
+        UnaryOperation.define("~", Expression.interpret("x*x"));
         BinaryOperation.define("%", 2, (a, b) -> a % b);
         Constants.define("$C", () -> 1);
 

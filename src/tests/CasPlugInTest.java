@@ -1,14 +1,14 @@
 package tests;
 
-import jmc.Function;
-import jmc.Operable;
+import jmc.cas.Expression;
+import jmc.cas.Operable;
 
 /**
  * Created by Jiachen on 27/05/2017.
  */
 public class CasPlugInTest {
     public static void main(String args[]) {
-        Operable operable = Function.interpret("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)").getOperable();
+        Operable operable = Expression.interpret("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)").getOperable();
         //operable =Operable.expand(operable);
         //operable = operable.plugIn(Function.interpret("x+h").getOperable());
         //operable = Operable.expand(operable);
@@ -22,6 +22,6 @@ public class CasPlugInTest {
     }
 
     private static String f(String s) {
-        return Function.colorMathSymbols(s);
+        return Expression.colorMathSymbols(s);
     }
 }

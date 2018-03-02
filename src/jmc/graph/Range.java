@@ -1,4 +1,4 @@
-package jmc;
+package jmc.graph;
 
 /**
  * Created by Jiachen on 05/05/2017.
@@ -11,7 +11,7 @@ public class Range {
     private boolean hasNextStep;
     private double current;
 
-    Range(double low, double high, double step) {
+    public Range(double low, double high, double step) {
         this.low = low;
         this.high = high;
         this.step = step;
@@ -20,7 +20,7 @@ public class Range {
         assertValidity();
     }
 
-    Range(Range clone) {
+    public Range(Range clone) {
         this(clone.getLow(), clone.getHigh(), clone.getStep());
         this.hasNextStep = clone.hasNextStep;
         this.current = clone.current;
@@ -38,7 +38,7 @@ public class Range {
         return this.high;
     }
 
-    double getCurStep() {
+    public double getCurStep() {
         return current;
     }
 
@@ -46,7 +46,7 @@ public class Range {
         current = low;
     }
 
-    double getStep() {
+    public double getStep() {
         return step;
     }
 
@@ -54,16 +54,16 @@ public class Range {
         this.step = step;
     }
 
-    void next() {
+    public void next() {
         if (current < high) current += step;
         else hasNextStep = false;
     }
 
-    double getSpan() {
+    public double getSpan() {
         return high - low;
     }
 
-    boolean hasNextStep() {
+    public boolean hasNextStep() {
         return hasNextStep;
     }
 
@@ -80,7 +80,7 @@ public class Range {
 
     }
 
-    boolean isInScope(double val) {
+    public boolean isInScope(double val) {
         return val <= high && val >= low;
     }
 

@@ -1,4 +1,6 @@
-package jmc;
+package jmc.cas;
+
+import jmc.graph.Graph;
 
 /**
  * Created by Jiachen on 03/05/2017.

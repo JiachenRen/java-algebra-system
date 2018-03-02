@@ -1,5 +1,6 @@
-package jmc;
+package jmc.graph;
 
+import jmc.Function;
 import jui.*;
 import processing.core.PApplet;
 import processing.core.PConstants;

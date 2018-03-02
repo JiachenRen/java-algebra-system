@@ -1,5 +1,6 @@
-package jmc;
+package jmc.graph;
 
+import jmc.Function;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class Plot {
     }
 
 
-    Plot(Range range) {
+    public Plot(Range range) {
         lowerBondX = range.getLow();
         upperBondX = range.getHigh();
     }
@@ -95,7 +96,7 @@ public class Plot {
         return coordinates;
     }
 
-    static float map(double d, double l, double u, double l1, double l2) {
+    public static float map(double d, double l, double u, double l1, double l2) {
         return PApplet.map((float) d, (float) l, (float) u, (float) l1, (float) l2);
     }
 
@@ -105,7 +106,7 @@ public class Plot {
      *
      * @param rangeY the valid range of the y values in which a certain point is going to be visible.
      */
-    void insertVerticalAsymptote(Range rangeY, Function function) {
+    public void insertVerticalAsymptote(Range rangeY, Function function) {
         outer:
         for (int i = APL - 1; i < data.size() - APL; i++) {
             for (int q = i - (APL - 1); q <= i + APL; q++) {
@@ -171,7 +172,7 @@ public class Plot {
     }
 
 
-    void sort() {
+    public void sort() {
         Point sorted[] = mergeSort(data.toArray(new Point[data.size()]));
         data = new ArrayList<>();
         data.addAll(Arrays.asList(sorted));

@@ -1,4 +1,4 @@
-package jmc;
+package jmc.graph;
 
 /**
  * Created by Jiachen on 05/05/2017.
@@ -16,7 +16,7 @@ public class Point {
         isValidPoint = true;
     }
 
-    Point(double x, double y) {
+    public Point(double x, double y) {
         setX(x);
         setY(y);
     }
@@ -88,7 +88,7 @@ public class Point {
         this.isOutOfScope = temp;
     }
 
-    static double dist(Point a, Point b) {
+    public static double dist(Point a, Point b) {
         return Point.dist(a.getX(), a.getY(), b.getX(), b.getY());
     }
 

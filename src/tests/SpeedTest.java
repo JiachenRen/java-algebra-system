@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.Function;
+import jmc.cas.Expression;
 
 /**
  * Created by Jiachen on 04/05/2017.
@@ -10,7 +11,7 @@ import jmc.Function;
 public class SpeedTest {
     private final static double start = 0, end = 1000000, step = 0.1;
     private final static String expStr = "sin(cos(x^(x+sec(x)^3))+12x)";
-    private static Function interpretedFunc = Function.interpret(expStr);
+    private static Function interpretedFunc = Expression.interpret(expStr);
     private static Function javaCompiledFunction = new Function() {
         @Override
         public double eval(double val) {

@@ -1,4 +1,4 @@
-package jmc;
+package jmc.utils;
 
 import jui.JNode;
 
