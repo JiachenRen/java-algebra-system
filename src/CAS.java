@@ -1,6 +1,6 @@
 /**
  * Created by Jiachen on 3/2/18.
- * JMC Computer Algebra System user interface
+ * JMC Computer Algebra System user interface model
  */
 
 import javafx.application.Application;

@@ -17,18 +17,22 @@ public class UnaryOperation extends Operation {
         this(leftHand, RegisteredUnaryOperation.extract(operation));
     }
 
+    /**
+     * Instantiating using this constructor might compromise CAS capabilities.
+     * This constructor accepts non-JMC standard functions; This means that as long as the function
+     * of concern returns a value, it would be valid.
+     *
+     * @param leftHand  e.g. "x" in "log(x)"
+     * @param operation "log" in "log(x)"
+     */
     public UnaryOperation(Operable leftHand, Function operation) {
         super(leftHand);
         this.operation = operation;
-        if (leftHand instanceof BinaryOperation) {
-            ((BinaryOperation) leftHand).setOmitParenthesis(true);
-        }
     }
 
     /**
      * @param x input, double x
-     * @return the computed value from the designated unary operation
-     * @since May 21st: critical bug fixed.
+     * @return the computed value by plugging in the value of x into the designated unary operation
      */
     public double eval(double x) {
         return operation.eval(getLeftHand().eval(x));
@@ -43,30 +47,44 @@ public class UnaryOperation extends Operation {
         RegisteredUnaryOperation.define(name, evaluable);
     }
 
+    /**
+     * List of built-in operations:
+     * -> cos, acos(cos^-1), sin, asin, tan, atan, sec, csc, cot, log, int, abs, ln, cosh, sinh, tanh, !(factorial)
+     *
+     * @return an ArrayList containing all of the defined unary operations.
+     */
     public static ArrayList<Function> registeredOperations() {
         return RegisteredUnaryOperation.list();
     }
 
     @Override
-    public void toExponentialForm() {
-        if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
+    public Operable toExponentialForm() {
+        if (getLeftHand() instanceof Operation)
+            return this.replicate().setLeftHand(((Operation) getLeftHand()).toExponentialForm());
+        else return this.replicate();
     }
 
+    /**
+     * Note: does not modify self.
+     * Only delegates downward if it contains an operation.
+     *
+     * @return a new Operable instance that is the addition only form of self.
+     */
     public Operable toAdditionOnly() {
-        if (operation.getName().equals("~")) {
-            if (getLeftHand() instanceof Raw) {
-                return new Raw(-((Raw) getLeftHand()).doubleValue());
-            } else if (getLeftHand() instanceof Operation) {
-                this.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
-            }
-            //bug fixed May 26th
-            return new BinaryOperation(new Raw(-1), "*", this.getLeftHand());
+        if (getLeftHand() instanceof Operation) {
+            UnaryOperation newInstance = this.replicate();
+            newInstance.setLeftHand(((Operation) newInstance.getLeftHand()).toAdditionOnly());
+            return newInstance;
         }
-        return this;
+        return this.replicate();
     }
 
+    /**
+     * @param operable the Operable instance to be negated. IT IS NOT MODIFIED.
+     * @return a new Operable instance that represents the negated version of the original
+     */
     public static Operable negate(Operable operable) {
-        return new BinaryOperation(new Raw(0), "-", operable);
+        return new BinaryOperation(new Raw(-1), "*", operable);
     }
 
 
@@ -75,20 +93,23 @@ public class UnaryOperation extends Operation {
     }
 
     /**
-     * TODO process trigonometric simplification
+     * Note: does not modify self.
      *
-     * @return simplified self
+     * @return a new Operable instance that is the simplified version of self.
      */
     public Operable simplify() {
         if (getLeftHand() instanceof Operation) {
-            this.setLeftHand(((Operation) getLeftHand()).simplify());
-            return this;
-        } else return this;
+            //TODO: process trigonometric simplification
+            //if this.operation = "atan" && getLeftHand().operation = "tan" then simplify
+            UnaryOperation newInstance = this.replicate();
+            newInstance.setLeftHand(((Operation) newInstance.getLeftHand()).simplify());
+            return newInstance;
+        } else return this.replicate();
     }
 
     @Override
     public UnaryOperation replicate() {
-        return new UnaryOperation(getLeftHand().replicate(), operation);
+        return new UnaryOperation(getLeftHand(), operation);
     }
 
     private static class RegisteredUnaryOperation implements Evaluable {
@@ -114,7 +135,6 @@ public class UnaryOperation extends Operation {
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);
-            define("~", x -> -x);
             System.out.println("# reserved unary operations declared");
         }
 
@@ -147,7 +167,7 @@ public class UnaryOperation extends Operation {
             reservedFunctions.add(Function.implement(name, evaluable));
         }
 
-        public static ArrayList<Function> list() {
+        static ArrayList<Function> list() {
             return reservedFunctions;
         }
 
@@ -156,10 +176,25 @@ public class UnaryOperation extends Operation {
         }
     }
 
+    /**
+     * Returns true if the operations (Function) e.g. "sin", "cos" are the same
+     *
+     * @param other the other operable, possibly UnaryOperation or BinaryOperation
+     * @return whether or not the two instances are identical to each other.
+     */
     public boolean equals(Operable other) {
-        return other instanceof UnaryOperation && ((UnaryOperation) other).operation.equals(this.operation) && this.getLeftHand().equals(((UnaryOperation) other).getLeftHand());
+        return other instanceof UnaryOperation
+                && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
+                && this.getLeftHand().equals(((UnaryOperation) other).getLeftHand()); //delegate down
     }
 
+    /**
+     * Creates a new Operable with its variable replaced with {nested}
+     * Note: does not modify self
+     *
+     * @param nested the operable to be plugged in
+     * @return a new instance with its original variable replaced with {nested}
+     */
     public Operable plugIn(Operable nested) {
         return new UnaryOperation(getLeftHand().plugIn(nested), this.operation);
     }
