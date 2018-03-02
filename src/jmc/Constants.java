@@ -103,7 +103,7 @@ public class Constants {
     public static void list() {
         int count = 0;
         for (Constant constant : constants) {
-            System.out.println(Function.coloredLine("[36;1m", "<" + count + ">\t" + constant.toString() + "\t-> " + constant.computedConst.compute(), "->", "<", ">"));
+            System.out.println(ColorFormatter.coloredLine("[36;1m", "<" + count + ">\t" + constant.toString() + "\t-> " + constant.computedConst.compute(), "->", "<", ">"));
             count++;
         }
     }
