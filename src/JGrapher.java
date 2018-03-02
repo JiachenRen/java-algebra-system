@@ -75,7 +75,7 @@ public class JGrapher extends PApplet {
         parent = new HBox(0, 0, width, height);
         parent.setCollapseInvisible(true)
                 .setId("parent")
-                .setMargins(3, 0)
+                .setMargins(1, 0)
                 .matchWindowDimension(true);
 
         VBox std = new VBox(0.1f, 1.0f);
@@ -519,7 +519,7 @@ public class JGrapher extends PApplet {
         strokeWeight.getTitleLabel()
                 .setAlign(CENTER);
         strokeWeight.setRange(0.1f, 3)
-                .setTitle("Stroke Weight")
+                .setTitle("Line Width")
                 .setValue(1f)
                 .link(() -> getCurrentFunction().setStrokeWeight(strokeWeight.getFloatValue())).setId("#0");
         adv.add(strokeWeight);

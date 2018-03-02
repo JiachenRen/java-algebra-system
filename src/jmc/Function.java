@@ -94,7 +94,7 @@ public abstract class Function implements Evaluable {
             throw new IllegalArgumentException("incorrect format: '()' mismatch");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
             throw new IllegalArgumentException("incorrect format: '<>' mismatch");
-        expression = expression.replace(" ", "");
+        expression = formatUnaryOperations(expression.replace(" ", ""));
         String exp = Function.formatCoefficients(expression);
         exp = handleParentheticalNotation(Function.handleCalcPriority(exp));
         System.out.println((char) 27 + "[1m" + "formatted input: " + (char) 27 + "[0m" + exp);
@@ -115,6 +115,34 @@ public abstract class Function implements Evaluable {
         String colored = formatColorMathSymbols(operable.toString());
         System.out.println((char) 27 + "[31;1m" + "output:\t" + (char) 27 + "[0m" + colored);
         return new InterpretedFunction(operable);
+    }
+
+    private static String formatUnaryOperations(String exp) {
+        while (containsUnformattedUnaryOperations(exp)) {
+            int idx1 = -1;
+            for (Function function : UnaryOperation.registeredOperations()) {
+                String candidate = function.getName() + "(";
+                if (exp.contains(candidate)) {
+                    idx1 = exp.indexOf(candidate) + candidate.length() - 1;
+                    break;
+                }
+            }
+            int idx2 = findMatchingIndex(exp, idx1, ')');
+            exp = replaceAt(replaceAt(exp, idx1, '<'), idx2, '>');
+        }
+        return exp;
+    }
+
+    private static String replaceAt(String s, int idx, char c) {
+        return s.substring(0, idx) + c + s.substring(idx + 1);
+    }
+
+    private static boolean containsUnformattedUnaryOperations(String exp) {
+        for (Function function : UnaryOperation.registeredOperations()) {
+            if (exp.contains(function.getName() + "("))
+                return true;
+        }
+        return false;
     }
 
     public static String formatColorMathSymbols(String exp) {
@@ -396,7 +424,7 @@ public abstract class Function implements Evaluable {
     }
 
     private static String handleParentheticalNotation(String exp) {
-        String non_operators = ")>"+LETTERS;
+        String non_operators = ")>" + LETTERS;
         for (int i = 1; i < exp.length(); i++) {
             char cur = exp.charAt(i);
             if (cur == '(') {
@@ -632,7 +660,7 @@ public abstract class Function implements Evaluable {
         this.matchAuxiliaryLinesColor = matchAuxiliaryLinesColor;
     }
 
-    public boolean equals(Function other){
+    public boolean equals(Function other) {
         return this.getName().equals(other.getName());
     }
 }

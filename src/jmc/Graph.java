@@ -119,8 +119,8 @@ public class Graph extends Contextual {
             this.setWindow(converted[0] > cur[0] ? cur[0] : converted[0], converted[0] > cur[0] ? converted[0] : cur[0], converted[1] > cur[1] ? cur[1] : converted[1], converted[1] > cur[1] ? converted[1] : cur[1]);
         }).setDisabled(true));
         this.addEventListener(new EventListener("ZOOM_RECT", Event.MOUSE_HELD).attachMethod(() -> {
-            getParent().fill(0, 25);
-            getParent().stroke(0);
+            getParent().fill(getTextColor(), 25);
+            getParent().stroke(getTextColor());
             getParent().rect(initMousePosX, initMousePosY, getParent().mouseX - initMousePosX, getParent().mouseY - initMousePosY);
         }).setDisabled(true));
     }

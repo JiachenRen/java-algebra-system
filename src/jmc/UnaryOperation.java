@@ -43,6 +43,10 @@ public class UnaryOperation extends Operation {
         RegisteredUnaryOperation.define(name, evaluable);
     }
 
+    public static ArrayList<Function> registeredOperations() {
+        return RegisteredUnaryOperation.list();
+    }
+
     @Override
     public void toExponentialForm() {
         if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
@@ -67,7 +71,7 @@ public class UnaryOperation extends Operation {
 
 
     public String toString() {
-        return operation.getName() + "<" + getLeftHand().toString() + ">";
+        return operation.getName() + "(" + getLeftHand().toString() + ")";
     }
 
     /**
@@ -126,7 +130,7 @@ public class UnaryOperation extends Operation {
             return unaryOperation.eval(x);
         }
 
-        public static Function extract(String name) {
+        private static Function extract(String name) {
             for (Function function : reservedFunctions) {
                 if (function.getName().equals(name))
                     return function;
@@ -134,13 +138,17 @@ public class UnaryOperation extends Operation {
             throw new RuntimeException("undefined unary operation: " + "\"" + name + "\"");
         }
 
-        public static void define(String name, Evaluable evaluable) {
+        private static void define(String name, Evaluable evaluable) {
             for (int i = 0; i < reservedFunctions.size(); i++) {
                 Function function = reservedFunctions.get(i);
                 if (function.getName().equals(name))
                     reservedFunctions.remove(i);
             }
             reservedFunctions.add(Function.implement(name, evaluable));
+        }
+
+        public static ArrayList<Function> list() {
+            return reservedFunctions;
         }
 
         public boolean equals(RegisteredUnaryOperation other) {
@@ -152,8 +160,8 @@ public class UnaryOperation extends Operation {
         return other instanceof UnaryOperation && ((UnaryOperation) other).operation.equals(this.operation) && this.getLeftHand().equals(((UnaryOperation) other).getLeftHand());
     }
 
-    public Operable plugIn(Operable nested){
-        return new UnaryOperation(getLeftHand().plugIn(nested),this.operation);
+    public Operable plugIn(Operable nested) {
+        return new UnaryOperation(getLeftHand().plugIn(nested), this.operation);
     }
 
 }
