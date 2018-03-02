@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * Created by Jiachen on 05/05/2017
  * Manages a Point ArrayList
- * May 17th TODO detect greatest integer function asymptotes.
+ * May 17th TODO: detect greatest integer function asymptotes.
  */
 public class Plot {
     private ArrayList<Point> data;
@@ -23,7 +23,7 @@ public class Plot {
     }
 
 
-    public Plot(Range range) {
+    Plot(Range range) {
         lowerBondX = range.getLow();
         upperBondX = range.getHigh();
     }
@@ -31,14 +31,14 @@ public class Plot {
     /**
      * Converts the plot data to actual coordinates on screen.
      * NOTE: by using this method, one should be aware that the y values are scaled.
-     * TODO remove rangeY, should be converted to field and initialized through constructor
+     * TODO: remove rangeY, should be converted to field and initialized through constructor
      *
      * @param rangeY the range of the y values which is obtained through
      *               the examination of graph window dimension.
      * @param width  the width of the graph
      * @param height the height of the graph.
      */
-    public void updateCoordinates(Range rangeY, double width, double height) {
+    void updateCoordinates(Range rangeY, double width, double height) {
         coordinates = new ArrayList<>();
         double lowerBondY = rangeY.getLow(), upperBondY = rangeY.getHigh();
         for (int i = 1; i < data.size(); i++) {
@@ -91,7 +91,7 @@ public class Plot {
         return upperBondX;
     }
 
-    public ArrayList<Point> getCoordinates() {
+    ArrayList<Point> getCoordinates() {
         return coordinates;
     }
 
@@ -101,11 +101,11 @@ public class Plot {
 
     /**
      * Inspects plot data points and note any asymptotes.
-     * TODO DEBUG: invalid asymptotes that don't actually exist would be marked if the graph is only partially visible
+     * TODO: invalid asymptotes that don't actually exist would be marked if the graph is only partially visible
      *
      * @param rangeY the valid range of the y values in which a certain point is going to be visible.
      */
-    public void insertVerticalAsymptote(Range rangeY, Function function) {
+    void insertVerticalAsymptote(Range rangeY, Function function) {
         outer:
         for (int i = APL - 1; i < data.size() - APL; i++) {
             for (int q = i - (APL - 1); q <= i + APL; q++) {
@@ -171,19 +171,19 @@ public class Plot {
     }
 
 
-    public void sort() {
+    void sort() {
         Point sorted[] = mergeSort(data.toArray(new Point[data.size()]));
         data = new ArrayList<>();
         data.addAll(Arrays.asList(sorted));
     }
 
-    public static Point[] mergeSort(Point[] array) {
+    private static Point[] mergeSort(Point[] array) {
         return recursiveMergeSort(0, array.length - 1, array);
     }
 
 
     //designed by Jiachen Ren on March 19th
-    public static Point[] recursiveMergeSort(int startIndex, int endIndex, Point[] array) {
+    private static Point[] recursiveMergeSort(int startIndex, int endIndex, Point[] array) {
         // base case
         if (endIndex - startIndex <= 1) {
             if (endIndex == startIndex) return new Point[]{array[endIndex]};
@@ -222,7 +222,7 @@ public class Plot {
         }
     }
 
-    public double lookUp(double x, double accuracy) {
+    double lookUp(double x, double accuracy) {
         return recursiveBinSearch(x, accuracy, 0, data.size());
     }
 

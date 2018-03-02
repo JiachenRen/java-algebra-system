@@ -2,6 +2,7 @@ package jmc;
 
 /**
  * Created by Jiachen on 05/05/2017.
+ * Point on the graph (graphing capabilities only)
  */
 public class Point {
     private double x;
@@ -15,12 +16,12 @@ public class Point {
         isValidPoint = true;
     }
 
-    public Point(double x, double y) {
+    Point(double x, double y) {
         setX(x);
         setY(y);
     }
 
-    public Point(Point clone) {
+    Point(Point clone) {
         this.x = clone.x;
         this.y = clone.y;
         this.isValidPoint = clone.isValidPoint;
@@ -49,7 +50,7 @@ public class Point {
             isValidPoint = false;
     }
 
-    public boolean isValid() {
+    boolean isValid() {
         return isValidPoint;
     }
 
@@ -61,21 +62,21 @@ public class Point {
         return "x: " + x + " y " + y;
     }
 
-    public Point setAsAnchor() {
+    Point setAsAnchor() {
         isAsymptoteAnchor = true;
         return this;
     }
 
-    public boolean isAsymptoteAnchor() {
+    boolean isAsymptoteAnchor() {
         return isAsymptoteAnchor;
     }
 
-    public Point setAsTail() {
+    Point setAsTail() {
         isAsymptoteTail = true;
         return this;
     }
 
-    public boolean isAsymptoteTail() {
+    boolean isAsymptoteTail() {
         return isAsymptoteTail;
     }
 
@@ -83,15 +84,15 @@ public class Point {
         return isOutOfScope;
     }
 
-    public void setOutOfScope(boolean temp) {
+    void setOutOfScope(boolean temp) {
         this.isOutOfScope = temp;
     }
 
-    public static double dist(Point a, Point b) {
+    static double dist(Point a, Point b) {
         return Point.dist(a.getX(), a.getY(), b.getX(), b.getY());
     }
 
-    public static double dist(double x1, double y1, double x2, double y2) {
+    private static double dist(double x1, double y1, double x2, double y2) {
         return Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 0.5);
     }
 }
