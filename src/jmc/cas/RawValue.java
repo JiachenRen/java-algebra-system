@@ -52,6 +52,6 @@ public class RawValue implements Operable {
      * @return new instance of self
      */
     public Operable plugIn(Operable nested) {
-        return new RawValue(this);
+        return this;
     }
 }

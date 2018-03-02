@@ -19,9 +19,9 @@ public class BinaryOperation extends Operation {
     }
 
     public BinaryOperation(Operable leftHand, RegisteredBinaryOperation operation, Operable rightHand) {
-        super(leftHand.replicate());
+        super(leftHand);
         this.operation = operation;
-        this.rightHand = rightHand.replicate();
+        this.rightHand = rightHand;
         omitParenthesis = true;
         processParentheticalNotation(getLeftHand(), false);
         processParentheticalNotation(this.rightHand, true);
@@ -97,27 +97,19 @@ public class BinaryOperation extends Operation {
      */
     @Override
     public Operable toExponentialForm() {
-        Operation newInstance = this.replicate();
-        if (getLeftHand() instanceof Operation) {
-            newInstance.setLeftHand(((Operation) getLeftHand()).toExponentialForm());
-        }
-        if (rightHand instanceof Operation) {
-            ((BinaryOperation) newInstance).rightHand = (((Operation) rightHand).toExponentialForm());
-        }
-        if (!this.operation.equals("/")) return newInstance;
-        BinaryOperation binOp = (BinaryOperation) newInstance;
-        if (binOp.rightHand.equals(new RawValue(0))) throw new ArithmeticException("division by zero: jmc");
-        if (binOp.rightHand instanceof BinaryOperation && ((BinaryOperation) binOp.rightHand).operation.equals("*")) {
-            BinaryOperation enclosed = ((BinaryOperation) binOp.rightHand);
+        if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
+        if (rightHand instanceof Operation) ((Operation) rightHand).toExponentialForm();
+        if (!this.operation.equals("/")) return this;
+        if (rightHand.equals(new RawValue(0))) throw new ArithmeticException("division by zero: jmc");
+        if (rightHand instanceof BinaryOperation && ((BinaryOperation) rightHand).operation.equals("*")) {
+            BinaryOperation enclosed = ((BinaryOperation) rightHand);
             enclosed.setLeftHand(new BinaryOperation(enclosed.getLeftHand(), "^", new RawValue(-1)));
             enclosed.rightHand = new BinaryOperation(enclosed.rightHand, "^", new RawValue(-1));
-        } else {
-            binOp.rightHand = new BinaryOperation(binOp.rightHand, "^", new RawValue(-1));
-        }
-        binOp.operation = RegisteredBinaryOperation.extract("*");
-        processParentheticalNotation(binOp.getLeftHand(), false);
-        processParentheticalNotation(binOp.rightHand, true);
-        return binOp;
+        } else this.rightHand = new BinaryOperation(rightHand, "^", new RawValue(-1));
+        operation = RegisteredBinaryOperation.extract("*");
+        processParentheticalNotation(getLeftHand(), false);
+        processParentheticalNotation(rightHand, true);
+        return this;
     }
 
     /**
@@ -488,14 +480,13 @@ public class BinaryOperation extends Operation {
     }
 
     public Operable toAdditionOnly() {
-        BinaryOperation newInstance = this.replicate();
-        if (getLeftHand() instanceof Operation) newInstance.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
-        newInstance.rightHand = rightHand instanceof Operation ? ((Operation) newInstance.rightHand).toAdditionOnly() : newInstance.rightHand;
-        if (newInstance.operation.name.equals("-")) {
-            newInstance.operation = RegisteredBinaryOperation.extract("+");
-            newInstance.rightHand = UnaryOperation.negate(newInstance.rightHand);
+        if (getLeftHand() instanceof Operation) this.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
+        this.rightHand = rightHand instanceof Operation ? ((Operation) rightHand).toAdditionOnly() : rightHand;
+        if (operation.name.equals("-")) {
+            operation = RegisteredBinaryOperation.extract("+");
+            rightHand = UnaryOperation.negate(rightHand);
         }
-        return newInstance;
+        return this;
     }
 
     private static ArrayList<Operable> toArrayList(Operable... operables) {

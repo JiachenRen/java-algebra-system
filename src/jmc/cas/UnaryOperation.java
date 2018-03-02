@@ -60,28 +60,30 @@ public class UnaryOperation extends Operation {
         return RegisteredUnaryOperation.list();
     }
 
+    /**
+     * Note: modifies self
+     * @return exponential form of self
+     */
     @Override
     public Operable toExponentialForm() {
         if (getLeftHand() instanceof Operation) {
-            UnaryOperation newInstance = this.replicate();
-            newInstance.setLeftHand(((Operation) getLeftHand()).toExponentialForm());
-            return newInstance;
-        } else return this.replicate();
+            this.setLeftHand(((Operation) getLeftHand()).toExponentialForm());
+            return this;
+        } else return this;
     }
 
     /**
-     * Note: does not modify self.
+     * Note: modifies self.
      * Only delegates downward if it contains an operation.
      *
      * @return a new Operable instance that is the addition only form of self.
      */
     public Operable toAdditionOnly() {
         if (getLeftHand() instanceof Operation) {
-            UnaryOperation newInstance = this.replicate();
-            newInstance.setLeftHand(((Operation) newInstance.getLeftHand()).toAdditionOnly());
-            return newInstance;
+            this.setLeftHand(((Operation) this.getLeftHand()).toAdditionOnly());
+            return this;
         }
-        return this.replicate();
+        return this;
     }
 
     /**
@@ -98,7 +100,7 @@ public class UnaryOperation extends Operation {
     }
 
     /**
-     * Note: does not modify self.
+     * Note: modifies self.
      *
      * @return a new Operable instance that is the simplified version of self.
      */
@@ -106,10 +108,9 @@ public class UnaryOperation extends Operation {
         if (getLeftHand() instanceof Operation) {
             //TODO: process trigonometric simplification
             //if this.operation = "atan" && getLeftHand().operation = "tan" then simplify
-            UnaryOperation newInstance = this.replicate();
-            newInstance.setLeftHand(((Operation) newInstance.getLeftHand()).simplify());
-            return newInstance;
-        } else return this.replicate();
+            this.setLeftHand(((Operation) this.getLeftHand()).simplify());
+            return this;
+        } else return this;
     }
 
     @Override
@@ -195,13 +196,14 @@ public class UnaryOperation extends Operation {
 
     /**
      * Creates a new Operable with its variable replaced with {nested}
-     * Note: does not modify self
+     * Note: modifies
      *
      * @param nested the operable to be plugged in
      * @return a new instance with its original variable replaced with {nested}
      */
     public Operable plugIn(Operable nested) {
-        return new UnaryOperation(getLeftHand().plugIn(nested), this.operation);
+        this.getLeftHand().plugIn(nested);
+        return this;
     }
 
 }

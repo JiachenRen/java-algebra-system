@@ -12,12 +12,13 @@ import processing.core.PApplet;
  */
 public class ExponentialFormatTest {
     public static void main(String args[]) {
-        Operable operable = Expression.interpret("x/(x-1)/(x+1/(x-1))");
-        Operable exponentialForm = ((Operation) operable).toExponentialForm();
-        System.out.println(Expression.colorMathSymbols(exponentialForm.toString()));
+        Operation operable = (Operation) Expression.interpret("x/(x-1)/(x+1/(x-1))");
+        operable.toExponentialForm();
+        operable.toAdditionOnly();
+        System.out.println(Expression.colorMathSymbols(operable.toString()));
 
-        operable = Expression.interpret("x-3x^2+4x-5");
-        Operable additionOnly = ((Operation) operable).toAdditionOnly();
-        System.out.println(Expression.colorMathSymbols(additionOnly.toString()));
+        operable = (Operation) Expression.interpret("x-3x^2+4x-5");
+        operable.toAdditionOnly();
+        System.out.println(Expression.colorMathSymbols(operable.toString()));
     }
 }
