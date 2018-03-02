@@ -2,7 +2,7 @@ package jmc;
 
 /**
  * Created by Jiachen on 3/2/18.
- * An enum encapsulating String representations of Ansi colors.
+ * An enum encapsulating Ansi color codes.
  */
 public enum AnsiColor {
     BLACK("[0;30m"),
