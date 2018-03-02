@@ -567,7 +567,7 @@ public class JGrapher extends PApplet {
     }
 
     public void draw() {
-        background(65);
+        background(50);
         JNode.run();
     }
 
@@ -585,6 +585,7 @@ public class JGrapher extends PApplet {
                 functionInputWrapper.setVisible(!functionInputWrapper.isVisible());
                 graphWrapper.syncSize();
                 graphWrapper.arrange();
+                return;
         }
 
         JNode.keyPressed();

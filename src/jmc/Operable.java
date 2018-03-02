@@ -33,9 +33,9 @@ public interface Operable extends Evaluable {
         if (operable instanceof Operation) {
             Operation replica = ((Operation) operable).replicate();
             replica.toExponentialForm();
-            System.out.println((char) 27 + "[1m" + "converted to exponential form: " + (char) 27 + "[0m" + Function.formatColorMathSymbols(replica.toString()));
+            System.out.println((char) 27 + "[1m" + "converted to exponential form: " + (char) 27 + "[0m" + Function.colorMathSymbols(replica.toString()));
             Operable potentialOperation = replica.toAdditionOnly();
-            System.out.println((char) 27 + "[1m" + "converted to \"+\" only: " + (char) 27 + "[0m" + Function.formatColorMathSymbols(potentialOperation.toString()));
+            System.out.println((char) 27 + "[1m" + "converted to \"+\" only: " + (char) 27 + "[0m" + Function.colorMathSymbols(potentialOperation.toString()));
             if (potentialOperation instanceof Operation) {
                 Operable simplified = ((Operation) potentialOperation).simplify(); //recursion removed May 26th.
                 if (simplified instanceof Operation && ((Operation) simplified).simplifiable()) {

@@ -13,7 +13,7 @@ public class CasPlugInTest {
         //operable = operable.plugIn(Function.interpret("x+h").getOperable());
         //operable = Operable.expand(operable);
         operable = Operable.getFirstDerivative(operable);
-        operable = Operable.expand(operable);
+//        operable = Operable.expand(operable);
         l(f(operable.toString()));
     }
 
@@ -22,6 +22,6 @@ public class CasPlugInTest {
     }
 
     private static String f(String s) {
-        return Function.formatColorMathSymbols(s);
+        return Function.colorMathSymbols(s);
     }
 }

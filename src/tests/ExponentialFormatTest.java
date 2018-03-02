@@ -24,7 +24,7 @@ public class ExponentialFormatTest extends PApplet {
         JNode.init(this);
         Operable operable = Function.interpret("x/(x-1)/(x+1/(x-1))").getOperable();
         ((Operation) operable).toExponentialForm();
-        System.out.println(Function.formatColorMathSymbols(operable.toString()));
+        System.out.println(Function.colorMathSymbols(operable.toString()));
     }
 
     public void draw() {

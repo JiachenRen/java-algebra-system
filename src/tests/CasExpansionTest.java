@@ -65,7 +65,7 @@ public class CasExpansionTest {
     }
 
     private static String f(String s) {
-        return Function.formatColorMathSymbols(s);
+        return Function.colorMathSymbols(s);
     }
 
     private static void inspect(String s) {

@@ -1,9 +1,8 @@
 package jmc;
 
-import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.util.ArrayList;
+import static jmc.ColorFormatter.*;
 
 /**
  * Function class,
@@ -92,10 +91,10 @@ public abstract class Function implements Evaluable {
             throw new IllegalArgumentException("incorrect format: '()' mismatch");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
             throw new IllegalArgumentException("incorrect format: '<>' mismatch");
-        expression = formatUnaryOperations(expression.replace(" ", "").replace("(-","(0-"));
+        expression = formatUnaryOperations(expression.replace(" ", "").replace("(-", "(0-"));
         String exp = Function.formatCoefficients(expression);
         exp = handleParentheticalNotation(Function.handleCalcPriority(exp));
-        System.out.println((char) 27 + "[1m" + "formatted input: " + (char) 27 + "[0m" + exp);
+        System.out.println(boldBlack("formatted input: ") + exp);
         ArrayList<Operable> components = new ArrayList<>();
         int hashId = 0;
         while (exp.indexOf(')') != -1) {
@@ -105,15 +104,18 @@ public abstract class Function implements Evaluable {
             components.add(formulated);
             String left = innerIndices[0] > 0 ? exp.substring(0, innerIndices[0]) : "";
             exp = left + "&" + hashId + exp.substring(innerIndices[1] + 1);
-            System.out.println((char) 27 + "[1;36m" + "func:\t" + (char) 27 + "[0m" + formatColorMathSymbols(exp));
+            System.out.println(lightCyan("func:\t") + colorMathSymbols(exp));
             hashId++;
         }
         Operable operable = generateOperations(exp, components);
         if (operable instanceof BinaryOperation) ((BinaryOperation) operable).setOmitParenthesis(true);
-        String colored = formatColorMathSymbols(operable.toString());
-        System.out.println((char) 27 + "[31;1m" + "output:\t" + (char) 27 + "[0m" + colored);
+        String colored = colorMathSymbols(operable.toString());
+        System.out.println(boldRed("output:\t") + colored);
         return new InterpretedFunction(operable);
     }
+
+
+
 
     private static String formatUnaryOperations(String exp) {
         while (containsUnformattedUnaryOperations(exp)) {
@@ -143,8 +145,7 @@ public abstract class Function implements Evaluable {
         return false;
     }
 
-    public static String formatColorMathSymbols(String exp) {
-        //String colored = coloredLine("[35;1m", exp, "x");
+    public static String colorMathSymbols(String exp) {
         String colored = coloredLine("[36;1m", exp, "<", ">");
         colored = coloredLine("[1;m", colored, "+", "-", "*", "/", "^");
         colored = coloredLine("[1;34m", colored, ")", "(");
@@ -191,7 +192,7 @@ public abstract class Function implements Evaluable {
 
 
     private static Operable generateOperations(String segment, ArrayList<Operable> operables) {
-        System.out.println((char) 27 + "[32;1m" + "exp:\t" + (char) 27 + "[0m" + formatColorMathSymbols(segment)); //skill learned May 16th, colored output!
+        System.out.println(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
         int operableHashId = 0;
         ArrayList<Operable> pendingOperations = new ArrayList<>();
         while (segment.indexOf('<') != -1) {
@@ -210,7 +211,7 @@ public abstract class Function implements Evaluable {
             }
             pendingOperations.add(new UnaryOperation(innerOperable, unaryOperation));
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
-            System.out.println((char) 27 + "[34;1m" + "unary:\t" + (char) 27 + "[0m" + formatColorMathSymbols(segment));
+            System.out.println(lightBlue("unary:\t") + colorMathSymbols(segment));
             segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
             operableHashId++;
         }
@@ -225,7 +226,7 @@ public abstract class Function implements Evaluable {
                     pendingOperations.add(operation);
                     String left = indices[0] == 0 ? "" : segment.substring(0, indices[0]);
                     segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
-                    System.out.println("->\t\t" + formatColorMathSymbols(segment));
+                    System.out.println("->\t\t" + colorMathSymbols(segment));
                     i = 0;
                     operableHashId++;
                 }
@@ -266,21 +267,7 @@ public abstract class Function implements Evaluable {
         return operands;
     }
 
-    /**
-     * returns a colored line!
-     *
-     * @param modifier a sequence of escape characters for modifying the color& font.
-     * @param line     the line to be colored
-     * @param symbols  the symbols to be replaced with color
-     * @return a beautifully formatted&colorful line for printing!
-     * @since May 16th
-     */
-    public static String coloredLine(String modifier, String line, String... symbols) {
-        for (String symbol : symbols) {
-            line = line.replace(symbol, (char) 27 + modifier + symbol + (char) 27 + "[0m");
-        }
-        return line;
-    }
+
 
     /**
      * TODO DEBUG
