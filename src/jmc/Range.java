@@ -2,6 +2,7 @@ package jmc;
 
 /**
  * Created by Jiachen on 05/05/2017.
+ * Range class (for graphing capabilities only)
  */
 public class Range {
     private double low;
@@ -10,7 +11,7 @@ public class Range {
     private boolean hasNextStep;
     private double current;
 
-    public Range(double low, double high, double step) {
+    Range(double low, double high, double step) {
         this.low = low;
         this.high = high;
         this.step = step;
@@ -19,25 +20,25 @@ public class Range {
         assertValidity();
     }
 
-    public Range(Range clone) {
+    Range(Range clone) {
         this(clone.getLow(), clone.getHigh(), clone.getStep());
         this.hasNextStep = clone.hasNextStep;
         this.current = clone.current;
     }
 
-    public Range(double low, double high) {
+    Range(double low, double high) {
         this(low, high, 0);
     }
 
-    public double getLow() {
+    double getLow() {
         return this.low;
     }
 
-    public double getHigh() {
+    double getHigh() {
         return this.high;
     }
 
-    public double getCurStep() {
+    double getCurStep() {
         return current;
     }
 
@@ -45,24 +46,24 @@ public class Range {
         current = low;
     }
 
-    public double getStep() {
+    double getStep() {
         return step;
     }
 
-    public void setStep(double step) {
+    void setStep(double step) {
         this.step = step;
     }
 
-    public void next() {
+    void next() {
         if (current < high) current += step;
         else hasNextStep = false;
     }
 
-    public double getSpan() {
+    double getSpan() {
         return high - low;
     }
 
-    public boolean hasNextStep() {
+    boolean hasNextStep() {
         return hasNextStep;
     }
 
@@ -79,7 +80,7 @@ public class Range {
 
     }
 
-    public boolean isInScope(double val) {
+    boolean isInScope(double val) {
         return val <= high && val >= low;
     }
 
@@ -87,7 +88,7 @@ public class Range {
         return "low: " + low + " high: " + high + " step: " + step;
     }
 
-    public int numSteps() {
+    private int numSteps() {
         return (int) (getSpan() / getStep());
     }
 
@@ -99,12 +100,12 @@ public class Range {
      *              while 0.5 would make the span 0.5 times
      *              the original.
      */
-    public void rescale(double scale) {
+    void rescale(double scale) {
         double original_span = this.getSpan();
         double mid = (getLow() + getHigh()) / 2;
         original_span *= scale;
-        this.low = mid - original_span/2;
-        this.high = mid + original_span/2;
+        this.low = mid - original_span / 2;
+        this.high = mid + original_span / 2;
         current = low;
         hasNextStep = true;
     }
