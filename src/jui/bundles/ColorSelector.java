@@ -69,7 +69,7 @@ public class ColorSelector extends VBox {
         String colorVarNames[] = new String[]{"R", "G", "B", "A"};
 
         title = new Label();
-        title.setContent("Color Selector");
+        title.setContent("Color Selector").setAlign(CENTER);
 
         renderedColor = new Label(.1f, 1.0f);
         renderedColor.setContent("");

@@ -75,7 +75,7 @@ public class JGrapher extends PApplet {
         parent = new HBox(0, 0, width, height);
         parent.setCollapseInvisible(true)
                 .setId("parent")
-                .setMargins(1, 0)
+                .setMargins(3, 0)
                 .matchWindowDimension(true);
 
         VBox std = new VBox(0.1f, 1.0f);
@@ -197,6 +197,7 @@ public class JGrapher extends PApplet {
 
 
         std.add(new Label().setContent("Window").inheritOutlook(modelLabel));
+//        std.add(new SpaceHolder());
 
         Runnable window = () -> {
             @SuppressWarnings("unchecked") ArrayList<TextInput> displayables = (ArrayList<TextInput>) JNode.get("$window");
