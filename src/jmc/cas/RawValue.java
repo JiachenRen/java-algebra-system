@@ -37,8 +37,22 @@ public class RawValue implements Operable {
         return new RawValue(number);
     }
 
+    public RawValue negate() {
+        this.number = this.doubleValue() * -1;
+        return this;
+    }
+
     public double doubleValue() {
         return number.doubleValue();
+    }
+
+    public int intValue() {
+        return number.intValue();
+    }
+
+    public boolean isInteger() {
+        String s = number.toString();
+        return s.endsWith(".0") || !s.contains(".");
     }
 
     public boolean equals(Operable other) {

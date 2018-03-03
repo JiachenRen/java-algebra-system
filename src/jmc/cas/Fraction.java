@@ -11,18 +11,16 @@ import java.math.BigInteger;
 public class Fraction extends RawValue {
     private long numerator;
     private long denominator;
+    private double tolerance = 5E-7;
 
     public Fraction(long numerator, long denominator) {
         super(numerator / denominator);
         this.numerator = numerator;
         this.denominator = denominator;
+        this.reduce();
     }
 
-    public Fraction(double val) {
-        super(val);
-    }
-
-    public static Fraction convertToFraction(double val) {
+    public static RawValue convertToFraction(double val) {
         String s = String.valueOf(val);
         long digitsDec = s.length() - 1 - s.indexOf('.');
         long denominator = 1;
@@ -32,18 +30,54 @@ public class Fraction extends RawValue {
             denominator *= 10;
         }
 
-        long numerator =  Math.round(val);
+        long numerator = Math.round(val);
         return new Fraction(numerator, denominator).reduce();
     }
 
     private long gcd() {
-        return gcd(Math.abs(numerator), Math.abs(denominator));
+        return gcd(numerator, denominator);
     }
 
-    public Fraction reduce() {
+    public RawValue add(RawValue o) {
+        if (!(o instanceof Fraction)) {
+            if (o.isInteger()) o = new Fraction(o.intValue(), 1);
+            else o = Fraction.convertToFraction(o.doubleValue(), tolerance);
+        } else o = o.replicate();
+        Fraction f = (Fraction) o;
+
+        long lcm = lcm(denominator, f.denominator);
+        this.simult(lcm / denominator);
+        f.simult(lcm / f.denominator);
+        this.numerator += f.numerator;
+        return this.reduce();
+    }
+
+    public RawValue sub(RawValue o) {
+        return this.add(o.replicate().negate());
+    }
+
+    public Fraction negate() {
+        this.numerator *= -1;
+        return this;
+    }
+
+    private void simult(long n) {
+        denominator *= n;
+        numerator *= n;
+    }
+
+    public RawValue reduce() {
         long gcd = gcd();
         this.numerator /= gcd;
         this.denominator /= gcd;
+        if (denominator == 1) {
+            return new RawValue(numerator);
+        } else if (numerator == 0) {
+            return new RawValue(0);
+        } else if (numerator < 0 && denominator < 0) {
+            this.numerator *= -1;
+            this.denominator *= -1;
+        }
         return this;
     }
 
@@ -53,7 +87,11 @@ public class Fraction extends RawValue {
      * @return greatest common divisor
      */
     private static long gcd(long a, long b) {
-        return MathContext.gcd(new BigInteger(Long.toString(a)), new BigInteger(Long.toString(b))).longValue();
+        return MathContext.gcd(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
+    }
+
+    private static long lcm(long a, long b) {
+        return MathContext.lcm(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
     }
 
     /**
@@ -63,12 +101,14 @@ public class Fraction extends RawValue {
      * @param tolerance desired difference between fraction and the actual double value
      * @return Fraction derived from the provided double value
      */
-    public static Fraction convertToFraction(double val, double tolerance) {
+    public static RawValue convertToFraction(double val, double tolerance) {
         if (val < 0) {
-            Fraction fraction = convertToFraction(-val);
-            fraction.numerator *= -1;
-            return fraction;
+            RawValue raw = convertToFraction(-val);
+            if (raw instanceof Fraction)
+                ((Fraction) raw).numerator *= -1;
+            return raw;
         }
+        //TODO: there should be a maximum tolerance for inputs like 0.1403508772
         long numerator = 1, h2 = 0, denominator = 0, k2 = 1;
         double b = val;
         do {
@@ -97,6 +137,10 @@ public class Fraction extends RawValue {
     public Fraction setDenominator(long n) {
         this.denominator = n;
         return this;
+    }
+
+    public Fraction replicate() {
+        return new Fraction(numerator, denominator);
     }
 
     @Override
