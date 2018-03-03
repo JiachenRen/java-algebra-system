@@ -1,9 +1,6 @@
 package tests;
 
-import jmc.cas.Expression;
-import jmc.cas.Operable;
-import jmc.cas.Operation;
-import jmc.cas.Variable;
+import jmc.cas.*;
 import jui.*;
 import processing.core.PApplet;
 
@@ -25,5 +22,9 @@ public class ExponentialFormatTest {
         operation = (Operation) Expression.interpret("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
         operation.plugIn(new Variable("x"), Expression.interpret("h"));
         System.out.println(operation);
+
+        System.out.println(Fraction.convertToFraction(3.9145345345345));
+        System.out.println(Fraction.convertToFraction(3.1415926535766, 5E-14));
+
     }
 }
