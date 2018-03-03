@@ -9,10 +9,10 @@ import java.math.BigInteger;
  * Fraction
  */
 public class Fraction extends RawValue {
-    private int numerator;
-    private int denominator;
+    private long numerator;
+    private long denominator;
 
-    public Fraction(int numerator, int denominator) {
+    public Fraction(long numerator, long denominator) {
         super(numerator / denominator);
         this.numerator = numerator;
         this.denominator = denominator;
@@ -24,22 +24,24 @@ public class Fraction extends RawValue {
 
     public static Fraction convertToFraction(double val) {
         String s = String.valueOf(val);
-        int digitsDec = s.length() - 1 - s.indexOf('.');
-        int denominator = 1;
+        long digitsDec = s.length() - 1 - s.indexOf('.');
+        long denominator = 1;
         for (int i = 0; i < digitsDec; i++) {
+
             val *= 10;
             denominator *= 10;
         }
-        int numerator = (int) Math.round(val);
+
+        long numerator =  Math.round(val);
         return new Fraction(numerator, denominator).reduce();
     }
 
-    private int gcd() {
+    private long gcd() {
         return gcd(Math.abs(numerator), Math.abs(denominator));
     }
 
     public Fraction reduce() {
-        int gcd = gcd();
+        long gcd = gcd();
         this.numerator /= gcd;
         this.denominator /= gcd;
         return this;
@@ -50,8 +52,8 @@ public class Fraction extends RawValue {
      * @param b second number
      * @return greatest common divisor
      */
-    private static int gcd(int a, int b) {
-        return MathContext.gcd(new BigInteger(Integer.toString(a)), new BigInteger(Integer.toString(b))).intValue();
+    private static long gcd(long a, long b) {
+        return MathContext.gcd(new BigInteger(Long.toString(a)), new BigInteger(Long.toString(b))).longValue();
     }
 
     /**
@@ -67,11 +69,11 @@ public class Fraction extends RawValue {
             fraction.numerator *= -1;
             return fraction;
         }
-        int numerator = 1, h2 = 0, denominator = 0, k2 = 1;
+        long numerator = 1, h2 = 0, denominator = 0, k2 = 1;
         double b = val;
         do {
-            int a = (int) Math.floor(b);
-            int aux = numerator;
+            long a = (long) Math.floor(b);
+            long aux = numerator;
             numerator = a * numerator + h2;
             h2 = aux;
             aux = denominator;
@@ -80,19 +82,19 @@ public class Fraction extends RawValue {
             b = 1 / (b - a);
         } while (Math.abs(val - numerator / (double) denominator) > val * tolerance);
 
-        return new Fraction(numerator, denominator);
+        return new Fraction(numerator, denominator).reduce();
     }
 
     public String toString() {
         return "(" + numerator + "/" + denominator + ")";
     }
 
-    public Fraction setNumerator(int n) {
+    public Fraction setNumerator(long n) {
         this.numerator = n;
         return this;
     }
 
-    public Fraction setDenominator(int n) {
+    public Fraction setDenominator(long n) {
         this.denominator = n;
         return this;
     }
