@@ -10,6 +10,7 @@ import static jmc.cas.Assets.*;
 /**
  * Created by Jiachen on 19/05/2017.
  * Expression class that programmatically interprets mathematical expressions like "ln(x)^2/e*pi" into binary code.
+ * An expression must be a function, but a function might not be able to be represented using an expression.
  */
 public class Expression extends Function {
 
@@ -52,7 +53,7 @@ public class Expression extends Function {
         Operable operable = generateOperations(exp, components);
         if (operable instanceof BinaryOperation) ((BinaryOperation) operable).setOmitParenthesis(true);
         String colored = colorMathSymbols(operable.toString());
-        System.out.println(boldRed("output:\t") + colored);
+        System.out.println(lightRed("output:\t") + colored);
         return operable;
     }
 

@@ -39,11 +39,17 @@ public class CasComprehensiveTest {
         RawValue raw1 = new RawValue(14.3);
         l(raw.isInteger());
 
+        Fraction.TOLERANCE = 5E-7;
+
         Fraction f7 = new Fraction(11, 7);
         Fraction f8 = new Fraction(6, 14);
         l(f7 + " + " + f8 + " = " + f7.replicate().add(f8));
         l(f8 + " - " + f7 + " = " + f8.replicate().sub(f7));
-        l(raw1 + " + " + f7 + " = " + f7.add(raw1));
+        l(raw1 + " + " + f7 + " = " + f7.replicate().add(raw1));
+        l(f7 + " x " + f8 + " = " + f7.replicate().mult(f8));
+        l(f8 + " x " + raw1 + " = " + f8.replicate().mult(raw1));
+        l(f8 + " / " + raw1 + " = " + f8.replicate().div(raw1));
+        l(f8 + " / " + f7 + " = " + f8.replicate().div(f7));
     }
 
     private static void l(Object... objects) {

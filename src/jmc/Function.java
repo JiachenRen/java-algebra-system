@@ -12,7 +12,7 @@ public abstract class Function implements Evaluable {
 
     private String name;
 
-    Function(String name) {
+    protected Function(String name) {
         setName(name);
     }
 

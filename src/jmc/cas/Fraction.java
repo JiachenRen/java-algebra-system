@@ -11,7 +11,7 @@ import java.math.BigInteger;
 public class Fraction extends RawValue {
     private long numerator;
     private long denominator;
-    private double tolerance = 5E-7;
+    public static double TOLERANCE = 5E-7;
 
     public Fraction(long numerator, long denominator) {
         super(numerator / denominator);
@@ -41,7 +41,7 @@ public class Fraction extends RawValue {
     public RawValue add(RawValue o) {
         if (!(o instanceof Fraction)) {
             if (o.isInteger()) o = new Fraction(o.intValue(), 1);
-            else o = Fraction.convertToFraction(o.doubleValue(), tolerance);
+            else o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
         } else o = o.replicate();
         Fraction f = (Fraction) o;
 
@@ -54,6 +54,32 @@ public class Fraction extends RawValue {
 
     public RawValue sub(RawValue o) {
         return this.add(o.replicate().negate());
+    }
+
+    public RawValue mult(RawValue o) {
+        if (o instanceof Fraction) {
+            numerator *= ((Fraction) o).numerator;
+            denominator *= ((Fraction) o).denominator;
+            return this.reduce();
+        } else if (o.isInteger()) {
+            numerator *= o.intValue();
+            return this.reduce();
+        } else {
+            o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
+            return mult(o);
+        }
+    }
+
+    @Override
+    public RawValue inverse() {
+        long tmp = denominator;
+        denominator = numerator;
+        numerator = tmp;
+        return this;
+    }
+
+    public RawValue div(RawValue o) {
+        return mult(o.inverse());
     }
 
     public Fraction negate() {
@@ -108,7 +134,7 @@ public class Fraction extends RawValue {
                 ((Fraction) raw).numerator *= -1;
             return raw;
         }
-        //TODO: there should be a maximum tolerance for inputs like 0.1403508772
+        //TODO: there should be a maximum TOLERANCE for inputs like 0.1403508772
         long numerator = 1, h2 = 0, denominator = 0, k2 = 1;
         double b = val;
         do {

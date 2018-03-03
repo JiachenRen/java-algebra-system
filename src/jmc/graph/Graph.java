@@ -1,6 +1,5 @@
 package jmc.graph;
 
-import jmc.GraphFunction;
 import jmc.cas.Expression;
 import jui.*;
 import processing.core.PApplet;

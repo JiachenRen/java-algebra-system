@@ -1,9 +1,7 @@
-package jmc;
+package jmc.graph;
 
+import jmc.Function;
 import jmc.cas.*;
-import jmc.graph.Plot;
-import jmc.graph.Point;
-import jmc.graph.Range;
 
 import java.util.ArrayList;
 

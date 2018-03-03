@@ -1,7 +1,7 @@
-import jmc.*;
 import jmc.cas.*;
 import jmc.extras.Element;
 import jmc.graph.Graph;
+import jmc.graph.GraphFunction;
 import jui.*;
 import jui.bundles.ColorSelector;
 import jui.bundles.ValueSelector;

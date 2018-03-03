@@ -1,6 +1,6 @@
 package tests;
 
-import jmc.GraphFunction;
+import jmc.graph.GraphFunction;
 import jmc.cas.Expression;
 import jmc.graph.Graph;
 import jui.JNode;

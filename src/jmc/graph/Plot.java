@@ -1,6 +1,5 @@
 package jmc.graph;
 
-import jmc.GraphFunction;
 import processing.core.PApplet;
 
 import java.util.ArrayList;
@@ -9,7 +8,7 @@ import java.util.Arrays;
 /**
  * Created by Jiachen on 05/05/2017
  * Manages a Point ArrayList
- * May 17th TODO: detect greatest integer function asymptotes.
+ * May 17th
  */
 public class Plot {
     private ArrayList<Point> data;

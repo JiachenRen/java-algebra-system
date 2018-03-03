@@ -55,6 +55,11 @@ public class RawValue implements Operable {
         return s.endsWith(".0") || !s.contains(".");
     }
 
+    public RawValue inverse() {
+        if (isInteger()) return new Fraction(1, intValue());
+        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
+    }
+
     public boolean equals(Operable other) {
         return other instanceof RawValue && ((RawValue) other).doubleValue() == this.doubleValue();
     }

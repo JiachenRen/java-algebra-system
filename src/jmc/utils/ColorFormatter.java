@@ -11,8 +11,8 @@ public class ColorFormatter {
         return color(s, "[1m");
     }
 
-    public static String boldRed(String s) {
-        return color(s, "[31;1m");
+    public static String lightRed(String s) {
+        return color(s, AnsiColor.LIGHT_RED.toString());
     }
 
     public static String lightCyan(String s) {
