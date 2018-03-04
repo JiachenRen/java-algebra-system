@@ -1,4 +1,4 @@
-package jmc;
+package jmc.cas;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -23,7 +23,7 @@ public abstract class Operation implements Operable {
         return leftHand;
     }
 
-    public abstract void toExponentialForm();
+    public abstract Operable toExponentialForm();
 
     /**
      * post operation: the operation itself is modified
@@ -36,12 +36,7 @@ public abstract class Operation implements Operable {
         this.leftHand = operable;
     }
 
-    public abstract Operation replicate();
-
-    public boolean simplifiable() {
-        Operable duplicate = this.replicate().simplify();
-        return !duplicate.equals(this);
-    }
+    public abstract Operation clone();
 
     public abstract Operable toAdditionOnly();
 }

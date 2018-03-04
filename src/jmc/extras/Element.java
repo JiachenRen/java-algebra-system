@@ -1,4 +1,4 @@
-package jmc;
+package jmc.extras;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public enum Element {
     private final String fullName;
     private final double atomicMass;
 
-    private Element(int atomicNumber, String fullName, double atomicMass) {
+    Element(int atomicNumber, String fullName, double atomicMass) {
         this.atomicNumber = atomicNumber;
         this.fullName = fullName;
         this.atomicMass = atomicMass;
