@@ -380,7 +380,13 @@ public class BinaryOperation extends Operation {
     }
 
     public boolean equals(Operable other) {
-        return other instanceof BinaryOperation && ((BinaryOperation) other).getLeftHand().equals(this.getLeftHand()) && ((BinaryOperation) other).rightHand.equals(this.rightHand) && this.operation.equals(((BinaryOperation) other).operation);
+        if (!(other instanceof BinaryOperation)) return false;
+        BinaryOperation binOp = (BinaryOperation) other;
+        return binOp.operation.equals(operation)
+                && ((binOp.getLeftHand().equals(this.getLeftHand())
+                && binOp.getRightHand().equals(this.getRightHand()))
+                || (binOp.getLeftHand().equals(this.getRightHand())
+                && binOp.getRightHand().equals(this.getLeftHand())));
     }
 
     public BinaryOperation toAdditionOnly() {
