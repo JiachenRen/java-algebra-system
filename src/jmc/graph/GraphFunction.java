@@ -21,6 +21,7 @@ public class GraphFunction extends Function {
     private boolean matchAuxiliaryLinesColor;
     private boolean autoAsymptoteExtension;
     private Operable operable;
+    private Variable independentVar = new Variable("x");
 
 
     public enum Style {
@@ -55,8 +56,8 @@ public class GraphFunction extends Function {
     }
 
     @Override
-    public double eval(double val) {
-        return operable.eval(val);
+    public double eval(double val) { // this might compromise speed
+        return operable.clone().plugIn(new Variable("x"), new RawValue(val)).val();
     }
 
     /**

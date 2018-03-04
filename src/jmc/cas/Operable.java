@@ -1,5 +1,6 @@
 package jmc.cas;
 
+
 /**
  * Created by Jiachen on 03/05/2017.
  * Operable
@@ -22,6 +23,7 @@ public interface Operable extends Evaluable {
 
     /**
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
+     *
      * @param o the Operable instance that you are looking for.
      * @return the level at which operable is found.
      */
@@ -49,6 +51,23 @@ public interface Operable extends Evaluable {
      * @return arbitrary value of the node.
      */
     double val();
+
+    /**
+     * @param o the Operable instance to be inspected.
+     * @return number of variables in the expression represented by o.
+     */
+    static int numVars(Operable o) {
+        int vars = 0;
+        for (Character c : Assets.VARS.toCharArray()) {
+            if (o.levelOf(new Variable(c.toString())) != -1)
+                vars += 1;
+        }
+        return vars;
+    }
+
+    static boolean isMultiVar(Operable o) {
+        return numVars(o) > 1;
+    }
 
     boolean isUndefined();
 }

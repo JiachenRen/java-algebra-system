@@ -78,7 +78,10 @@ public class CasComprehensiveTest {
         operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(op -> {
             l(boldBlack("original: ") + Expression.colorMathSymbols(op.toString()));
+            l(boldBlack("plug in 5 for x: ") + op.clone().plugIn(new Variable("x"), new RawValue(5)));
+            l(boldBlack("evaluated at 5: ") + op.clone().plugIn(new Variable("x"), new RawValue(5)).val());
             l(lightCyan("arbitrary value: ") + op.val());
+            l(boldBlack("# vars: ") + Operable.numVars(op));
             l(lightRed("undefined: ") + op.isUndefined());
             l(lightBlue("level of x: ") + op.levelOf(new Variable("x")));
             if (op instanceof Operation) {
@@ -98,6 +101,8 @@ public class CasComprehensiveTest {
         Operable operable = Expression.interpret("0^0");
         l(operable.eval(3));
 
+        l(Operable.numVars(Expression.interpret("a+b*x+a+b/ln(c+e+pi)")));
+        l(Operable.isMultiVar(Expression.interpret("x*3+e")));
 //        ArrayList<String> arr = new ArrayList<>();
 //        Collections.addAll(arr, "a","b","c","d","e","f");
 //        l(arr.subList(1,arr.size()-1));

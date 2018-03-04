@@ -174,9 +174,9 @@ public class JGrapher extends PApplet {
                 Operable original = Expression.interpret(funcTextInput.getStaticContent());
                 if (casEnabled) {
                     if (original instanceof BinaryOperation)
-                        original = ((BinaryOperation) original).simplify();
+                        original = original.simplify();
                     else if (original instanceof UnaryOperation)
-                        original = ((UnaryOperation) original).simplify();
+                        original = original.simplify();
                 }
                 funcTextInput.setContent(original.toString());
             } catch (RuntimeException e) {
@@ -190,7 +190,7 @@ public class JGrapher extends PApplet {
                 graph.override(funcNameTextInput.getContent(), func);
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
-                System.out.println((char) 27 + "[1;31m" + "interpretation incomplete -> pending..." + (char) 27 + "[0m");
+                System.out.println((char) 27 + "[1;31m" + "interpretation failed -> missing operands..." + (char) 27 + "[0m");
             }
         });
         functionInputWrapper.add(funcTextInput);
