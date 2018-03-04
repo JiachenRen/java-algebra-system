@@ -43,6 +43,10 @@ public class RawValue implements Operable, LeafNode {
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
+    public Operable simplify() {
+        return this;
+    }
+
     public RawValue clone() {
         return new RawValue(number);
     }

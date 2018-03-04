@@ -8,6 +8,7 @@ public class Variable implements Operable, LeafNode {
     private String name;
 
     public Variable(String name) {
+        if (name.equals("")) throw new IllegalArgumentException("variable name cannot be empty");
         this.name = name;
     }
 
@@ -25,6 +26,10 @@ public class Variable implements Operable, LeafNode {
 
     public String toString() {
         return name;
+    }
+
+    public Operable simplify() {
+        return this;
     }
 
     /**

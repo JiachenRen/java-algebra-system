@@ -67,7 +67,7 @@ public class CasComprehensiveTest {
         System.out.println(c);
 
         ArrayList<String> ops = new ArrayList<>();
-        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + log(10))", "2^((x^2)^3)", "1473x", "0/0", "0/0 + 0", "5 + 7 -log(11) + e^2");
+        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + log(10))", "2^((x^2)^3)", "1473x", "0/0", "0/0 + 0", "5 + 7 -log(11) + e^2","0^x");
         List<Operable> operables;
         operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(op -> {
@@ -75,8 +75,7 @@ public class CasComprehensiveTest {
             l(lightCyan("arbitrary value: ") + op.val());
             l(lightRed("undefined: ") + op.isUndefined());
             if (op instanceof Operation) {
-                Operation operation1 = (Operation) op;
-                l(lightGreen("simplified: ") + Expression.colorMathSymbols(operation1.clone().simplify().toString()));
+                l(lightGreen("simplified: ") + Expression.colorMathSymbols(op.clone().simplify().toString()));
             }
             l("");
         });
@@ -88,6 +87,9 @@ public class CasComprehensiveTest {
         System.out.println(Fraction.UNDEF.isUndefined());
         System.out.println(new Fraction(3,0).isUndefined());
         System.out.println(Math.log(11));
+
+        Operable operable = Expression.interpret("0^0");
+        System.out.println(operable.eval(3));
 
 //        ArrayList<String> arr = new ArrayList<>();
 //        Collections.addAll(arr, "a","b","c","d","e","f");

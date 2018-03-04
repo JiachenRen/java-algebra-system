@@ -11,7 +11,7 @@ public class Range {
     private boolean hasNextStep;
     private double current;
 
-    public Range(double low, double high, double step) {
+    Range(double low, double high, double step) {
         this.low = low;
         this.high = high;
         this.step = step;
@@ -20,7 +20,7 @@ public class Range {
         assertValidity();
     }
 
-    public Range(Range clone) {
+    Range(Range clone) {
         this(clone.getLow(), clone.getHigh(), clone.getStep());
         this.hasNextStep = clone.hasNextStep;
         this.current = clone.current;
@@ -38,15 +38,11 @@ public class Range {
         return this.high;
     }
 
-    public double getCurStep() {
+    double getCurStep() {
         return current;
     }
 
-    public void reset() {
-        current = low;
-    }
-
-    public double getStep() {
+    double getStep() {
         return step;
     }
 
@@ -54,16 +50,16 @@ public class Range {
         this.step = step;
     }
 
-    public void next() {
+    void next() {
         if (current < high) current += step;
         else hasNextStep = false;
     }
 
-    public double getSpan() {
+    double getSpan() {
         return high - low;
     }
 
-    public boolean hasNextStep() {
+    boolean hasNextStep() {
         return hasNextStep;
     }
 
@@ -80,7 +76,7 @@ public class Range {
 
     }
 
-    public boolean isInScope(double val) {
+    boolean isInScope(double val) {
         return val <= high && val >= low;
     }
 

@@ -1,5 +1,7 @@
 package jmc.cas;
 
+import com.sun.istack.internal.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +25,7 @@ public class BinaryOperation extends Operation {
         this.operation = operation;
         this.rightHand = rightHand;
         omitParenthesis = true;
-        processParentheticalNotation(getLeftHand(), false);
-        processParentheticalNotation(this.rightHand, true);
+        simplifyParenthesis();
     }
 
     /**
@@ -43,6 +44,12 @@ public class BinaryOperation extends Operation {
                 op.setOmitParenthesis(false);
             }
         }
+    }
+
+    private BinaryOperation simplifyParenthesis() {
+        processParentheticalNotation(getLeftHand(), false);
+        processParentheticalNotation(this.rightHand, true);
+        return this;
     }
 
     /**
@@ -97,7 +104,7 @@ public class BinaryOperation extends Operation {
      * "(x-4)(x-5)(x-3/(x-6))^-1", and then recursively reduced to
      * "(x-4)(x-5)(x-3*(x-6)^-1)^-1"
      * basic CAS capabilities. Implementation began: May 19th.
-     * Note: does not change self.
+     * NOTE: modifies self.
      */
     @Override
     public BinaryOperation toExponentialForm() {
@@ -117,18 +124,55 @@ public class BinaryOperation extends Operation {
     }
 
     /**
+     * HELPER METHOD
+     *
+     * @param i i == 1 -> getLeftHand(), i == 2 -> getRightHand()
+     * @return operand Operable
+     */
+    private Operable get(int i) {
+        switch (i) {
+            case 1:
+                return getLeftHand();
+            case 2:
+                return getRightHand();
+        }
+        throw new RuntimeException("invalid index");
+    }
+
+    /**
+     * HELPER METHOD
+     *
+     * @param i i == 1 -> getRightHand(), i == 2 -> getLeftHand()
+     * @return operand Operable
+     */
+    private Operable getOther(int i) {
+        if (i != 1 && i != 2) throw new RuntimeException("invalid index");
+        return i == 1 ? getRightHand() : getLeftHand();
+    }
+
+    /**
+     * HELPER METHOD
+     * whether this BinaryOperation contain the operand as an immediate child
+     *
+     * @param o Operable operand
+     * @return 1 if at left side operand, 2 if at right side operand, 0 if !contains.
+     */
+    private int contains(Operable o) {
+        if (getLeftHand().equals(o)) return 1;
+        else if (getRightHand().equals(o)) return 2;
+        return 0;
+    }
+
+    /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
      */
     public Operable simplify() {
 
-        if (getLeftHand() instanceof Operation) {
-            setLeftHand(((Operation) getLeftHand()).simplify());
-        }
-        if (rightHand instanceof Operation) {
-            rightHand = ((Operation) rightHand).simplify();
-        }
+        setLeftHand(getLeftHand().simplify());
+        rightHand = rightHand.simplify();
+        this.simplifyParenthesis();
 
         if (isUndefined()) return RawValue.UNDEF;
 
@@ -175,6 +219,7 @@ public class BinaryOperation extends Operation {
             }
         }
 
+
         if (getLeftHand().equals(getRightHand())) {
             switch (operation.name) {
                 case "+":
@@ -182,10 +227,46 @@ public class BinaryOperation extends Operation {
                 case "-":
                     return new RawValue(0);
                 case "*":
-                    return new BinaryOperation(getLeftHand(), "*", new RawValue(2));
+                    return new BinaryOperation(getLeftHand(), "^", new RawValue(2));
                 case "/":
                     return new RawValue(1);
             }
+        }
+
+        this.toAdditionOnly().toExponentialForm();
+
+        for (int i = 1; i <= 2; i++) {
+            if (get(i).val() == 0) {
+                switch (operation.name) {
+                    case "+":
+                        return getOther(i);
+                    case "*":
+                        return new RawValue(0);
+                    case "^":
+                        return i == 1 ? new RawValue(0) : new RawValue(1);
+                }
+            }
+        }
+
+        if (getLeftHand() instanceof BinaryOperation && getRightHand() instanceof BinaryOperation) {
+            BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
+            BinaryOperation binOp2 = (BinaryOperation) getRightHand();
+            if (binOp1.operation.equals(binOp2.operation))
+                switch (operation.name) {
+                    case "+":
+                        switch (binOp1.operation.name) {
+                            case "*":
+                                for (int i = 1; i <= 2; i++) {
+                                    Operable o1 = binOp1.get(i);
+                                    int idx = binOp2.contains(o1);
+                                    if (idx != 0) {
+                                        Operable add = new BinaryOperation(binOp1.getOther(i), "+", binOp2.getOther(idx)).simplify();
+                                        return new BinaryOperation(o1, "*", add).simplify();
+                                    }
+                                }
+
+                        }
+                }
         }
 
 
