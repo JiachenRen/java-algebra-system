@@ -90,6 +90,10 @@ public class Constants {
         public Operable plugIn(Variable var, Operable nested) {
             return new Constant(this);
         }
+
+        public int numNodes() {
+            return 1;
+        }
     }
 
     public static ArrayList<Constant> list() {

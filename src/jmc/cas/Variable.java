@@ -61,4 +61,8 @@ public class Variable implements Operable {
     public Operable plugIn(Variable var, Operable other) {
         return other;
     }
+
+    public int numNodes() {
+        return 1;
+    }
 }

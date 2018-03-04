@@ -209,4 +209,8 @@ public class UnaryOperation extends Operation {
         return this;
     }
 
+    public int numNodes() {
+        return 1 + getLeftHand().numNodes();
+    }
+
 }

@@ -73,4 +73,8 @@ public class RawValue implements Operable {
     public Operable plugIn(Variable var, Operable nested) {
         return this;
     }
+
+    public int numNodes() {
+        return 1;
+    }
 }

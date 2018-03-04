@@ -171,7 +171,11 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-//    public ArrayList<Operable> crossSimplify() {
+    public int numNodes() {
+        return getLeftHand().numNodes() + getRightHand().numNodes() + 1;
+    }
+
+//    public ArrayList<Operable> crossSimplify(ArrayList<Operable> pool) {
 //
 //    }
 
@@ -198,7 +202,7 @@ public class BinaryOperation extends Operation {
             pool.add(operable);
         } else if (operable instanceof BinaryOperation) {
             BinaryOperation binOp = ((BinaryOperation) operable);
-            if (binOp.operation.priority == this.getPriority()) {
+            if (binOp.getPriority() == this.getPriority()) {
                 pool.addAll(binOp.flattened());
             } else {
                 pool.add(binOp);
