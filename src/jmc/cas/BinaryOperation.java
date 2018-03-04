@@ -60,6 +60,10 @@ public class BinaryOperation extends Operation {
         return operation.eval(leftVal, rightVal);
     }
 
+    public double val() {
+        return operation.eval(getLeftHand().val(), getRightHand().val());
+    }
+
     public String toString() {
         String temp = getLeftHand().toString() + operation.name + rightHand.toString();
         return omitParenthesis ? temp : "(" + temp + ")";
@@ -331,8 +335,10 @@ public class BinaryOperation extends Operation {
         if (rightHand instanceof RawValue) {
             RawValue r = ((RawValue) rightHand);
             switch (operation.name) {
-                case "/": return r.isZero();
-                case "^": return getLeftHand() instanceof RawValue && ((RawValue) getLeftHand()).isZero() && !r.isPositive();
+                case "/":
+                    return r.isZero();
+                case "^":
+                    return getLeftHand() instanceof RawValue && ((RawValue) getLeftHand()).isZero() && !r.isPositive();
             }
         }
         //TODO: how about BinaryOperations like 3 - 3 which is essentially 0?

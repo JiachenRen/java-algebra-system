@@ -6,7 +6,6 @@ package jmc.cas;
  */
 public class Variable implements Operable, LeafNode {
     private String name;
-    private double val;
 
     public Variable(String name) {
         this.name = name;
@@ -20,17 +19,8 @@ public class Variable implements Operable, LeafNode {
         this.name = name;
     }
 
-    public double getVal() {
-        return val;
-    }
-
-    public void setVal(double val) {
-        this.val = val;
-    }
-
     public double eval(double x) {
-        this.setVal(x);
-        return getVal();
+        return x;
     }
 
     public String toString() {
@@ -43,9 +33,7 @@ public class Variable implements Operable, LeafNode {
      * @return new Variable instance that is identical to self.
      */
     public Variable clone() {
-        Variable newInstance = new Variable(name);
-        newInstance.setVal(this.val);
-        return newInstance;
+        return new Variable(name);
     }
 
     public boolean equals(Operable other) {
@@ -54,6 +42,15 @@ public class Variable implements Operable, LeafNode {
 
     public boolean isUndefined() {
         return false;
+    }
+
+    /**
+     * Since a variable is not an arbitrary number, val() should return NaN.
+     *
+     * @return NaN
+     */
+    public double val() {
+        return Double.NaN;
     }
 
     /**

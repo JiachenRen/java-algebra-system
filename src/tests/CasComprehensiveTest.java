@@ -7,9 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static jmc.utils.ColorFormatter.boldBlack;
-import static jmc.utils.ColorFormatter.lightGreen;
-import static jmc.utils.ColorFormatter.lightRed;
+import static jmc.utils.ColorFormatter.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -69,16 +67,18 @@ public class CasComprehensiveTest {
         System.out.println(c);
 
         ArrayList<String> ops = new ArrayList<>();
-        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + 10)", "2^((x^2)^3)", "1473x", "0/0", "0/0 + 0");
+        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + log(10))", "2^((x^2)^3)", "1473x", "0/0", "0/0 + 0", "5 + 7 -log(11) + e^2");
         List<Operable> operables;
         operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(op -> {
             l(boldBlack("original: ") + Expression.colorMathSymbols(op.toString()));
+            l(lightCyan("arbitrary value: ") + op.val());
             l(lightRed("undefined: ") + op.isUndefined());
             if (op instanceof Operation) {
                 Operation operation1 = (Operation) op;
                 l(lightGreen("simplified: ") + Expression.colorMathSymbols(operation1.clone().simplify().toString()));
             }
+            l("");
         });
 
         System.out.println(new RawValue(5).equals(new RawValue(5.0)));
@@ -87,6 +87,7 @@ public class CasComprehensiveTest {
         System.out.println(RawValue.UNDEF.equals(RawValue.UNDEF));
         System.out.println(Fraction.UNDEF.isUndefined());
         System.out.println(new Fraction(3,0).isUndefined());
+        System.out.println(Math.log(11));
 
 //        ArrayList<String> arr = new ArrayList<>();
 //        Collections.addAll(arr, "a","b","c","d","e","f");

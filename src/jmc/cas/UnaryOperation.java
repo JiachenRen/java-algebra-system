@@ -89,7 +89,6 @@ public class UnaryOperation extends Operation implements LeafNode {
 
     /**
      * @param operable the Operable instance to be negated. IT IS NOT MODIFIED.
-     *
      * @return a new Operable instance that represents the negated version of the original
      */
     public static Operable negate(Operable operable) {
@@ -128,7 +127,7 @@ public class UnaryOperation extends Operation implements LeafNode {
             reservedFunctions = new ArrayList<>();
             define("cos", Math::cos);
             define("sin", Math::sin);
-            define("log", Math::log);
+            define("log", Math::log10);
             define("int", Math::floor);
             define("tan", Math::tan);
             define("atan", Math::atan);
@@ -214,15 +213,23 @@ public class UnaryOperation extends Operation implements LeafNode {
         return 1 + getLeftHand().numNodes();
     }
 
+    public double val() {
+        return operation.eval(getLeftHand().val());
+    }
+
     public boolean isUndefined() {
         if (getLeftHand().isUndefined()) return true;
         if (getLeftHand() instanceof RawValue) {
             double n = ((RawValue) getLeftHand()).doubleValue();
             switch (operation.getName()) {
-                case "ln": return n <= 0;
-                case "log": return n <= 0;
-                case "asin": return n > 1 || n < -1;
-                case "acos": return n > 1 || n < -1;
+                case "ln":
+                    return n <= 0;
+                case "log":
+                    return n <= 0;
+                case "asin":
+                    return n > 1 || n < -1;
+                case "acos":
+                    return n > 1 || n < -1;
 //                case "tan":
 //                case "cot":
 //                case "sec":

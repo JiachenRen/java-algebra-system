@@ -31,5 +31,15 @@ public interface Operable extends Evaluable {
      */
     Operable plugIn(Variable var, Operable replacement);
 
+    /**
+     * traverses the composite tree and evaluates every single node that represents a raw value.
+     * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
+     * however, if variables exists in the expression, NaN is returned.
+     * e.g. if the Operable represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
+     *
+     * @return arbitrary value of the node.
+     */
+    double val();
+
     boolean isUndefined();
 }

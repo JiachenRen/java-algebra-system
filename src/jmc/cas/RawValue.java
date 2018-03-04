@@ -19,8 +19,9 @@ public class RawValue implements Operable, LeafNode {
     }
 
     public double eval(double x) {
-        return number.doubleValue();
+        return doubleValue();
     }
+    public double val() {return doubleValue();}
 
     /**
      * Removes the extra ".0" at the end of the number

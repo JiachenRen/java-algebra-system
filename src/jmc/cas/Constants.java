@@ -80,17 +80,13 @@ public class Constants {
         }
 
         @Override
-        public Constant clone() {
-            return new Constant(getName(), computedConst);
-        }
-
-        @Override
-        public double getVal() {
+        public double val() {
             return computedConst.compute();
         }
 
-        @Deprecated
-        public void setVal(double val) {
+        @Override
+        public Constant clone() {
+            return new Constant(getName(), computedConst);
         }
 
         public boolean equals(Operable other) {
