@@ -89,6 +89,7 @@ public class UnaryOperation extends Operation implements LeafNode {
 
     /**
      * @param operable the Operable instance to be negated. IT IS NOT MODIFIED.
+     *
      * @return a new Operable instance that represents the negated version of the original
      */
     public static Operable negate(Operable operable) {
