@@ -38,10 +38,5 @@ public abstract class Operation implements Operable {
 
     public abstract Operation clone();
 
-    public boolean simplifiable() {
-        Operable duplicate = this.clone().simplify();
-        return !duplicate.equals(this);
-    }
-
     public abstract Operable toAdditionOnly();
 }

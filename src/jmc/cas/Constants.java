@@ -24,7 +24,7 @@ public class Constants {
 
     public static boolean contains(String symbol) {
         for (Constant constant : constants) {
-            if (constant.name.equals(symbol))
+            if (constant.getName().equals(symbol))
                 return true;
         }
         return false;
@@ -41,7 +41,7 @@ public class Constants {
     public static void define(String name, ComputedConst computedConst) {
         boolean defined = false;
         for (Constant constant : constants) {
-            if (constant.name.equals(name)) {
+            if (constant.getName().equals(name)) {
                 constant.computedConst = computedConst;
                 defined = true;
             }
@@ -51,40 +51,50 @@ public class Constants {
 
     public static double valueOf(String constant) {
         for (Constant c : constants) {
-            if (c.name.equals(constant))
+            if (c.getName().equals(constant))
                 return c.computedConst.compute();
         }
         return 0.0;
     }
 
-    static class Constant implements Operable {
+    static class Constant extends Variable {
         private ComputedConst computedConst;
-        private String name;
 
         Constant(String name, ComputedConst computedConst) {
+            super(name);
             this.computedConst = computedConst;
-            this.name = name;
+
         }
 
         Constant(Constant other) {
+            super(other.getName());
             this.computedConst = other.computedConst;
-            this.name = other.name;
         }
 
         public String toString() {
-            return name;
+            return getName();
         }
 
         public double eval(double x) {
             return computedConst.compute();
         }
 
+        @Override
         public Constant clone() {
-            return new Constant(name, computedConst);
+            return new Constant(getName(), computedConst);
+        }
+
+        @Override
+        public double getVal() {
+            return computedConst.compute();
+        }
+
+        @Deprecated
+        public void setVal(double val) {
         }
 
         public boolean equals(Operable other) {
-            return other instanceof Constant && ((Constant) other).name.equals(this.name);
+            return other instanceof Constant && ((Constant) other).getName().equals(getName());
         }
 
         public Operable plugIn(Variable var, Operable nested) {
@@ -103,7 +113,7 @@ public class Constants {
 
     public static Constant getConstant(String name) {
         for (Constant constant : constants) {
-            if (constant.name.equals(name))
+            if (constant.getName().equals(name))
                 return constant;
         }
         return null;
