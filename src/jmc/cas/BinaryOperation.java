@@ -171,8 +171,22 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
+//    public ArrayList<Operable> crossSimplify() {
+//
+//    }
+
+    /**
+     * e.g. input: "(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3"
+     * e.g. output: [(3+4.5), ln(5.3+4), 2.7^(-1), (x+1)^(-1), x, 3^(-1)]
+     * <p>
+     * e.g. input: "3 - 2x + 4x - 4 + 7z"
+     * e.g. output: [3, (-1)*2*x, 4*x, (-1)*4, 7*z]
+     *
+     * @return an ArrayList containing all terms at the same priority level
+     */
     public ArrayList<Operable> flattened() {
         ArrayList<Operable> pool = new ArrayList<>();
+        if (operation.priority == 1) return pool; //if the operation is ^, then no commutative property applies.
         BinaryOperation clone = this.clone().toAdditionOnly().toExponentialForm();
         clone.flat(pool, clone.getLeftHand());
         clone.flat(pool, clone.getRightHand());
