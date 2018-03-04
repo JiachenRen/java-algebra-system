@@ -199,6 +199,7 @@ public class UnaryOperation extends Operation implements LeafNode {
      * Creates a new Operable with its variable replaced with {nested}
      * Note: modifies
      *
+     *
      * @param replacement the operable to be plugged in
      * @return a new instance with its original variable replaced with {nested}
      */
