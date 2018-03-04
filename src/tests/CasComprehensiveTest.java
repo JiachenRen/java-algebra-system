@@ -49,17 +49,26 @@ public class CasComprehensiveTest {
         l(f8 + " / " + raw1 + " = " + f8.clone().div(raw1));
         l(f8 + " / " + f7 + " = " + f8.clone().div(f7));
 
-        Operation op = (Operation) Expression.interpret("(3 + 4.5) * 5.3 / 2.7");
-        l(op);
-        l(op.clone().simplify());
-        l(((BinaryOperation) op).flattened());
-
         Operation op1 = (Operation) Expression.interpret("(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3");
         l(((BinaryOperation) op1).flattened());
         Operation op2 = (Operation) Expression.interpret("3 - 2x + 4x - 4 + 7pi");
         l(((BinaryOperation) op2).flattened());
 
-        l(op.numNodes(), op1.numNodes(), op2.numNodes());
+        l(op1.numNodes(), op2.numNodes());
+
+        Operable c = new Constants.Constant("e", () -> Math.E);
+        System.out.println(c);
+
+        Operation op = (Operation) Expression.interpret("(3 + 4.5x) * 5.3 / 2.7 * (5x + 10)");
+        l(op);
+        l(op.clone().simplify());
+
+
+//        ArrayList<String> arr = new ArrayList<>();
+//        Collections.addAll(arr, "a","b","c","d","e","f");
+//        System.out.println(arr.subList(1,arr.size()-1));
+
+
 
 
     }

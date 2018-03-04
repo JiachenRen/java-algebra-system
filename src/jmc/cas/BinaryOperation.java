@@ -1,6 +1,7 @@
 package jmc.cas;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -168,18 +169,74 @@ public class BinaryOperation extends Operation {
             }
         }
 
+        if (getPriority() == 1) return this; //up to this point the ^ operator cannot be simplified.
 
-
-        return this;
+        //up to this point all simplifications should have been tried, except the recursive cross-simplification
+        if (getLeftHand() instanceof LeafNode //e.g. ln(x) * x is not simplifiable
+                && rightHand instanceof LeafNode) {
+            return this; //no more could be done.
+        } else if (getLeftHand() instanceof LeafNode //e.g. x * (3.5x + 4) is not simplifiable
+                && rightHand instanceof BinaryOperation
+                && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
+            return this;
+        } else if (getRightHand() instanceof LeafNode //e.g. (3.5x + 4) * x  is not simplifiable
+                && getLeftHand() instanceof BinaryOperation
+                && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()) {
+            return this;
+        } else if (getLeftHand() instanceof BinaryOperation //e.g. (3.5x + 4) * (4x + 3) is not simplifiable
+                && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()
+                && rightHand instanceof BinaryOperation
+                && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
+            return this;
+        } else { //perform cross-simplification
+            ArrayList<Operable> flattened = this.flattened(); //make operations of the same priority throughout the binary tree visible at the same level.
+            crossSimplify(flattened);
+            if (flattened.size() < 2) return flattened.get(0);
+            else return reconstructBinTree(flattened);
+        }
     }
 
     public int numNodes() {
         return getLeftHand().numNodes() + getRightHand().numNodes() + 1;
     }
 
-//    public ArrayList<Operable> crossSimplify(ArrayList<Operable> pool) {
-//
-//    }
+    /**
+     * This method shouldn't be used when priority == 1, or with the operation ^, since it is not commutative.
+     *
+     * @param pool ArrayList containing flattened operables
+     */
+    public void crossSimplify(ArrayList<Operable> pool) {
+        if (getPriority() == 1) return;
+        for (int i = 0; i < pool.size() - 1; i++) {
+            Operable operable = pool.get(i);
+            for (int k = i + 1; k < pool.size(); k++) {
+                Operable other = pool.get(k);
+                String operation = getPriority() == 2 ? "*" : "+";
+                BinaryOperation binOp = new BinaryOperation(operable, operation, other);
+                int n1 = binOp.numNodes();
+                Operable op = binOp.simplify(); //be careful, avoid stack overflow
+                if (op.numNodes() < n1) { //simplifiable
+                    pool.remove(i);
+                    pool.remove(k - 1);
+                    pool.add(op);
+                    crossSimplify(pool); //result maybe bin tree or just Operable.
+                } else if (pool.size() <= 2) return;
+            }
+        }
+    }
+
+    /**
+     * reconstruct binary operation tree from flattened ArrayList of operations.
+     *
+     * @return reconstructed BinaryOperation tree.
+     */
+    public BinaryOperation reconstructBinTree(ArrayList<Operable> flattened) {
+        if (flattened.size() < 2) return null;
+        String op = getPriority() == 2 ? "*" : "+";
+        BinaryOperation root = new BinaryOperation(flattened.remove(0), op, flattened.remove(0));
+        while (flattened.size() > 0) root = new BinaryOperation(root, op, flattened.remove(0));
+        return root;
+    }
 
     /**
      * e.g. input: "(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3"

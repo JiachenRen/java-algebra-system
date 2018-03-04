@@ -6,7 +6,7 @@ import jmc.graph.Graph;
  * Created by Jiachen on 03/05/2017.
  * Wrapper class for a number
  */
-public class RawValue implements Operable {
+public class RawValue implements Operable, LeafNode {
     private Number number;
 
     public RawValue(Number number) {

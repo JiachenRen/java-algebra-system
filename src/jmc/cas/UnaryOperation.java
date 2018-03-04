@@ -12,7 +12,7 @@ import static java.lang.Math.*;
  * code refactored May 20th, performance enhanced with static function lib and method reference.
  * breakthrough May 20th.
  */
-public class UnaryOperation extends Operation {
+public class UnaryOperation extends Operation implements LeafNode {
 
     private Function operation;
 

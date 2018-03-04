@@ -57,10 +57,10 @@ public class Constants {
         return 0.0;
     }
 
-    static class Constant extends Variable {
+    public static class Constant extends Variable {
         private ComputedConst computedConst;
 
-        Constant(String name, ComputedConst computedConst) {
+        public Constant(String name, ComputedConst computedConst) {
             super(name);
             this.computedConst = computedConst;
 

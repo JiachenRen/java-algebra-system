@@ -4,7 +4,7 @@ package jmc.cas;
  * Created by Jiachen on 16/05/2017.
  * Variable class
  */
-public class Variable implements Operable {
+public class Variable implements Operable, LeafNode {
     private String name;
     private double val;
 
