@@ -1,8 +1,6 @@
 package tests;
 
 import jmc.cas.*;
-import jui.*;
-import processing.core.PApplet;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -43,13 +41,17 @@ public class CasComprehensiveTest {
 
         Fraction f7 = new Fraction(11, 7);
         Fraction f8 = new Fraction(6, 14);
-        l(f7 + " + " + f8 + " = " + f7.replicate().add(f8));
-        l(f8 + " - " + f7 + " = " + f8.replicate().sub(f7));
-        l(raw1 + " + " + f7 + " = " + f7.replicate().add(raw1));
-        l(f7 + " x " + f8 + " = " + f7.replicate().mult(f8));
-        l(f8 + " x " + raw1 + " = " + f8.replicate().mult(raw1));
-        l(f8 + " / " + raw1 + " = " + f8.replicate().div(raw1));
-        l(f8 + " / " + f7 + " = " + f8.replicate().div(f7));
+        l(f7 + " + " + f8 + " = " + f7.clone().add(f8));
+        l(f8 + " - " + f7 + " = " + f8.clone().sub(f7));
+        l(raw1 + " + " + f7 + " = " + f7.clone().add(raw1));
+        l(f7 + " x " + f8 + " = " + f7.clone().mult(f8));
+        l(f8 + " x " + raw1 + " = " + f8.clone().mult(raw1));
+        l(f8 + " / " + raw1 + " = " + f8.clone().div(raw1));
+        l(f8 + " / " + f7 + " = " + f8.clone().div(f7));
+
+        Operation op = (Operation) Expression.interpret("(3 + 4.5) * 5.3 / 2.7");
+        l(op);
+        l(op.simplify());
     }
 
     private static void l(Object... objects) {

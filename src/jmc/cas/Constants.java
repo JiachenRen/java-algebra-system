@@ -79,7 +79,7 @@ public class Constants {
             return computedConst.compute();
         }
 
-        public Constant replicate() {
+        public Constant clone() {
             return new Constant(name, computedConst);
         }
 

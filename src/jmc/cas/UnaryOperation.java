@@ -115,7 +115,7 @@ public class UnaryOperation extends Operation {
     }
 
     @Override
-    public UnaryOperation replicate() {
+    public UnaryOperation clone() {
         return new UnaryOperation(getLeftHand(), operation);
     }
 

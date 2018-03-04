@@ -7,7 +7,7 @@ package jmc.cas;
 public interface Operable extends Evaluable {
     String toString();
 
-    Operable replicate();
+    Operable clone();
 
     boolean equals(Operable other);
 

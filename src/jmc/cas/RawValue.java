@@ -33,7 +33,7 @@ public class RawValue implements Operable {
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
-    public RawValue replicate() {
+    public RawValue clone() {
         return new RawValue(number);
     }
 

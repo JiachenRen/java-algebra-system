@@ -42,7 +42,7 @@ public class Fraction extends RawValue {
         if (!(o instanceof Fraction)) {
             if (o.isInteger()) o = new Fraction(o.intValue(), 1);
             else o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
-        } else o = o.replicate();
+        } else o = o.clone();
         Fraction f = (Fraction) o;
 
         long lcm = lcm(denominator, f.denominator);
@@ -53,7 +53,7 @@ public class Fraction extends RawValue {
     }
 
     public RawValue sub(RawValue o) {
-        return this.add(o.replicate().negate());
+        return this.add(o.clone().negate());
     }
 
     public RawValue mult(RawValue o) {
@@ -71,7 +71,7 @@ public class Fraction extends RawValue {
     }
 
     @Override
-    public RawValue inverse() {
+    public Fraction inverse() {
         long tmp = denominator;
         denominator = numerator;
         numerator = tmp;
@@ -165,7 +165,7 @@ public class Fraction extends RawValue {
         return this;
     }
 
-    public Fraction replicate() {
+    public Fraction clone() {
         return new Fraction(numerator, denominator);
     }
 

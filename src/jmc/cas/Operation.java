@@ -36,10 +36,10 @@ public abstract class Operation implements Operable {
         this.leftHand = operable;
     }
 
-    public abstract Operation replicate();
+    public abstract Operation clone();
 
     public boolean simplifiable() {
-        Operable duplicate = this.replicate().simplify();
+        Operable duplicate = this.clone().simplify();
         return !duplicate.equals(this);
     }
 

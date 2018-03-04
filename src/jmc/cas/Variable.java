@@ -42,7 +42,7 @@ public class Variable implements Operable {
      *
      * @return new Variable instance that is identical to self.
      */
-    public Variable replicate() {
+    public Variable clone() {
         Variable newInstance = new Variable(name);
         newInstance.setVal(this.val);
         return newInstance;

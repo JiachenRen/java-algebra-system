@@ -2,8 +2,6 @@ package jmc.cas;
 
 import java.util.ArrayList;
 
-import static jmc.utils.ColorFormatter.*;
-
 /**
  * Created by Jiachen on 16/05/2017.
  * added the ability to expand parenthesis and constant expressions. Accomplished May 20th.
@@ -114,29 +112,73 @@ public class BinaryOperation extends Operation {
     }
 
     /**
-     * TODO: should perform all simplifications using exponential notation
+     * Note: modifies self, but may not
      *
-     * @return
+     * @return the simplified version of self
      */
     public Operable simplify() {
-        if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
-            System.out.println(boldBlack("primitive calc: ") + Expression.colorMathSymbols(this.toString()));
-            RawValue calculated = new RawValue(operation.eval(((RawValue) getLeftHand()).doubleValue(), ((RawValue) rightHand).doubleValue()));
-            //TODO: add a fraction class.
-            return calculated;
-        }
+
         if (getLeftHand() instanceof Operation) {
+
             setLeftHand(((Operation) getLeftHand()).simplify());
         }
         if (rightHand instanceof Operation) {
             rightHand = ((Operation) rightHand).simplify();
         }
+
+        if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
+            if (getLeftHand() instanceof Fraction && 是加减乘除()) {
+                Fraction f = (Fraction) getLeftHand().clone();
+                RawValue r = (RawValue) rightHand.clone();
+                switch (operation.name) {
+                    case "+":
+                        return f.add(r);
+                    case "-":
+                        return f.sub(r);
+                    case "*":
+                        return f.mult(r);
+                    case "/":
+                        return f.div(r);
+                }
+            } else if (rightHand instanceof Fraction && 是加减乘除()) {
+                Fraction f = (Fraction) rightHand.clone();
+                RawValue r = (RawValue) getLeftHand().clone();
+                switch (operation.name) {
+                    case "+":
+                        return f.add(r);
+                    case "-":
+                        return f.negate().add(r);
+                    case "*":
+                        return f.mult(r);
+                    case "/":
+                        return f.inverse().mult(r);
+                }
+            }
+
+            RawValue r1 = (RawValue) getLeftHand();
+            RawValue r2 = (RawValue) rightHand;
+
+            if (r1.isInteger() && r2.isInteger()) {
+                if (operation.name.equals("/")) {
+                    return new Fraction(r1.intValue(), r2.intValue());
+                } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
+            } else {
+                RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
+                RawValue f2 = Fraction.convertToFraction(r2.doubleValue(), Fraction.TOLERANCE);
+                return new BinaryOperation(f1, operation, f2).simplify();
+            }
+        }
+
         return this;
     }
 
+    private boolean 是加减乘除() {
+        return "+-*/".contains(operation.name);
+    }
+
     @Override
-    public BinaryOperation replicate() {
-        return new BinaryOperation(getLeftHand().replicate(), operation, rightHand.replicate());
+    public BinaryOperation clone() {
+        return new BinaryOperation(getLeftHand().clone(), operation, rightHand.clone());
     }
 
     public boolean equals(Operable other) {
