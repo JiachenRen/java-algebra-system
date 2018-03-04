@@ -75,4 +75,8 @@ public class Variable implements Operable, LeafNode {
     public int numNodes() {
         return 1;
     }
+
+    public Operable replace(Operable o, Operable r) {
+        return this.equals(o) ? r : this;
+    }
 }

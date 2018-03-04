@@ -52,6 +52,9 @@ public class GraphFunction extends Function {
     public GraphFunction(String name, boolean dynamic, Operable operable) {
         super(name);
         this.operable = operable;
+        if (Operable.isMultiVar(operable)) {
+
+        }
         setDynamic(dynamic);
     }
 

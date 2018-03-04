@@ -435,6 +435,14 @@ public class BinaryOperation extends Operation {
         return left > right ? right + 1 : left + 1;
     }
 
+    public Operable replace(Operable o, Operable r) {
+        if (this.equals(o)) return r;
+        BinaryOperation clone = this.clone();
+        clone.setLeftHand(clone.getLeftHand().replace(o, r));
+        clone.setRightHand(clone.getRightHand().replace(o, r));
+        return clone;
+    }
+
     public interface BinEvaluable {
         double eval(double a, double b);
     }

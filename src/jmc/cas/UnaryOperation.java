@@ -246,4 +246,10 @@ public class UnaryOperation extends Operation implements LeafNode {
         return i + 1;
     }
 
+    public Operable replace(Operable o, Operable r) {
+        if (this.equals(o)) return r;
+        UnaryOperation clone = this.clone();
+        return clone.setLeftHand(clone.getLeftHand().replace(o, r));
+    }
+
 }

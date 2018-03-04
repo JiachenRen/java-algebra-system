@@ -103,6 +103,7 @@ public class CasComprehensiveTest {
 
         l(Operable.numVars(Expression.interpret("a+b*x+a+b/ln(c+e+pi)")));
         l(Operable.isMultiVar(Expression.interpret("x*3+e")));
+        l(Expression.interpret("x*3+e").replace(new BinaryOperation(new Variable("x"),"*",new RawValue(3)), new Variable("a")));
 //        ArrayList<String> arr = new ArrayList<>();
 //        Collections.addAll(arr, "a","b","c","d","e","f");
 //        l(arr.subList(1,arr.size()-1));

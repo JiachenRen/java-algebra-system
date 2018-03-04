@@ -32,8 +32,9 @@ public abstract class Operation implements Operable {
      */
     public abstract Operable simplify();
 
-    public void setLeftHand(Operable operable) {
+    public Operable setLeftHand(Operable operable) {
         this.leftHand = operable;
+        return this;
     }
 
     public abstract Operation clone();

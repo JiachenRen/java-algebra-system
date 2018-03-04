@@ -1,6 +1,8 @@
 package jmc.cas;
 
 
+import java.util.ArrayList;
+
 /**
  * Created by Jiachen on 03/05/2017.
  * Operable
@@ -57,13 +59,25 @@ public interface Operable extends Evaluable {
      * @return number of variables in the expression represented by o.
      */
     static int numVars(Operable o) {
-        int vars = 0;
+        return extractVariables(o).size();
+    }
+
+    static ArrayList<Variable> extractVariables(Operable o) {
+        ArrayList<Variable> vars = new ArrayList<>();
         for (Character c : Assets.VARS.toCharArray()) {
-            if (o.levelOf(new Variable(c.toString())) != -1)
-                vars += 1;
+            Variable var = new Variable(c.toString());
+            if (o.levelOf(var) != -1)
+                vars.add(var);
         }
         return vars;
     }
+
+    /**
+     * @param o the operable to be replaced
+     * @param r the operable to take o's place
+     * @return the original operable with o replaced by r.
+     */
+    Operable replace(Operable o, Operable r);
 
     static boolean isMultiVar(Operable o) {
         return numVars(o) > 1;

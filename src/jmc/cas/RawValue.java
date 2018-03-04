@@ -112,4 +112,8 @@ public class RawValue implements Operable, LeafNode {
     public int levelOf(Operable o) {
         return this.equals(o) ? 0 : -1;
     }
+
+    public Operable replace(Operable o, Operable r) {
+        return this.equals(o) ? r : this;
+    }
 }
