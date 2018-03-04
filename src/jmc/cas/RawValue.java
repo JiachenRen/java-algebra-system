@@ -80,7 +80,7 @@ public class RawValue implements Operable, LeafNode {
 
     public boolean equals(Operable other) {
         return other instanceof RawValue
-                && ((RawValue) other).isUndefined()
+                && other.isUndefined()
                 && this.isUndefined()
                 || other instanceof RawValue
                 && ((RawValue) other).doubleValue()
@@ -107,5 +107,9 @@ public class RawValue implements Operable, LeafNode {
 
     public int numNodes() {
         return 1;
+    }
+
+    public int levelOf(Operable o) {
+        return this.equals(o) ? 0 : -1;
     }
 }

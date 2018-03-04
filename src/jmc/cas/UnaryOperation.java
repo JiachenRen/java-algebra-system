@@ -239,4 +239,11 @@ public class UnaryOperation extends Operation implements LeafNode {
         return false;
     }
 
+    public int levelOf(Operable o) {
+        if (this.equals(o)) return 0;
+        int i = getLeftHand().levelOf(o);
+        if (i == -1) return -1;
+        return i + 1;
+    }
+
 }

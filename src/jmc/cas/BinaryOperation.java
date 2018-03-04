@@ -155,7 +155,7 @@ public class BinaryOperation extends Operation {
      * whether this BinaryOperation contain the operand as an immediate child
      *
      * @param o Operable operand
-     * @return 1 if at left side operand, 2 if at right side operand, 0 if !contains.
+     * @return 1 if at left side operand, 2 if at right side operand, 0 if !levelOf.
      */
     private int contains(Operable o) {
         if (getLeftHand().equals(o)) return 1;
@@ -424,6 +424,15 @@ public class BinaryOperation extends Operation {
         }
         //TODO: how about BinaryOperations like 3 - 3 which is essentially 0?
         return false;
+    }
+
+    public int levelOf(Operable o) {
+        if (this.equals(o)) return 0;
+        int left = getLeftHand().levelOf(o);
+        int right = getRightHand().levelOf(o);
+        if (left == -1 && right == -1) return -1;
+        if (left == -1 || right == -1) return left == -1 ? right + 1 : left + 1;
+        return left > right ? right + 1 : left + 1;
     }
 
     public interface BinEvaluable {

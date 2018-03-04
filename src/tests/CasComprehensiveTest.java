@@ -64,36 +64,43 @@ public class CasComprehensiveTest {
         l(op1.numNodes(), op2.numNodes());
 
         Operable c = new Constants.Constant("e", () -> Math.E);
-        System.out.println(c);
+        l(c);
 
         ArrayList<String> ops = new ArrayList<>();
-        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + log(10))", "2^((x^2)^3)", "1473x", "0/0", "0/0 + 0", "5 + 7 -log(11) + e^2","0^x");
+        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + log(10))",
+                "2^((x^2)^3)", "1473x",
+                "0/0", "0/0 + 0",
+                "5 + 7 -log(11) + e^2",
+                "0^x",
+                "(ln(x)+3)*5"
+        );
         List<Operable> operables;
         operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(op -> {
             l(boldBlack("original: ") + Expression.colorMathSymbols(op.toString()));
             l(lightCyan("arbitrary value: ") + op.val());
             l(lightRed("undefined: ") + op.isUndefined());
+            l(lightBlue("level of x: ") + op.levelOf(new Variable("x")));
             if (op instanceof Operation) {
                 l(lightGreen("simplified: ") + Expression.colorMathSymbols(op.clone().simplify().toString()));
             }
             l("");
         });
 
-        System.out.println(new RawValue(5).equals(new RawValue(5.0)));
-        System.out.println(RawValue.UNDEF.isUndefined());
-        System.out.println(RawValue.UNDEF);
-        System.out.println(RawValue.UNDEF.equals(RawValue.UNDEF));
-        System.out.println(Fraction.UNDEF.isUndefined());
-        System.out.println(new Fraction(3,0).isUndefined());
-        System.out.println(Math.log(11));
+        l(new RawValue(5).equals(new RawValue(5.0)));
+        l(RawValue.UNDEF.isUndefined());
+        l(RawValue.UNDEF);
+        l(RawValue.UNDEF.equals(RawValue.UNDEF));
+        l(Fraction.UNDEF.isUndefined());
+        l(new Fraction(3, 0).isUndefined());
+        l(Math.log(11));
 
         Operable operable = Expression.interpret("0^0");
-        System.out.println(operable.eval(3));
+        l(operable.eval(3));
 
 //        ArrayList<String> arr = new ArrayList<>();
 //        Collections.addAll(arr, "a","b","c","d","e","f");
-//        System.out.println(arr.subList(1,arr.size()-1));
+//        l(arr.subList(1,arr.size()-1));
 
 
     }

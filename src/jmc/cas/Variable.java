@@ -68,6 +68,10 @@ public class Variable implements Operable, LeafNode {
         return other;
     }
 
+    public int levelOf(Operable o) {
+        return this.equals(o) ? 0 : -1;
+    }
+
     public int numNodes() {
         return 1;
     }

@@ -21,6 +21,13 @@ public interface Operable extends Evaluable {
     int numNodes();
 
     /**
+     * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
+     * @param o the Operable instance that you are looking for.
+     * @return the level at which operable is found.
+     */
+    int levelOf(Operable o);
+
+    /**
      * plugs in the operable nested for all variables in the expression
      * NOTE: the method returns the operable with the desired nested operable plugged in, but
      * the operable itself is not altered.
