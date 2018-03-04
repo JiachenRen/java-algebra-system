@@ -7,6 +7,7 @@ import jmc.graph.Graph;
  * Wrapper class for a number
  */
 public class RawValue implements Operable, LeafNode {
+    public static RawValue UNDEF = new RawValue(Double.NaN);
     private Number number;
 
     public RawValue(Number number) {
@@ -27,9 +28,17 @@ public class RawValue implements Operable, LeafNode {
      * @return the formatted String representation of the number.
      */
     public String toString() {
+        if (isUndefined()) {
+            return "undef";
+        } else if (isInteger()) {
+            String s = Integer.toString(intValue());
+            if (s.length() <= 6) return s;
+        } else {
+            String s = Double.toString(doubleValue());
+            if (s.length() <= 6) return s;
+        }
         double extracted = number.doubleValue();
         String formatted = Graph.formatForDisplay(extracted);
-        if (formatted.endsWith(".0")) formatted = formatted.substring(0, formatted.length() - 2);
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
@@ -55,13 +64,30 @@ public class RawValue implements Operable, LeafNode {
         return s.endsWith(".0") || !s.contains(".");
     }
 
+    public boolean isUndefined() {
+        return new Double(number.doubleValue()).isNaN();
+    }
+
     public RawValue inverse() {
         if (isInteger()) return new Fraction(1, intValue());
         else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
     }
 
     public boolean equals(Operable other) {
-        return other instanceof RawValue && ((RawValue) other).doubleValue() == this.doubleValue();
+        return other instanceof RawValue
+                && ((RawValue) other).isUndefined()
+                && this.isUndefined()
+                || other instanceof RawValue
+                && ((RawValue) other).doubleValue()
+                == this.doubleValue();
+    }
+
+    public boolean isZero() {
+        return doubleValue() == 0;
+    }
+
+    public boolean isPositive() {
+        return doubleValue() > 0;
     }
 
     /**

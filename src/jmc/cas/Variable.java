@@ -52,6 +52,10 @@ public class Variable implements Operable, LeafNode {
         return other instanceof Variable && ((Variable) other).getName().equals(this.name);
     }
 
+    public boolean isUndefined() {
+        return false;
+    }
+
     /**
      * Ensures that {other} does not get modified.
      *

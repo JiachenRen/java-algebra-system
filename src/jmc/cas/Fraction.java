@@ -12,9 +12,10 @@ public class Fraction extends RawValue {
     private long numerator;
     private long denominator;
     public static double TOLERANCE = 5E-7;
+    public static Fraction UNDEF = new Fraction(0,0);
 
     public Fraction(long numerator, long denominator) {
-        super(numerator / denominator);
+        super(denominator == 0 ? Double.NaN : numerator / denominator);
         this.numerator = numerator;
         this.denominator = denominator;
         this.reduce();
@@ -39,6 +40,7 @@ public class Fraction extends RawValue {
     }
 
     public RawValue add(RawValue o) {
+        if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (!(o instanceof Fraction)) {
             if (o.isInteger()) o = new Fraction(o.intValue(), 1);
             else o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
@@ -57,6 +59,7 @@ public class Fraction extends RawValue {
     }
 
     public RawValue mult(RawValue o) {
+        if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (o instanceof Fraction) {
             numerator *= ((Fraction) o).numerator;
             denominator *= ((Fraction) o).denominator;
@@ -72,10 +75,16 @@ public class Fraction extends RawValue {
 
     @Override
     public Fraction inverse() {
+        if (isUndefined()) return Fraction.UNDEF;
         long tmp = denominator;
         denominator = numerator;
         numerator = tmp;
         return this;
+    }
+
+    @Override
+    public boolean isUndefined() {
+        return super.isUndefined() || denominator == 0;
     }
 
     public RawValue div(RawValue o) {
@@ -93,6 +102,7 @@ public class Fraction extends RawValue {
     }
 
     public RawValue reduce() {
+        if (isUndefined()) return RawValue.UNDEF;
         long gcd = gcd();
         this.numerator /= gcd;
         this.denominator /= gcd;
@@ -169,8 +179,17 @@ public class Fraction extends RawValue {
         return new Fraction(numerator, denominator);
     }
 
+    @Override public boolean isZero() {
+        return !isUndefined() && denominator == 0;
+    }
+
+    @Override public boolean isPositive() {
+        return !isUndefined() && numerator / denominator > 0;
+    }
+
     @Override
     public double doubleValue() {
+        if (isUndefined()) return Double.NaN;
         return (double) numerator / (double) denominator;
     }
 }

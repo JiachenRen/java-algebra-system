@@ -2,6 +2,15 @@ package tests;
 
 import jmc.cas.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static jmc.utils.ColorFormatter.boldBlack;
+import static jmc.utils.ColorFormatter.lightGreen;
+import static jmc.utils.ColorFormatter.lightRed;
+
 /**
  * Created by Jiachen on 16/05/2017.
  * toExponentialForm test
@@ -59,16 +68,29 @@ public class CasComprehensiveTest {
         Operable c = new Constants.Constant("e", () -> Math.E);
         System.out.println(c);
 
-        Operation op = (Operation) Expression.interpret("(3 + 4.5x) * 5.3 / 2.7 * (5x + 10)");
-        l(op);
-        l(op.clone().simplify());
+        ArrayList<String> ops = new ArrayList<>();
+        Collections.addAll(ops, "(3 + 4.5x) * 5.3 / 2.7 * (5x + 10)", "2^((x^2)^3)", "1473x", "0/0", "0/0 + 0");
+        List<Operable> operables;
+        operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
+        operables.forEach(op -> {
+            l(boldBlack("original: ") + Expression.colorMathSymbols(op.toString()));
+            l(lightRed("undefined: ") + op.isUndefined());
+            if (op instanceof Operation) {
+                Operation operation1 = (Operation) op;
+                l(lightGreen("simplified: ") + Expression.colorMathSymbols(operation1.clone().simplify().toString()));
+            }
+        });
 
+        System.out.println(new RawValue(5).equals(new RawValue(5.0)));
+        System.out.println(RawValue.UNDEF.isUndefined());
+        System.out.println(RawValue.UNDEF);
+        System.out.println(RawValue.UNDEF.equals(RawValue.UNDEF));
+        System.out.println(Fraction.UNDEF.isUndefined());
+        System.out.println(new Fraction(3,0).isUndefined());
 
 //        ArrayList<String> arr = new ArrayList<>();
 //        Collections.addAll(arr, "a","b","c","d","e","f");
 //        System.out.println(arr.subList(1,arr.size()-1));
-
-
 
 
     }

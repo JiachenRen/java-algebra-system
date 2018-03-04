@@ -126,6 +126,8 @@ public class BinaryOperation extends Operation {
             rightHand = ((Operation) rightHand).simplify();
         }
 
+        if (isUndefined()) return RawValue.UNDEF;
+
         if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
             if (getLeftHand() instanceof Fraction && 是加减乘除()) {
                 Fraction f = (Fraction) getLeftHand().clone();
@@ -168,6 +170,20 @@ public class BinaryOperation extends Operation {
                 return new BinaryOperation(f1, operation, f2).simplify();
             }
         }
+
+        if (getLeftHand().equals(getRightHand())) {
+            switch (operation.name) {
+                case "+":
+                    return new BinaryOperation(new RawValue(2), "*", getLeftHand());
+                case "-":
+                    return new RawValue(0);
+                case "*":
+                    return new BinaryOperation(getLeftHand(), "*", new RawValue(2));
+                case "/":
+                    return new RawValue(1);
+            }
+        }
+
 
         if (getPriority() == 1) return this; //up to this point the ^ operator cannot be simplified.
 
@@ -308,6 +324,19 @@ public class BinaryOperation extends Operation {
 
     public void setRightHand(Operable operable) {
         this.rightHand = operable;
+    }
+
+    public boolean isUndefined() {
+        if (getLeftHand().isUndefined() || getRightHand().isUndefined()) return true;
+        if (rightHand instanceof RawValue) {
+            RawValue r = ((RawValue) rightHand);
+            switch (operation.name) {
+                case "/": return r.isZero();
+                case "^": return getLeftHand() instanceof RawValue && ((RawValue) getLeftHand()).isZero() && !r.isPositive();
+            }
+        }
+        //TODO: how about BinaryOperations like 3 - 3 which is essentially 0?
+        return false;
     }
 
     public interface BinEvaluable {
