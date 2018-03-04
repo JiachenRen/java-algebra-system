@@ -95,7 +95,7 @@ public class BinaryOperation extends Operation {
      * Note: does not change self.
      */
     @Override
-    public Operable toExponentialForm() {
+    public BinaryOperation toExponentialForm() {
         if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
         if (rightHand instanceof Operation) ((Operation) rightHand).toExponentialForm();
         if (!this.operation.equals("/")) return this;
@@ -119,7 +119,6 @@ public class BinaryOperation extends Operation {
     public Operable simplify() {
 
         if (getLeftHand() instanceof Operation) {
-
             setLeftHand(((Operation) getLeftHand()).simplify());
         }
         if (rightHand instanceof Operation) {
@@ -172,6 +171,27 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
+    public ArrayList<Operable> flattened() {
+        ArrayList<Operable> pool = new ArrayList<>();
+        BinaryOperation clone = this.clone().toAdditionOnly().toExponentialForm();
+        clone.flat(pool, clone.getLeftHand());
+        clone.flat(pool, clone.getRightHand());
+        return pool;
+    }
+
+    private void flat(ArrayList<Operable> pool, Operable operable) {
+        if (operable instanceof UnaryOperation || operable instanceof RawValue || operable instanceof Variable) {
+            pool.add(operable);
+        } else if (operable instanceof BinaryOperation) {
+            BinaryOperation binOp = ((BinaryOperation) operable);
+            if (binOp.operation.priority == this.getPriority()) {
+                pool.addAll(binOp.flattened());
+            } else {
+                pool.add(binOp);
+            }
+        }
+    }
+
     private boolean 是加减乘除() {
         return "+-*/".contains(operation.name);
     }
@@ -185,7 +205,7 @@ public class BinaryOperation extends Operation {
         return other instanceof BinaryOperation && ((BinaryOperation) other).getLeftHand().equals(this.getLeftHand()) && ((BinaryOperation) other).rightHand.equals(this.rightHand) && this.operation.equals(((BinaryOperation) other).operation);
     }
 
-    public Operable toAdditionOnly() {
+    public BinaryOperation toAdditionOnly() {
         if (getLeftHand() instanceof Operation) this.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
         this.rightHand = rightHand instanceof Operation ? ((Operation) rightHand).toAdditionOnly() : rightHand;
         if (operation.name.equals("-")) {

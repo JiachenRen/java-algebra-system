@@ -51,7 +51,13 @@ public class CasComprehensiveTest {
 
         Operation op = (Operation) Expression.interpret("(3 + 4.5) * 5.3 / 2.7");
         l(op);
-        l(op.simplify());
+        l(op.clone().simplify());
+        l(((BinaryOperation) op).flattened());
+
+        Operation op1 = (Operation) Expression.interpret("(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3");
+        l(((BinaryOperation) op1).flattened());
+
+
     }
 
     private static void l(Object... objects) {
