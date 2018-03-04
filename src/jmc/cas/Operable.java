@@ -30,4 +30,6 @@ public interface Operable extends Evaluable {
      * @return the resulting operable with nested plugged in
      */
     Operable plugIn(Variable var, Operable replacement);
+
+    boolean isUndefined();
 }

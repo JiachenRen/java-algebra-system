@@ -213,4 +213,22 @@ public class UnaryOperation extends Operation implements LeafNode {
         return 1 + getLeftHand().numNodes();
     }
 
+    public boolean isUndefined() {
+        if (getLeftHand().isUndefined()) return true;
+        if (getLeftHand() instanceof RawValue) {
+            double n = ((RawValue) getLeftHand()).doubleValue();
+            switch (operation.getName()) {
+                case "ln": return n <= 0;
+                case "log": return n <= 0;
+                case "asin": return n > 1 || n < -1;
+                case "acos": return n > 1 || n < -1;
+//                case "tan":
+//                case "cot":
+//                case "sec":
+//                case "csc":
+            }
+        }
+        return false;
+    }
+
 }
