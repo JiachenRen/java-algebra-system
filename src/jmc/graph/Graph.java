@@ -5,6 +5,7 @@ import jui.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -481,7 +482,9 @@ public class Graph extends Contextual {
     public static GraphFunction createLinearFunction(Point first, Point second) {
         double k = (first.getY() - second.getY()) / (first.getX() - second.getX());
         double b = first.getY() - k * first.getX();
-        return new GraphFunction(Expression.interpret(k +"*x+" +b)).setName(k + "," + b);
+        String k1 = new BigDecimal(k).toPlainString();
+        String b1 = new BigDecimal(b).toPlainString();
+        return new GraphFunction(Expression.interpret(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
     }
 
     /**
@@ -509,7 +512,7 @@ public class Graph extends Contextual {
     public void resize(float x, float y) {
         super.resize(x, y);
         this.updateNumMarkings();
-        this.updateGraphs();
+        this.updateFunctions();
     }
 
     private void updateNumMarkings() {
@@ -545,7 +548,7 @@ public class Graph extends Contextual {
         rangeX = new Range(minX, maxX, rangeX.getStep());
         rangeY = new Range(minY, maxY);
         this.updateNumMarkings();
-        new Thread(this::updateGraphs).start(); //performance enhancement May 20th
+        new Thread(this::updateFunctions).start(); //performance enhancement May 20th
     }
 
     public void setWindowX(double minX, double maxX) {
@@ -578,7 +581,7 @@ public class Graph extends Contextual {
      * @param function      the function that is going to replace the original one.
      * @param preserveStyle whether or not to preserve the graphics style of the original function
      */
-    public void override(String name, GraphFunction function, boolean preserveStyle) {
+    public boolean override(String name, GraphFunction function, boolean preserveStyle) {
         boolean overridden = false;
         for (int i = functions.size() - 1; i >= 0; i--) {
             if (functions.get(i).getName().equals(name)) {
@@ -588,18 +591,28 @@ public class Graph extends Contextual {
             }
         }
         if (!overridden) functions.add(function.setName(name));
-        function.updatePlot(rangeX, rangeY, h);
-        function.getPlot().updateCoordinates(rangeY, w, h);
+        updateFunction(function);
+        return overridden;
     }
 
-    public void override(String name, GraphFunction function) {
-        this.override(name, function, true);
+    public GraphFunction getLastFunction() {
+        if (functions.size() == 0) return null;
+        return functions.get(functions.size() - 1);
+    }
+
+    public void updateFunction(GraphFunction func) {
+        func.updatePlot(rangeX, rangeY, h);
+        func.getPlot().updateCoordinates(rangeY, w, h);
+    }
+
+    public boolean override(String name, GraphFunction function) {
+        return this.override(name, function, true);
     }
 
     /**
      * Comprehensive update
      */
-    private void updateGraphs() {
+    private void updateFunctions() {
         this.updatePlots();
         this.updatePlotCoordinates();
     }

@@ -178,7 +178,8 @@ public abstract class Container extends Displayable {
                 c.remove(obj);
             }
             displayables.remove(obj);
-            //JNode.remove(obj);
+            JNode.getDisplayables().remove(obj);
+//            JNode.remove(obj);
         }
         syncSize();
         arrange();

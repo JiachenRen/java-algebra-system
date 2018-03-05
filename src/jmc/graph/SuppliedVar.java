@@ -1,5 +1,7 @@
 package jmc.graph;
 
+import jmc.cas.Mode;
+import jmc.cas.Operable;
 import jmc.cas.Variable;
 
 /**
@@ -9,12 +11,13 @@ import jmc.cas.Variable;
 public class SuppliedVar extends Variable {
     private double val;
 
-    SuppliedVar(String name) {
+    public SuppliedVar(String name) {
         super(name);
     }
 
-    void setVal(double val) {
+    public SuppliedVar setVal(double val) {
         this.val = val;
+        return this;
     }
 
     @Override
@@ -25,5 +28,25 @@ public class SuppliedVar extends Variable {
     @Override
     public double val() {
         return val;
+    }
+
+    @Override
+    public SuppliedVar clone() {
+        super.clone();
+        return new SuppliedVar(this.getName()).setVal(this.val);
+    }
+
+    @Override
+    public Operable replace(Operable o, Operable r) {
+        return o.equals(this) ? r : this;
+    }
+
+    @Override
+    public boolean equals(Operable other) {
+        return other instanceof SuppliedVar && ((SuppliedVar) other).getName().equals(getName());
+    }
+
+    public String toString() {
+        return Mode.DEBUG ? "&" + getName() + "&" : getName();
     }
 }

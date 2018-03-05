@@ -2,6 +2,7 @@ import jmc.cas.*;
 import jmc.extras.Element;
 import jmc.graph.Graph;
 import jmc.graph.GraphFunction;
+import jmc.graph.SuppliedVar;
 import jui.*;
 import jui.bundles.ColorSelector;
 import jui.bundles.ValueSelector;
@@ -12,7 +13,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jiachen on 22/05/2017.
@@ -22,7 +25,10 @@ public class JGrapher extends PApplet {
     private Graph graph;
     private HBox parent;
     private HBox functionInputWrapper;
-    private VBox graphWrapper;
+    private VBox middleSection;
+    private HBox graphWrapper;
+    private VBox suppliedVarWrapper;
+    private TextInput modelInput;
     private boolean casEnabled = false;
 
     public static void main(String args[]) {
@@ -85,9 +91,9 @@ public class JGrapher extends PApplet {
         std.setMarginX(0);
         parent.add(std);
 
-        graphWrapper = new VBox();
-        graphWrapper.setId("graphWrapper").setCollapseInvisible(true);
-        parent.add(graphWrapper);
+        middleSection = new VBox();
+        middleSection.setId("middleSection").setCollapseInvisible(true);
+        parent.add(middleSection);
 
         Displayable modelLabel = new Label()
                 .setTextColor(0, 0, 0, 255)
@@ -95,7 +101,7 @@ public class JGrapher extends PApplet {
                 .setContourVisible(false)
                 .setBackgroundColor(255, 255, 255, 200);
 
-        TextInput modelInput = new TextInput()
+        modelInput = new TextInput()
                 .setCursorColor(255)
                 .setCursorThickness(1);
 //                .setTextColor(230)
@@ -103,17 +109,28 @@ public class JGrapher extends PApplet {
 
         Button modelButton = new Button();
 
-//        graphWrapper.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
+//        middleSection.add(new Label("Grapher Version 1.0 By Jiachen Ren").inheritOutlook(modelLabel));
+
+        graphWrapper = (HBox) new HBox().setRelative(true);
+        graphWrapper.setMargins(0, 0);
+        graphWrapper.setCollapseInvisible(true);
 
         graph = (Graph) new Graph().setRelative(true).setId("graph");
         graph.setTextColor(modelLabel.backgroundColor);
         graph.setBackgroundColor(0, 0, 0, 150);
         graphWrapper.add(graph);
 
+        suppliedVarWrapper = new VBox(0.1f, 1);
+        suppliedVarWrapper.setVisible(false);
+        suppliedVarWrapper.setMargins(0, 0);
+        graphWrapper.add(suppliedVarWrapper);
+
+        middleSection.add(graphWrapper);
+
 
         functionInputWrapper = new HBox(1.0f, 0.035f);
         functionInputWrapper.setMargins(0, 0).setId("#functionInputWrapper");
-        graphWrapper.add(functionInputWrapper);
+        middleSection.add(functionInputWrapper);
 
         TextInput funcNameTextInput = new TextInput();
         funcNameTextInput.inheritOutlook(modelInput)
@@ -187,10 +204,12 @@ public class JGrapher extends PApplet {
             try {
                 Operable interpreted = Expression.interpret(funcTextInput.getContent());
                 GraphFunction func = new GraphFunction(interpreted);
-                graph.override(funcNameTextInput.getContent(), func);
+                boolean shouldOverride = !graph.override(funcNameTextInput.getContent(), func);
+                updateSuppliedVarValueSelectors(shouldOverride);
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
-                System.out.println((char) 27 + "[1;31m" + "interpretation failed -> missing operands..." + (char) 27 + "[0m");
+//                System.out.println((char) 27 + "[1;31m" + "interpretation failed -> missing operands..." + (char) 27 + "[0m");
+                e.printStackTrace();
             }
         });
         functionInputWrapper.add(funcTextInput);
@@ -376,6 +395,8 @@ public class JGrapher extends PApplet {
                                 funcNameTextInput.setContent(funcName);
                                 //noinspection ConstantConditions
                                 JNode.getTextInputById("f(x)").setContent(operable);
+                                updateSuppliedVarValueSelectors(true);
+
                             });
                         } else {
                             funcsWrapper.getDisplayables().get(i).setVisible(false);
@@ -523,6 +544,8 @@ public class JGrapher extends PApplet {
         strokeWeight.setTitlePercentage(0.7f);
         strokeWeight.getTitleLabel()
                 .setAlign(CENTER);
+        strokeWeight.getTextInput()
+                .inheritOutlook(modelInput);
         strokeWeight.setRange(0.1f, 3)
                 .setTitle("Line Width")
                 .setValue(1f)
@@ -551,6 +574,66 @@ public class JGrapher extends PApplet {
         Constants.list();
 
         graph.equalizeAxes();
+    }
+
+    //TODO: override accidentally alters the previous function
+    private void updateSuppliedVarValueSelectors(boolean override) {
+        GraphFunction func = getCurrentFunction();
+        if (func == null) return;
+        if (!func.isMultiVar()) {
+            suppliedVarWrapper.setVisible(false);
+            graphWrapper.syncSize();
+            graphWrapper.arrange();
+        } else {
+            if (override) suppliedVarWrapper.removeAll();
+            List<String> existing = suppliedVarWrapper.getDisplayables().stream()
+                    .map(d -> d.getId().substring(1))
+                    .collect(Collectors.toList());
+            ArrayList<SuppliedVar> vars = func.getSuppliedVars();
+            List<String> varStrs = vars.stream()
+                    .map(Variable::getName)
+                    .collect(Collectors.toList());
+            for (int i = 0; i < suppliedVarWrapper.getDisplayables().size(); i++) {
+                if (!varStrs.contains(existing.get(i)))
+                    suppliedVarWrapper.remove("#" + existing.get(i));
+            }
+
+            for (SuppliedVar v : vars) {
+                ValueSelector selector;
+                if (existing.contains(v.getName())) {
+                    selector = (ValueSelector) JNode.get("#" + v.getName()).get(0);
+                } else {
+                    selector = new ValueSelector(1, 0.05f);
+                    selector.setTitlePercentage(0.3f).setId("#" + v.getName());
+                    selector.getTitleLabel()
+                            .setAlign(CENTER);
+                    selector.getTextInput()
+                            .inheritOutlook(modelInput);
+                    selector.setRange(-10, 10)
+                            .setTitle(v.getName());
+                    suppliedVarWrapper.add(selector);
+                }
+                if (override) selector.setValue((float) v.val());
+                Runnable r = () -> {
+                    SuppliedVar sv = new SuppliedVar(v.getName());
+                    sv.setVal(selector.getFloatValue());
+                    v.setVal(sv.val());
+                    func.setOperable(func.getOperable().replace(v, sv));
+                    graph.updateFunction(func);
+                };
+                selector.getTextInput().getSubmitMethod().run();
+                selector.link(r);
+                r.run();
+            }
+
+            suppliedVarWrapper.setVisible(true);
+            graphWrapper.syncSize();
+            graphWrapper.arrange();
+        }
+    }
+
+    private Displayable get(String id) {
+        return JNode.getContainerById(id);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -588,8 +671,8 @@ public class JGrapher extends PApplet {
         switch (key) {
             case TAB:
                 functionInputWrapper.setVisible(!functionInputWrapper.isVisible());
-                graphWrapper.syncSize();
-                graphWrapper.arrange();
+                middleSection.syncSize();
+                middleSection.arrange();
                 return;
         }
 

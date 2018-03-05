@@ -191,7 +191,7 @@ public class ValueSelector extends VBox {
      * @return the calculated float value from the slider
      */
     public float getFloatValue() {
-        return valueSlider.getFloatValue();
+        return textInput.getFloatValue();
     }
 
     /**

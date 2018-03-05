@@ -197,8 +197,11 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
 
 
     public Slider setValue(float val) {
-        if (val < valueLow || val > valueHigh)
+        if (val < valueLow || val > valueHigh) {
+            this.val = val < valueLow ? valueLow : val;
+            this.val = val > valueHigh ? valueHigh : val;
             return this;
+        }
         this.val = val;
         updateRollerPos();
         return this;

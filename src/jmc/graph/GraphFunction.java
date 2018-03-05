@@ -22,6 +22,7 @@ public class GraphFunction extends Function {
     private boolean autoAsymptoteExtension;
     private Operable operable;
     private Variable independentVar = new Variable("x");
+    private ArrayList<SuppliedVar> suppliedVars;
 
 
     public enum Style {
@@ -52,15 +53,27 @@ public class GraphFunction extends Function {
     public GraphFunction(String name, boolean dynamic, Operable operable) {
         super(name);
         this.operable = operable;
-        if (Operable.isMultiVar(operable)) {
-
-        }
+        suppliedVars = new ArrayList<>();
+        initSuppliedVars();
         setDynamic(dynamic);
+    }
+
+    public void initSuppliedVars() {
+        if (Operable.isMultiVar(operable)) {
+            ArrayList<Variable> vars = Operable.extractVariables(operable);
+            for (Variable v : vars) {
+                if (!v.equals(independentVar)) {
+                    SuppliedVar sv = new SuppliedVar(v.getName());
+                    suppliedVars.add(sv);
+                    operable = operable.replace(v, sv); //god this bug took me forever to find
+                }
+            }
+        }
     }
 
     @Override
     public double eval(double val) { // this might compromise speed
-        return operable.clone().plugIn(new Variable("x"), new RawValue(val)).val();
+        return operable.eval(val);
     }
 
     /**
@@ -146,6 +159,10 @@ public class GraphFunction extends Function {
         return dynamic;
     }
 
+    public boolean isMultiVar() {
+        return this.suppliedVars.size() > 0;
+    }
+
     public float getStrokeWeight() {
         return strokeWeight;
     }
@@ -192,7 +209,7 @@ public class GraphFunction extends Function {
         this.tangentLineVisible = tangentLineVisible;
     }
 
-//    /**
+    //    /**
 //     * TODO debug, java doc, not yet functional!
 //     *
 //     * @param x
@@ -243,8 +260,16 @@ public class GraphFunction extends Function {
         this.matchAuxiliaryLinesColor = matchAuxiliaryLinesColor;
     }
 
+    public ArrayList<SuppliedVar> getSuppliedVars() {
+        return suppliedVars;
+    }
+
     public Operable getOperable() {
         return this.operable;
+    }
+
+    public void setOperable(Operable o) {
+        this.operable = o;
     }
 
     @Override
