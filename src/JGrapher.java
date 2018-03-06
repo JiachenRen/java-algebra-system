@@ -301,6 +301,7 @@ public class JGrapher extends PApplet {
                 .setContentOn("Axes On")
                 .setState(graph.isAxesVisible())
                 .onClick(() -> graph.setAxesVisible(!graph.isAxesVisible())));
+
         std.add(new SpaceHolder());
         std.add(new Label("Evaluation")
                 .inheritOutlook(modelLabel));
@@ -407,6 +408,17 @@ public class JGrapher extends PApplet {
 
 
         std.add(new SpaceHolder());
+//        ValueSelector stepLength = new ValueSelector(1.0f, 0.057f);
+//        stepLength.setTitlePercentage(0.7f);
+//        stepLength.getTitleLabel()
+//                .setAlign(CENTER);
+//        stepLength.getTextInput()
+//                .inheritOutlook(modelInput);
+//        stepLength.setRange(0.05f, 1)
+//                .setTitle("Plot Tolerance")
+//                .setValue((float) graph.getStepLength())
+//                .link(() -> graph.setStepLength(stepLength.getFloatValue()));
+//        std.add(stepLength);
 
 
         Button button = new Button("Show Advanced")
@@ -503,7 +515,7 @@ public class JGrapher extends PApplet {
         adv.add(dynamic);
 
         adv.add(new SpaceHolder());
-        adv.add(new Label().setContent("VA Extension")
+        adv.add(new Label().setContent("VA Detection")
                 .inheritOutlook(modelLabel));
         Button extensionOn = new Button()
                 .inheritOutlook(modelButton)
@@ -527,19 +539,9 @@ public class JGrapher extends PApplet {
         functionColor.getTitleWrapper().setRelativeH(0.13f);
         adv.add(functionColor);
 
-        adv.add(new SpaceHolder());
-
         adv.add(new Label()
-                .setContent("Additional")
+                .setContent("Function")
                 .inheritOutlook(modelLabel));
-        adv.add(new Switch()
-                .inheritOutlook(modelButton)
-                .inheritMode(modelButton)
-                .setContentOn("Differentiate")
-                .setContentOff("Uniform").onClick(() -> {
-                    Switch self = (Switch) JNode.get("#9").get(0);
-                    getCurrentFunction().setMatchAuxiliaryLinesColor(self.isOn());
-                }).setId("#9"));
         ValueSelector strokeWeight = new ValueSelector(1.0f, 0.057f);
         strokeWeight.setTitlePercentage(0.7f);
         strokeWeight.getTitleLabel()
@@ -552,6 +554,24 @@ public class JGrapher extends PApplet {
                 .link(() -> getCurrentFunction().setStrokeWeight(strokeWeight.getFloatValue())).setId("#0");
         adv.add(strokeWeight);
         adv.add(new SpaceHolder());
+
+        adv.add(new Label()
+                .setContent("Auxiliary Lines")
+                .inheritOutlook(modelLabel));
+        adv.add(new Switch()
+                .inheritOutlook(modelButton)
+                .inheritMode(modelButton)
+                .setContentOn("Colorful")
+                .setContentOff("Consistent").onClick(() -> {
+                    Switch self = (Switch) JNode.get("#9").get(0);
+                    getCurrentFunction().setMatchAuxiliaryLinesColor(self.isOn());
+                }).setId("#9"));
+
+        adv.add(new SpaceHolder());
+
+        adv.add(new Label()
+                .setContent("UI")
+                .inheritOutlook(modelLabel));
         adv.add(new Button()
                 .inheritOutlook(modelButton)
                 .inheritMode(modelButton)

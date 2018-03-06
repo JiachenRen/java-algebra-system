@@ -34,7 +34,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
     public Runnable onFocusMethod;
 
     public Slider(float x, float y, float w, float h) {
-        super( x, y, w, h);
+        super(x, y, w, h);
         init();
     }
 
@@ -72,7 +72,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
      */
     public void mousePressed() {
         super.mousePressed();
-        if (mouseOverBar()||mouseOverRoller())
+        if (mouseOverBar() || mouseOverRoller())
             isLockedOn = true;
     }
 
@@ -345,6 +345,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
     /**
      * This method is overridden so that each component of the slider would be
      * resized properly according to the dimension of this displayable instance.
+     *
      * @param w the new width for the slider
      * @param h the new height for the slider.
      */
@@ -359,6 +360,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
      * The relocation mechanism is overridden so that the change that need
      * to be made to the position of the roller could also be taken into
      * consideration.
+     *
      * @param x x-coordinate on screen.
      * @param y y-coordinate on screen.
      */
@@ -373,6 +375,7 @@ public abstract class Slider extends Displayable implements MouseControl, Scalab
 
     /**
      * Even if the roller is not visible, it would still be in place.
+     *
      * @param rollerVisible boolean value
      * @return this instance of slider
      */

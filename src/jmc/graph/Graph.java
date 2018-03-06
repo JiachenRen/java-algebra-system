@@ -578,6 +578,7 @@ public class Graph extends Contextual {
 
     public void setStepLength(double pixels) {
         this.stepLength = pixels;
+        this.updateFunctions();
     }
 
     /**
@@ -791,7 +792,7 @@ public class Graph extends Contextual {
 
         for (GraphFunction function : functions) {
             if (!function.isVisible() || !function.tracingEnabled()) continue;
-            double yPosOnGraph = function.isDynamic() ? function.eval(xPosOnGraph) : function.getPlot().lookUp(xPosOnGraph, rangeX.getStep() / stepLength);
+            double yPosOnGraph = function.isDiscrete() ? function.getPlot().lookUp(xPosOnGraph, rangeX.getStep() / stepLength) : function.eval(xPosOnGraph);
             yPosOnGraph = yPosOnGraph == Double.MAX_VALUE ? function.eval(xPosOnGraph) : yPosOnGraph;
             float y = convertToCoordinateOnScreen(xPosOnGraph, yPosOnGraph)[1];
             if (!isInScope(x, y)) continue;
@@ -887,6 +888,7 @@ public class Graph extends Contextual {
     public boolean tracingIsOn() {
         return tracingOn;
     }
+    public double getStepLength() {return stepLength;}
 
     public void setTracingOn(boolean tracingOn) {
         this.tracingOn = tracingOn;

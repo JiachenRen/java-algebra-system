@@ -272,6 +272,10 @@ public class GraphFunction extends Function {
         this.operable = o;
     }
 
+    public boolean isDiscrete() {
+        return this.graphStyle.equals(Style.DISCRETE);
+    }
+
     @Override
     public GraphFunction setName(String name) {
         super.setName(name);
