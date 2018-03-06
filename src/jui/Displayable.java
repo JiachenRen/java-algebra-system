@@ -12,7 +12,7 @@ import java.util.ArrayList;
 //modified April 22nd. Took me half an hour, I eliminated all rounding errors for containers!
 //primitive type for coordinate and dimension is changed from int to float. Proved to be helpful!
 //refresh requesting technique applied April 23rd
-//TODO: add inheritMode(), clone();
+//TODO: clone();
 
 /**
  * add mousePressedTextColor(), mousePressedContourColor(), mouseOverTextColor(), mouseOverContourColor();
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class Displayable implements MouseControl, Serializable {
     public boolean displayContour = JNode.DISPLAY_CONTOUR;
     public boolean isVisible = true;
+    public Displayable parent;
 
     public int colorMode = JNode.COLOR_MODE;
     public int backgroundColor = JNode.BACKGROUND_COLOR;
@@ -152,6 +153,10 @@ public class Displayable implements MouseControl, Serializable {
 
     public Displayable setVisible(boolean temp) {
         isVisible = temp;
+        if (parent != null && parent instanceof Container) {
+            ((Container) parent).syncSize();
+            ((Container) parent).arrange();
+        }
         return this;
     }
 

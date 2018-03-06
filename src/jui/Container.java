@@ -141,14 +141,13 @@ public abstract class Container extends Displayable {
 
     public abstract float undeclaredSpace();
 
-    public Container add(Displayable displayable) {
-        displayable.setRelative(true);
-        if (!JNode.getDisplayables().contains(displayable))
-            JNode.add(displayable);
-        this.displayables.add(displayable);
-        //intended to synchronize the size add the sub-class objects according to their
+    public Container add(Displayable d) {
+        d.setRelative(true);
+        if (!JNode.getDisplayables().contains(d))
+            JNode.add(d);
+        this.displayables.add(d);
+        d.parent = this;
         syncSize();
-        //intended to arrange the coordinates of the sub-class objects accordingly with their width.
         arrange();
         return this;
     }
@@ -159,6 +158,21 @@ public abstract class Container extends Displayable {
 
     public boolean contains(Displayable temp) {
         return displayables.contains(temp);
+    }
+    public boolean contains(String id) {
+        for (Displayable d: displayables) {
+            if (d.getId().equals(id))
+                return true;
+        }
+        return false;
+    }
+
+    public Displayable get(String id) {
+        for (Displayable d: displayables) {
+            if (d.getId().equals(id))
+                return d;
+        }
+        return null;
     }
 
     /**
@@ -179,7 +193,6 @@ public abstract class Container extends Displayable {
             }
             displayables.remove(obj);
             JNode.getDisplayables().remove(obj);
-//            JNode.remove(obj);
         }
         syncSize();
         arrange();
@@ -448,7 +461,7 @@ public abstract class Container extends Displayable {
     public void remove(String id) {
         for (int i = displayables.size() - 1; i >= 0; i--) {
             Displayable displayable = displayables.get(i);
-            if (displayable.getId().endsWith(id))
+            if (displayable.getId().equals(id))
                 this.remove(displayable);
         }
     }

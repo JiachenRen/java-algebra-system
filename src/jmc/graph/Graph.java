@@ -27,6 +27,7 @@ public class Graph extends Contextual {
     private double stepValueY;
     private float markLengthBig;
     private float axisMarkingTextSize;
+    private float lineWidth = 1;
     private int maxMarkingLength;
     private int minMarkingLength;
     private ArrayList<GraphFunction> functions;
@@ -375,7 +376,7 @@ public class Graph extends Contextual {
                     if (function.isAutoAsymptoteExtension()) getParent().vertex(translatedX, translatedY);
                     if (function.isAsymptoteVisible()) {
                         getParent().pushStyle();
-                        getParent().strokeWeight(1);
+                        getParent().strokeWeight(lineWidth);
                         getParent().stroke(asymptoteColor);
                         JNode.dashLine(translatedX, y, translatedX, y + h, new float[]{4});
                         getParent().popStyle();
@@ -412,6 +413,7 @@ public class Graph extends Contextual {
      */
     public void drawTangentLineToPoint(double x, String name) {
         GraphFunction tangentLine = tangentLineToPoint(x, getFunction(name), rangeX.getStep());
+        if (tangentLine == null) return;
         double y1 = rangeY.getLow(), y2 = rangeY.getHigh();
         ArrayList<Double> fx = solveInScope(rangeY.getLow(), tangentLine);
         ArrayList<Double> sx = solveInScope(rangeY.getHigh(), tangentLine);
@@ -439,6 +441,7 @@ public class Graph extends Contextual {
         float p1[] = convertToCoordinateOnScreen(x1, y1);
         float p2[] = convertToCoordinateOnScreen(x2, y2);
         if (!isInScope(p1[0], p1[1]) || !isInScope(p2[0], p2[1])) return;
+        getParent().strokeWeight(lineWidth);
         JNode.dashLine(p1[0], p1[1], p2[0], p2[1], new float[]{3, 5});
     }
 
@@ -482,9 +485,13 @@ public class Graph extends Contextual {
     public static GraphFunction createLinearFunction(Point first, Point second) {
         double k = (first.getY() - second.getY()) / (first.getX() - second.getX());
         double b = first.getY() - k * first.getX();
-        String k1 = new BigDecimal(k).toPlainString();
-        String b1 = new BigDecimal(b).toPlainString();
-        return new GraphFunction(Expression.interpret(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
+        try {
+            String k1 = new BigDecimal(k).toPlainString();
+            String b1 = new BigDecimal(b).toPlainString();
+            return new GraphFunction(Expression.interpret(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     /**
@@ -775,6 +782,7 @@ public class Graph extends Contextual {
 
         float screenX = this.convertToCoordinateOnScreen(xPosOnGraph, 0)[0];
         if (!isInScope(screenX, y + h / 2)) return;
+        getParent().strokeWeight(lineWidth);
         JNode.dashLine(screenX, y, screenX, y + h, new float[]{3});
 
         float[] offset = new float[]{3, 3}, dim = new float[]{w / 10, h / 25};
@@ -783,12 +791,12 @@ public class Graph extends Contextual {
 
         for (GraphFunction function : functions) {
             if (!function.isVisible() || !function.tracingEnabled()) continue;
-            double yPosOnGraph = function.getPlot().lookUp(xPosOnGraph, rangeX.getStep() / stepLength);
+            double yPosOnGraph = function.isDynamic() ? function.eval(xPosOnGraph) : function.getPlot().lookUp(xPosOnGraph, rangeX.getStep() / stepLength);
             yPosOnGraph = yPosOnGraph == Double.MAX_VALUE ? function.eval(xPosOnGraph) : yPosOnGraph;
             float y = convertToCoordinateOnScreen(xPosOnGraph, yPosOnGraph)[1];
             if (!isInScope(x, y)) continue;
             if (function.isMatchAuxiliaryLinesColor()) getParent().stroke(function.getColor());
-            getParent().strokeWeight(1); //is this necessary?
+            getParent().strokeWeight(lineWidth); //is this necessary?
             if (!isEvaluationOn()) JNode.dashLine(x, y, x + w, y, new float[]{3});
             getParent().pushStyle();
             getParent().stroke(function.getColor());
@@ -884,21 +892,28 @@ public class Graph extends Contextual {
         this.tracingOn = tracingOn;
         @SuppressWarnings("unchecked") ArrayList<Displayable> matching = (ArrayList<Displayable>) JNode.get("#functionInputWrapper");
         if (matching.size() == 0) return;
-        HBox functionInputWrapper = (HBox) matching.get(0);
+        HBox wrapper = (HBox) matching.get(0);
         if (tracingOn) {
-            TextInput tempTextInput = (TextInput) new TextInput().setContent("x = ").setId("#XVAL");
-            tempTextInput.onFocus(() -> tempTextInput.setContent("x = "));
-            tempTextInput.onKeyTyped(() -> tempTextInput.setContent(tempTextInput.getContent().contains("x = ") ? tempTextInput.getContent() : "x = "));
-            tempTextInput.onEditing(() -> {
-                String temp = tempTextInput.getContent().substring(4);
-                try {
-                    this.trace(Double.valueOf(temp));
-                } catch (NumberFormatException ignore) {
-                }
-            });
-            functionInputWrapper.add(tempTextInput);
+            if (!wrapper.contains("#XVAL")) {
+                TextInput input = (TextInput) new TextInput().setContent("x = ").setId("#XVAL");
+                input.onFocus(() -> input.setContent("x = "));
+                input.onKeyTyped(() -> input.setContent(input.getContent().contains("x = ") ? input.getContent() : "x = "));
+                input.onEditing(() -> {
+                    String temp = input.getContent().substring(4);
+                    try {
+                        this.trace(Double.valueOf(temp));
+                    } catch (NumberFormatException ignore) {
+                    }
+                });
+                wrapper.add(input);
+                wrapper.setCollapseInvisible(true);
+            } else {
+                wrapper.get("#XVAL").setVisible(true);
+            }
         } else {
-            functionInputWrapper.remove("#XVAL");
+            if (wrapper.contains("#XVAL")) {
+                wrapper.get("#XVAL").setVisible(false);
+            }
         }
     }
 }
