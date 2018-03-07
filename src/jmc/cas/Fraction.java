@@ -57,12 +57,32 @@ public class Fraction extends RawValue {
         return this.reduce();
     }
 
-//    public RawValue exp(RawValue o) {
-//        if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
-//        if (o instanceof Fraction) {
-//            this.exp(((Fraction) o).numerator);
-//        }
-//    }
+    public Operable exp(RawValue o) {
+        if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
+        if (o instanceof Fraction) {
+            Fraction f = ((Fraction) o);
+            this.exp(f.numerator);
+            this.reduce();
+            BinaryOperation nu = extractRoot((int) this.numerator, (int) f.denominator);
+            BinaryOperation de = extractRoot((int) this.denominator, (int) f.denominator);
+            if (nu == null || de == null) return RawValue.UNDEF;
+            BinaryOperation irr = (BinaryOperation) de.getRightHand();
+            Operable a = new BinaryOperation(de.getLeftHand(), "*", irr.getLeftHand());
+            Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRightHand());
+            BinaryOperation conjugate = new BinaryOperation(irr.getLeftHand(), "^", c);
+//            BinaryOperation b = new BinaryOperation(irr.getLeftHand(), "*", conjugate);
+            Operable d = new BinaryOperation(nu.getLeftHand(), "/", a);
+            BinaryOperation e = new BinaryOperation(nu.getRightHand(), "*", conjugate);
+            return new BinaryOperation(d, "*", e);
+        } else if (o.isInteger()) {
+            this.exp(o.intValue());
+            this.reduce();
+            return this;
+        } else {
+            o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
+            return exp(o);
+        }
+    }
 
     public Fraction exp(long i) {
         this.numerator = (long) Math.pow(this.numerator, i);
@@ -77,7 +97,7 @@ public class Fraction extends RawValue {
      * @param n number within the root, n^(1/r)
      * @return irrational form Fraction or BinaryOperation
      */
-    public static Operable extractRoot(int n, int r) {
+    public static BinaryOperation extractRoot(int n, int r) {
         if (n == 0) return null;
         ArrayList<Long> factors = getFactors(n);
         ArrayList<Long> uniqueFactors = new ArrayList<>();
@@ -117,7 +137,7 @@ public class Fraction extends RawValue {
         BigInteger i = new BigInteger(Long.toString(n));
         List<Long> factors = MathContext.factor(i).stream()
                 .map(BigInteger::longValue)
-                .sorted((a,b) -> a <= b ? -1 : 1)
+                .sorted((a, b) -> a <= b ? -1 : 1)
                 .collect(Collectors.toList());
         return (ArrayList<Long>) factors;
     }

@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.Fraction;
+import jmc.cas.Operable;
 
 /**
  * Created by Jiachen on 3/6/18.
@@ -11,6 +12,11 @@ public class FractionTest {
         Fraction f = new Fraction(4050800, 1);
         l(Fraction.extractRoot(350003000,2));
         l(Fraction.getFactors(35000));
+
+        Fraction f1 = new Fraction(3,4);
+        Fraction f2 = new Fraction(4, 3);
+        Operable o = f1.exp(f2);
+        l(o);
     }
 
     private static void l(Object... objects) {
