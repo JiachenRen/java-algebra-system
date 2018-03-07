@@ -3,6 +3,9 @@ package jmc.cas;
 import jmc.MathContext;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jiachen on 3/2/18.
@@ -52,6 +55,71 @@ public class Fraction extends RawValue {
         f.simult(lcm / f.denominator);
         this.numerator += f.numerator;
         return this.reduce();
+    }
+
+//    public RawValue exp(RawValue o) {
+//        if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
+//        if (o instanceof Fraction) {
+//            this.exp(((Fraction) o).numerator);
+//        }
+//    }
+
+    public Fraction exp(long i) {
+        this.numerator = (long) Math.pow(this.numerator, i);
+        this.denominator = (long) Math.pow(this.denominator, i);
+        return (Fraction) this.reduce();
+    }
+
+    /**
+     * extract root, n^(1/r) to a*b^(1/r)
+     *
+     * @param r root (square, cube, quad, etc)
+     * @param n number within the root, n^(1/r)
+     * @return irrational form Fraction or BinaryOperation
+     */
+    public static Operable extractRoot(int n, int r) {
+        if (n == 0) return null;
+        ArrayList<Long> factors = getFactors(n);
+        ArrayList<Long> uniqueFactors = new ArrayList<>();
+        long cur = 1;
+        for (Long f : factors) {
+            if (cur != f) {
+                uniqueFactors.add(f);
+                cur = f;
+            }
+        }
+        int[] num = new int[uniqueFactors.size()];
+        int max = uniqueFactors.get(uniqueFactors.size() - 1).intValue();
+        int[] map = new int[max + 1];
+        for (int i = 0; i < uniqueFactors.size(); i++) {
+            map[uniqueFactors.get(i).intValue()] = i;
+        }
+        factors.forEach(f -> num[map[f.intValue()]] += 1);
+        int ext = 1, n1 = 1;
+        for (int i = 0; i < num.length; i++) {
+            int k = num[i] / r;
+            long u = uniqueFactors.get(i);
+            ext *= Math.pow(u, k);
+            int q = num[i] - r * k;
+            n1 *= Math.pow(u, q);
+        }
+
+        BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r));
+        BinaryOperation irr = new BinaryOperation(new RawValue(n1), "^", exp);
+        return new BinaryOperation(new RawValue(ext), "*", irr);
+    }
+
+    /**
+     * @param n number
+     * @return factors of n in an ArrayList sorted from smallest to largest.
+     */
+    public static ArrayList<Long> getFactors(long n) {
+        BigInteger i = new BigInteger(Long.toString(n));
+        List<Long> factors = MathContext.factor(i).stream()
+                .map(BigInteger::longValue)
+                .sorted((a,b) -> a <= b ? -1 : 1)
+                .collect(Collectors.toList());
+        return (ArrayList<Long>) factors;
     }
 
     public RawValue sub(RawValue o) {
@@ -189,7 +257,8 @@ public class Fraction extends RawValue {
         return !isUndefined() && numerator / denominator > 0;
     }
 
-    @Override public boolean isInteger() {
+    @Override
+    public boolean isInteger() {
         return false;
     }
 

@@ -8,14 +8,15 @@ import java.util.ArrayList;
 public class JMathContextTest {
 
     public static void main(String[] args) {
-        ArrayList<BigInteger> factors = MathContext.factor(new BigInteger(args[0]));
+        ArrayList<BigInteger> factors = MathContext.factor(new BigInteger("146580900"));
         for (BigInteger b : factors)
             System.out.println(b);
+        l(MathContext.factorial(new BigInteger("300")));
 
     }
 
-    public static void l(String s) {
-        System.out.println(s);
+    private static void l(Object o) {
+        System.out.println(o);
     }
 
 

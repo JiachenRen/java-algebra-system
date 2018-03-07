@@ -138,7 +138,7 @@ public class UnaryOperation extends Operation implements LeafNode {
             define("sec", x -> 1 / cos(x));
             define("csc", x -> 1 / sin(x));
             define("cot", x -> 1 / tan(x));
-            define("!", x -> MathContext.f(abs((long) x)));
+            define("!", x -> MathContext.factorial(abs((long) x)));
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);

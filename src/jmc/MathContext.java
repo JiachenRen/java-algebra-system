@@ -28,13 +28,13 @@ public class MathContext {
         else return gcd(a, b.mod(a));
     }
 
-    public static BigInteger f(BigInteger a) {
+    public static BigInteger factorial(BigInteger a) {
         if (a.equals(ONE) || a.equals(ZERO)) return a;
-        else return a.multiply(f(a.subtract(ONE)));
+        else return a.multiply(factorial(a.subtract(ONE)));
     }
 
-    public static long f(long a) {
-        return f(new BigInteger(Long.toString(a))).longValue();
+    public static long factorial(long a) {
+        return factorial(new BigInteger(Long.toString(a))).longValue();
     }
 
     /**
@@ -92,9 +92,11 @@ public class MathContext {
 
     /**
      * This method wraps the recursiveFactor(BigInteger N, ArrayList<BigInteger> factors) method.
+     * 1 is not returned as a factor.
+     * e.g. factor(12) returns [2,2,3]
      *
-     * @param N
-     * @return
+     * @param N the number to be factored
+     * @return an ArrayList containing the factors of N.
      */
     public static ArrayList<BigInteger> factor(BigInteger N) {
         ArrayList<BigInteger> factors = new ArrayList<>();
