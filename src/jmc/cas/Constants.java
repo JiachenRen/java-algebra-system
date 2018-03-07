@@ -19,6 +19,7 @@ public class Constants {
         constants = new ArrayList<>();
         define("e", () -> Math.E);
         define("pi", () -> Math.PI);
+        define("∞", () -> Double.POSITIVE_INFINITY);
         define("rand", Math::random);
     }
 

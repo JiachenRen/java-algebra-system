@@ -12,7 +12,7 @@ public class Fraction extends RawValue {
     private long numerator;
     private long denominator;
     public static double TOLERANCE = 5E-7;
-    public static Fraction UNDEF = new Fraction(0,0);
+    public static Fraction UNDEF = new Fraction(0, 0);
 
     public Fraction(long numerator, long denominator) {
         super(denominator == 0 ? Double.NaN : numerator / denominator);
@@ -179,12 +179,18 @@ public class Fraction extends RawValue {
         return new Fraction(numerator, denominator);
     }
 
-    @Override public boolean isZero() {
+    @Override
+    public boolean isZero() {
         return !isUndefined() && denominator == 0;
     }
 
-    @Override public boolean isPositive() {
+    @Override
+    public boolean isPositive() {
         return !isUndefined() && numerator / denominator > 0;
+    }
+
+    @Override public boolean isInteger() {
+        return false;
     }
 
     @Override

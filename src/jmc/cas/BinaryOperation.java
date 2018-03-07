@@ -177,6 +177,8 @@ public class BinaryOperation extends Operation {
         if (isUndefined()) return RawValue.UNDEF;
 
         if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
+            RawValue r1 = (RawValue) getLeftHand();
+            RawValue r2 = (RawValue) rightHand;
             if (getLeftHand() instanceof Fraction && 是加减乘除()) {
                 Fraction f = (Fraction) getLeftHand().clone();
                 RawValue r = (RawValue) rightHand.clone();
@@ -203,10 +205,11 @@ public class BinaryOperation extends Operation {
                     case "/":
                         return f.inverse().mult(r);
                 }
+            } else if (operation.name.equals("^")) { //fractional mode
+
             }
 
-            RawValue r1 = (RawValue) getLeftHand();
-            RawValue r2 = (RawValue) rightHand;
+
 
             if (r1.isInteger() && r2.isInteger()) {
                 if (operation.name.equals("/")) {
@@ -251,11 +254,16 @@ public class BinaryOperation extends Operation {
         if (getLeftHand() instanceof BinaryOperation && getRightHand() instanceof BinaryOperation) {
             BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
             BinaryOperation binOp2 = (BinaryOperation) getRightHand();
-            if (binOp1.operation.equals(binOp2.operation))
+            if (binOp1.operation.equals(binOp2.operation)) //e.g. x*a + x*b, "*" == "*"
                 switch (operation.name) {
                     case "+":
                         switch (binOp1.operation.name) {
                             case "*":
+                                /*
+                                1. for the form x*(a+b) + x*c, should it be simplified to x*(a+b+c)?
+                                2. for the form x*(a+b) + x*(b-a), it should definitely be simplified to 2*b*x.
+                                right now it does both 1 and 2.
+                                */
                                 for (int i = 1; i <= 2; i++) {
                                     Operable o1 = binOp1.get(i);
                                     int idx = binOp2.contains(o1);
@@ -264,8 +272,28 @@ public class BinaryOperation extends Operation {
                                         return new BinaryOperation(o1, "*", add).simplify();
                                     }
                                 }
+                                break;
+                            case "^":
+                                break;
 
                         }
+                        break;
+                    case "*":
+                        switch (binOp1.operation.name) {
+                            case "^":
+                                /*
+                                1. for the form x^(a+b) + x^c, should it be simplified to x^(a+b+c)?
+                                2. for the form x^(a+b) + x^(-a), it should definitely be simplified to 2*b*x.
+                                 */
+                                Operable op1Left = binOp1.getLeftHand();
+                                Operable op2Left = binOp2.getLeftHand();
+                                if (op1Left.equals(op2Left)) {
+                                    Operable add = new BinaryOperation(binOp1.getRightHand(), "+", binOp2.getRightHand()).simplify();
+                                    return new BinaryOperation(op1Left, "^", add);
+                                }
+                                break;
+                        }
+                        break;
                 }
         }
 

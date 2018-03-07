@@ -208,8 +208,8 @@ public class JGrapher extends PApplet {
                 updateSuppliedVarValueSelectors(shouldOverride);
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
-//                System.out.println((char) 27 + "[1;31m" + "interpretation failed -> missing operands..." + (char) 27 + "[0m");
-                e.printStackTrace();
+                System.out.println((char) 27 + "[1;31m" + "interpretation failed -> missing operands..." + (char) 27 + "[0m");
+//                e.printStackTrace();
             }
         });
         functionInputWrapper.add(funcTextInput);
