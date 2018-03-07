@@ -70,10 +70,9 @@ public class Fraction extends RawValue {
             Operable a = new BinaryOperation(de.getLeftHand(), "*", irr.getLeftHand());
             Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRightHand());
             BinaryOperation conjugate = new BinaryOperation(irr.getLeftHand(), "^", c);
-//            BinaryOperation b = new BinaryOperation(irr.getLeftHand(), "*", conjugate);
             Operable d = new BinaryOperation(nu.getLeftHand(), "/", a);
             BinaryOperation e = new BinaryOperation(nu.getRightHand(), "*", conjugate);
-            return new BinaryOperation(d, "*", e);
+            return new BinaryOperation(d, "*", e).simplify();
         } else if (o.isInteger()) {
             this.exp(o.intValue());
             this.reduce();

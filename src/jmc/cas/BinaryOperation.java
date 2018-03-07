@@ -215,10 +215,12 @@ public class BinaryOperation extends Operation {
                 if (operation.name.equals("/")) {
                     return new Fraction(r1.intValue(), r2.intValue());
                 } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
-            } else {
+            } else if (!r1.isInteger() && !(r1 instanceof Fraction)){
                 RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
+                return new BinaryOperation(f1, operation, r2).simplify();
+            } else if (!r2.isInteger() && !(r2 instanceof Fraction)){
                 RawValue f2 = Fraction.convertToFraction(r2.doubleValue(), Fraction.TOLERANCE);
-                return new BinaryOperation(f1, operation, f2).simplify();
+                return new BinaryOperation(r1, operation, f2).simplify();
             }
         }
 
