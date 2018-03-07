@@ -8,6 +8,8 @@ import jmc.graph.Graph;
  */
 public class RawValue implements Operable, LeafNode {
     public static RawValue UNDEF = new RawValue(Double.NaN);
+    public static RawValue ONE = new RawValue(1);
+    public static RawValue ZERO = new RawValue(0);
     private Number number;
 
     public RawValue(Number number) {

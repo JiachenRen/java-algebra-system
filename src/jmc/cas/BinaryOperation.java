@@ -1,9 +1,7 @@
 package jmc.cas;
 
-import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -20,7 +18,7 @@ public class BinaryOperation extends Operation {
         this(leftHand, RegisteredBinaryOperation.extract(operation), rightHand);
     }
 
-    public BinaryOperation(Operable leftHand, RegisteredBinaryOperation operation, Operable rightHand) {
+    private BinaryOperation(Operable leftHand, RegisteredBinaryOperation operation, Operable rightHand) {
         super(leftHand);
         this.operation = operation;
         this.rightHand = rightHand;
@@ -206,19 +204,24 @@ public class BinaryOperation extends Operation {
                         return f.inverse().mult(r);
                 }
             } else if (operation.name.equals("^")) { //fractional mode
-
+                if (r1 instanceof Fraction) {
+                    return ((Fraction) r1).exp(r2);
+                } else if (r2.val() == 0) { // 0^0
+                    return r1.val() == 0 ? RawValue.UNDEF : new RawValue(1);
+                } else if (r2.val() < 0) { // x^-b = (1/x)^b
+                    return new BinaryOperation(r1.inverse(), "^", r2.negate()).simplify();
+                }
             }
-
 
 
             if (r1.isInteger() && r2.isInteger()) {
                 if (operation.name.equals("/")) {
                     return new Fraction(r1.intValue(), r2.intValue());
                 } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
-            } else if (!r1.isInteger() && !(r1 instanceof Fraction)){
+            } else if (!r1.isInteger() && !(r1 instanceof Fraction)) {
                 RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
                 return new BinaryOperation(f1, operation, r2).simplify();
-            } else if (!r2.isInteger() && !(r2 instanceof Fraction)){
+            } else if (!r2.isInteger() && !(r2 instanceof Fraction)) {
                 RawValue f2 = Fraction.convertToFraction(r2.doubleValue(), Fraction.TOLERANCE);
                 return new BinaryOperation(r1, operation, f2).simplify();
             }
@@ -336,7 +339,7 @@ public class BinaryOperation extends Operation {
      *
      * @param pool ArrayList containing flattened operables
      */
-    public void crossSimplify(ArrayList<Operable> pool) {
+    private void crossSimplify(ArrayList<Operable> pool) {
         if (getPriority() == 1) return;
         for (int i = 0; i < pool.size() - 1; i++) {
             Operable operable = pool.get(i);
@@ -361,7 +364,7 @@ public class BinaryOperation extends Operation {
      *
      * @return reconstructed BinaryOperation tree.
      */
-    public BinaryOperation reconstructBinTree(ArrayList<Operable> flattened) {
+    private BinaryOperation reconstructBinTree(ArrayList<Operable> flattened) {
         if (flattened.size() < 2) return null;
         String op = getPriority() == 2 ? "*" : "+";
         BinaryOperation root = new BinaryOperation(flattened.remove(0), op, flattened.remove(0));
@@ -509,7 +512,7 @@ public class BinaryOperation extends Operation {
             return binEvaluable.eval(a, b);
         }
 
-        public static void define(String name, int priority, BinEvaluable evaluable) {
+        private static void define(String name, int priority, BinEvaluable evaluable) {
             for (int i = 0; i < registeredBinOps.size(); i++) {
                 RegisteredBinaryOperation function = registeredBinOps.get(i);
                 if (function.name.equals(name))

@@ -63,9 +63,11 @@ public class Fraction extends RawValue {
             Fraction f = ((Fraction) o);
             this.exp(f.numerator);
             this.reduce();
-            BinaryOperation nu = extractRoot((int) this.numerator, (int) f.denominator);
-            BinaryOperation de = extractRoot((int) this.denominator, (int) f.denominator);
-            if (nu == null || de == null) return RawValue.UNDEF;
+            Operable o1 = extractRoot((int) this.numerator, (int) f.denominator);
+            Operable o2 = extractRoot((int) this.denominator, (int) f.denominator);
+            if (o1 == null || o1.isUndefined() || o2 == null || o2.isUndefined()) return RawValue.UNDEF;
+            BinaryOperation nu = (BinaryOperation) o1;
+            BinaryOperation de = (BinaryOperation) o2;
             BinaryOperation irr = (BinaryOperation) de.getRightHand();
             Operable a = new BinaryOperation(de.getLeftHand(), "*", irr.getLeftHand());
             Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRightHand());
@@ -83,10 +85,14 @@ public class Fraction extends RawValue {
         }
     }
 
-    public Fraction exp(long i) {
+    public RawValue exp(long i) {
+        if (i < 0) {
+            i *= -1;
+            this.inverse();
+        }
         this.numerator = (long) Math.pow(this.numerator, i);
         this.denominator = (long) Math.pow(this.denominator, i);
-        return (Fraction) this.reduce();
+        return this.reduce();
     }
 
     /**
@@ -96,8 +102,18 @@ public class Fraction extends RawValue {
      * @param n number within the root, n^(1/r)
      * @return irrational form Fraction or BinaryOperation
      */
-    public static BinaryOperation extractRoot(int n, int r) {
+    public static Operable extractRoot(int n, int r) {
         if (n == 0) return null;
+        else if (n == 1 || n == -1) {
+            BinaryOperation in = new BinaryOperation(RawValue.ONE, "^", RawValue.ZERO);
+            return new BinaryOperation(new RawValue(n), "*", in);
+        } else if (r == 0) throw new IllegalArgumentException("root cannot be negative");
+        boolean isNegative = false;
+        if (n < 0) {
+            if (r % 2 == 0) return RawValue.UNDEF;
+            isNegative = true;
+            n *= -1;
+        }
         ArrayList<Long> factors = getFactors(n);
         ArrayList<Long> uniqueFactors = new ArrayList<>();
         long cur = 1;
@@ -114,7 +130,7 @@ public class Fraction extends RawValue {
             map[uniqueFactors.get(i).intValue()] = i;
         }
         factors.forEach(f -> num[map[f.intValue()]] += 1);
-        int ext = 1, n1 = 1;
+        int ext = isNegative ? -1 : 1, n1 = 1;
         for (int i = 0; i < num.length; i++) {
             int k = num[i] / r;
             long u = uniqueFactors.get(i);
@@ -180,6 +196,7 @@ public class Fraction extends RawValue {
 
     public Fraction negate() {
         this.numerator *= -1;
+        this.reduce();
         return this;
     }
 
@@ -285,5 +302,13 @@ public class Fraction extends RawValue {
     public double doubleValue() {
         if (isUndefined()) return Double.NaN;
         return (double) numerator / (double) denominator;
+    }
+
+    public long getNumerator() {
+        return numerator;
+    }
+
+    public long getDenominator() {
+        return denominator;
     }
 }
