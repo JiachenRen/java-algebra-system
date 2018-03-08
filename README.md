@@ -96,10 +96,14 @@ IRRATIONAL/RATIONAL NUMBERS
 ```
 
 ### Extensibility
-The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
+The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `BinaryOperation` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
 #### Binary Operation
-BinaryOperation has a private nested class `RegisteredBinaryOperation` that is invisible outside of the `jmc.cas` package. It conforms to interface `BinEvaluable`, which specifies. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
+BinaryOperation has a private nested class `RegisteredBinaryOperation` that is invisible outside of the `jmc.cas` package. It conforms to interface `BinEvaluable`, which specifies only one method `double eval(double a, double b)`. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
 ```java
 BinaryOperation.define("%", 2, (a, b) -> a % b); // defines the modular binary operation (which is nonstandard)
 ```
 The first argument is the symbolic representation of binary operation. It can be any `String` that contains a single symbol. The second argument is the **priority** of the operation. The priority defines the order of binary operations - it can either be either `1`,`2`, or `3` with 3 being the highest. Addition and subtraction are of **priority 1** (lowest), while multiplification and division are of **priority 2** and exponentiation having **priority 3** (highest). In the code segment above, the `%` is defined to be having the same priority as `*` and `/`. The third argument is of type `BinEvaluable`. You can do any operation with the left/right operand as long as a double is returned.
+```
+System.out.println(Expression.interpret("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0"
+```
+#### 
