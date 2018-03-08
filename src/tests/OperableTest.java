@@ -42,5 +42,6 @@ public class OperableTest {
         ArrayList<Operable> operables;
         operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
         l(Operable.contains(operables, Expression.interpret("0-x")));
+        l(Operable.commonTerms(Expression.interpret("x*2*b*a*b*x^2/x"), Expression.interpret("b*x^2*b*x*1")));
     }
 }

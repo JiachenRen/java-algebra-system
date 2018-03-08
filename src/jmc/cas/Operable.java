@@ -83,15 +83,43 @@ public interface Operable extends Evaluable {
     /**
      * invocation of commonTerms(o1 = "a*b*(c+d)*m", o2 = "f*(c+d)*m")
      * returns [(c+d), m]
-     * o1 will be changed to "a*b" while o2 will be changed to "f"
      *
      * @param o1 Operable #1
      * @param o2 Operable #2
      * @return an ArrayList containing common terms of o1 and o2
      */
-//    static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
-//
-//    }
+    static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
+        ArrayList<Operable> terms = new ArrayList<>();
+        if (o1 instanceof LeafNode && o2 instanceof LeafNode) {
+            if (o1.equals(o2)) {
+                terms.add(o1.clone());
+            }
+        } else if (((o1 instanceof BinaryOperation) && (o2 instanceof LeafNode)) || ((o1 instanceof LeafNode) && (o2 instanceof BinaryOperation))) {
+            BinaryOperation binOp = (BinaryOperation) (o1 instanceof BinaryOperation ? o1 : o2);
+            Operable op = o1 instanceof BinaryOperation ? o2 : o1;
+            ArrayList<Operable> pool = binOp.flattened();
+            if (Operable.contains(pool, op))
+                terms.add(op.clone());
+        } else if (o1 instanceof BinaryOperation && o2 instanceof BinaryOperation) {
+            BinaryOperation binOp1 = (BinaryOperation) o1;
+            BinaryOperation binOp2 = (BinaryOperation) o2;
+            ArrayList<Operable> pool1 = binOp1.flattened();
+            ArrayList<Operable> pool2 = binOp2.flattened();
+            for (int i = pool1.size() - 1; i >= 0; i--) {
+                Operable op1 = pool1.get(i);
+                for (int k = pool2.size() - 1; k >= 0; k--) {
+                    Operable op2 = pool2.get(k);
+                    if (op1.equals(op2)) {
+                        pool1.remove(i);
+                        pool2.remove(k);
+                        terms.add(op1.clone());
+                        break;
+                    }
+                }
+            }
+        }
+        return terms;
+    }
 
     /**
      * @param o the operable to be replaced
