@@ -119,8 +119,8 @@ Expression.interpret("digits(x)^2").eval(1234) // returns 16 since there are 4 d
 Aside from declaring custom binary/unary operations, you can also define constants. Constants in JMC behave differently from what you would expect, however, and here's how it works. All of the constants are managed under the `Constants` class, which contains 2 subclasses, `Constant` and `ComputedConst` with `Constant` being a nested class that is a subclass of `Variable` and `ComputedConst` being a nested interface. The `ComputedConst` interface declares a single method `double compute()` and is utilized by `Constant` to compute a value. Here is how it works in practice:
 ```java
 Constants.define("π", () -> Math.PI); // a constant having the value π. ("pi" is the default name for π in JMC)
-Constants.define("seed", () -> Math.random()); // a "dynamic constant" that returns a random value between 0 and 1 when evaluated
+Constants.define("seed", Math::random); // a "dynamic constant" that returns a random value between 0 and 1 when evaluated
 System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
-System.out.println(Expression.interpret("seed*2-1")) // prints a random number between -1 and 1.
+System.out.println(Expression.interpret("seed*2-1").val()) // prints a random number between -1 and 1.
 ```
 
