@@ -72,8 +72,8 @@ public class BinaryOperation extends Operation {
     public String toString() {
         boolean k = getLeftHand() instanceof RawValue && getLeftHand().val() < 0;
         boolean q = getRightHand() instanceof RawValue && getRightHand().val() < 0;
-        String left = k ? "("+getLeftHand().toString()+")" : getLeftHand().toString();
-        String right = q ? "("+getRightHand().toString()+")" : getRightHand().toString();
+        String left = k ? "(" + getLeftHand().toString() + ")" : getLeftHand().toString();
+        String right = q ? "(" + getRightHand().toString() + ")" : getRightHand().toString();
         String temp = left + operation.name + right;
         return omitParenthesis ? temp : "(" + temp + ")";
     }
@@ -225,15 +225,53 @@ public class BinaryOperation extends Operation {
     }
 
     /**
+     * HELPER METHOD
+     * <p>
+     * handles special cases where the right hand of the binary operation is a certain integer.
+     *
+     * @param i the integer that represents the value of the right operand.
+     * @return simplified Operable
+     */
+    private Operable simplifyRightHand(int i) {
+        if (i == 0) {
+            switch (operation.name) {
+                case "+":
+                    return getLeftHand();
+                case "-":
+                    return getLeftHand();
+                case "*":
+                    return RawValue.ZERO;
+                case "/":
+                    return RawValue.UNDEF;
+                case "^":
+                    return RawValue.ONE;
+            }
+        } else if (i == 1) {
+            switch (operation.name) {
+                case "+":
+                    break;
+                case "-":
+                    break;
+                case "*":
+                    return getLeftHand();
+                case "/":
+                    return getLeftHand();
+                case "^":
+                    return getLeftHand();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
      */
     public Operable simplify() {
 
-        setLeftHand(getLeftHand().simplify());
-        rightHand = rightHand.simplify();
-        this.simplifyParenthesis();
+        simplifySubNodes();
+        simplifyParenthesis();
 
         if (isUndefined()) return RawValue.UNDEF;
 
@@ -242,27 +280,11 @@ public class BinaryOperation extends Operation {
             if (simplified != null) return simplified;
         }
 
-        // at this point neither left hand nor right hand is undefined.
+        //at this point neither left hand nor right hand is undefined.
 
         if (rightHand instanceof RawValue && ((RawValue) rightHand).isInteger()) {
-            int i = ((RawValue) rightHand).intValue();
-            if (i == 0) {
-                switch (operation.name) {
-                    case "+": return getLeftHand();
-                    case "-": return getLeftHand();
-                    case "*": return RawValue.ZERO;
-                    case "/": return RawValue.UNDEF;
-                    case "^": return RawValue.ONE;
-                }
-            } else if (i == 1) {
-                switch (operation.name) {
-                    case "+": break;
-                    case "-": break;
-                    case "*": return getLeftHand();
-                    case "/": return getLeftHand();
-                    case "^": return getLeftHand();
-                }
-            }
+            Operable simplified = simplifyRightHand(((RawValue) rightHand).intValue());
+            if (simplified != null) return simplified;
         }
 
 
@@ -279,7 +301,9 @@ public class BinaryOperation extends Operation {
             }
         }
 
-        this.toAdditionOnly().toExponentialForm();
+        //converting to exponential form and additional only, allowing further simplification.
+        this.toAdditionOnly().toExponentialForm().simplifySubNodes();
+
 
         for (int i = 1; i <= 2; i++) {
             if (get(i).val() == 0) {
@@ -293,7 +317,8 @@ public class BinaryOperation extends Operation {
                 }
             } else if (get(i).equals(RawValue.ONE)) {
                 switch (operation.name) {
-                    case "*": return getOther(i);
+                    case "*":
+                        return getOther(i);
                 }
             }
         }
@@ -370,6 +395,17 @@ public class BinaryOperation extends Operation {
             if (flattened.size() < 2) return flattened.get(0);
             else return reconstructBinTree(flattened);
         }
+    }
+
+    /**
+     * HELPER METHOD
+     *
+     * @return self
+     */
+    private Operable simplifySubNodes() {
+        setLeftHand(getLeftHand().simplify());
+        rightHand = rightHand.simplify();
+        return this;
     }
 
     public int numNodes() {
