@@ -22,7 +22,8 @@ The simplification algorithm is based on a **composite binary tree**, an origina
       Raw   Var                                                    3   x
         
 ```
-The algorithm handles the following simplifiable forms:
+#### The algorithm handles the following simplifiable forms:
+BINARY OPERATIONS
 ```
 (a*b)^#  -> a^#*b^#     a^b*a^c  -> a^(b+c)
 a*a^b    -> a^(b+1)     x-x      -> 0
@@ -38,3 +39,4 @@ x/1      -> x
 0^(-1)   -> undef
 x/0      -> undef
 ```
+
