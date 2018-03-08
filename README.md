@@ -11,14 +11,14 @@ Powerful and bug-free multi-variable computer algebra system. Right now it handl
 ### Simplification
 The simplification algorithm is based on a composite binary tree, an original data structure.
 ```
- e.g.           BinOp                 would represent the expression          (ln(3^x)*(3/4) + (5/e+2.5))
-              /       \                                                         /                  \
-          BinOp        BinOp                                              ln(3^x) * (3/4)        5/e + 2.5
-          /   \        /    \                                               /          \          /     \
-        UOp   Frac   BinOp   Raw                                        ln(3^x)       (3/4)     5/e     2.5
-         |           /    \                                                |                    / \
-        BinOp      Const  Var                                             3^x                  5   e
-        /   \                                                             / \
-      Raw   Var                                                          3   x
+ e.g.           BinOp           would represent the expression          (ln(3^x)*(3/4) + (5/e+2.5))
+              /       \                                                   /                  \
+          BinOp        BinOp                                        ln(3^x) * (3/4)        5/e + 2.5
+          /   \        /    \                                         /          \          /     \
+        UOp   Frac   BinOp   Raw                                  ln(3^x)       (3/4)     5/e     2.5
+         |           /    \                                          |                    / \
+        BinOp      Const  Var                                       3^x                  5   e
+        /   \                                                       / \
+      Raw   Var                                                    3   x
         
 ```
