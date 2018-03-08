@@ -625,10 +625,36 @@ public class BinaryOperation extends Operation {
                 if (denominator == null || denominator.equals(RawValue.ONE))
                     return numerator;
                 else return new BinaryOperation(numerator, "/", denominator);
+            case "+":
+                if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
+                    Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
+                    return new BinaryOperation(right, "-", right1).beautify();
+                } else if (isVirtuallyNegative(right) && !isVirtuallyNegative(left)) {
+                    Operable right1 = new BinaryOperation(right, "*", RawValue.ONE.negate()).simplify();
+                    return new BinaryOperation(left, "-", right1).beautify();
+                }
+            case "^":
+                ArrayList<Operable> ns = new ArrayList<>();
+                ArrayList<Operable> ds = new ArrayList<>();
+                this.setLeftHand(left);
+                this.setRightHand(right);
+
+                separate(this, ds, ns);
+                Operable n = reconstruct(ns);
+                Operable d = reconstruct(ds);
+                if (n == null) return this;
+                if (d == null || d.equals(RawValue.ONE))
+                    return n;
+                else return new BinaryOperation(n, "/", d);
+
         }
         this.setLeftHand(left);
         this.setRightHand(right);
-        return this.clone();
+        return this;
+    }
+
+    private boolean isVirtuallyNegative(Operable binOp) {
+        return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), RawValue.ONE.negate());
     }
 
     private Operable reconstruct(ArrayList<Operable> operables) {

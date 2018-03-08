@@ -47,6 +47,8 @@ public class CasSimplificationTest {
             "2.5/n",
             "1/4*(3/x)",
             "-a-b",
+            "2x^-1",
+            "a-b+c-2d^-2+3",
             "ln(sin(x*a + x*b))"
     };
 
