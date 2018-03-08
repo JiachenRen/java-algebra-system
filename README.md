@@ -113,7 +113,7 @@ UnaryOperation.define("digits", x -> Integer.toString((int) x).length()); // an 
 ```
 The first argument is the name of the unary operation, like `log`, `cos`, etc. The name could only contain letters `[a-Z]` and **must has more than 2 characters**. Single letters are reserved for variable names. The second argument is of type `Evaluable`, which must takes in a double and return a double.
 ```java
-Expression.interpret("digits(x)^2").eval(1234) // returns 16 since there are 4 digits in 6666 and 4^2 = 16.
+Expression.interpret("digits(x)^2").eval(1234) // returns 16 since there are 4 digits in 1234 and 4^2 = 16.
 ```
 #### Constants
 Aside from declaring custom binary/unary operations, you can also define constants. Constants in JMC behave differently from what you would expect, however, and here's how it works. All of the constants are managed under the `Constants` class, which contains 2 subclasses, `Constant` and `ComputedConst` with `Constant` being a nested class that is a subclass of `Variable` and `ComputedConst` being a nested interface. The `ComputedConst` interface declares a single method `double compute()` and is utilized by `Constant` to compute a value. Here is how it works in practice:
