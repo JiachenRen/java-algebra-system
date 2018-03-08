@@ -24,7 +24,7 @@ The simplification algorithm is based on a **composite binary tree**, an origina
 ```
 #### The algorithm handles the following simplifiable forms:
 BINARY OPERATIONS
-```
+```java
 (a*b)^#  -> a^#*b^#     a^b*a^c  -> a^(b+c)
 a*a^b    -> a^(b+1)     x-x      -> 0
 0^0      -> undef       x+x      -> 2*x
