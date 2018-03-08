@@ -28,11 +28,58 @@ An emnormous advantage that this data structure offers is that it simplifies the
 BinaryOperation mult = new BinaryOperation(new Variable("a"), "*", new Variable("a"));
 BinaryOperation exp = new BinaryOperation(new Variable("a"), "^", new RawValue(2));
 BinaryOperation add = new BinaryOperation(mult, "+", exp);
-System.out.println(add) // prints "a*a+a^2"
+System.out.println(add); // prints "a*a+a^2"
 ```
-Call to add.simplify() will subsequently invoke mult.simplify(), which takes a*a and returns a^2 which then produces the expression a^2+a^2, which is then simplified to 2*a^2 by invocation of this.simplify.
-```
+Call to add.simplify() will subsequently invoke mult.simplify(), which takes a*a and returns `a^2` which then produces the expression `a^2+a^2`, which is then simplified to `2*a^2` by invocation of this.simplify().
+```java
 System.out.println(add.clone().simplify()); // produces "2*a^2"
+```
+Fortunately, you don't have to create mathematical expressions using JMC by creating algebraic operations one at a time. That would be extremely painful, slow, and buggy. The JMC library does all the hard parts for you! The expression `a*a+a^2` from the example above could also be created by using the `interpret(String exp)` of the `Expression` class.
+```java
+Operable op = Expression.interpret("a*a+a^2"); // constructs the binary operation tree.
+System.out.println(op.clone().simplify(); // prints "2*a^2"
+```
+You can also set `Mode.DEBUG = true` to see how it actually performs the interpretation.
+```java
+formatted input: ln<(log<(x^(2*e^2+x))>)>^(1/5)/(x^3+2*x+9)^(1/3*e*x)
+exp:	2*e^2+x
+->		2*#0+x
+->		#1+x
+->		#2
+func:	ln<(log<(x^&0)>)>^(1/5)/(x^3+2*x+9)^(1/3*e*x)
+exp:	x^&0
+->		#0
+func:	ln<(log<&1>)>^(1/5)/(x^3+2*x+9)^(1/3*e*x)
+exp:	log<&1>
+exp:	&1
+unary:	log<&1>
+func:	ln<&2>^(1/5)/(x^3+2*x+9)^(1/3*e*x)
+exp:	1/5
+->		#0
+func:	ln<&2>^&3/(x^3+2*x+9)^(1/3*e*x)
+exp:	x^3+2*x+9
+->		#0+2*x+9
+->		#0+#1+9
+->		#2+9
+->		#3
+func:	ln<&2>^&3/&4^(1/3*e*x)
+exp:	1/3*e*x
+->		#0*e*x
+->		#1*x
+->		#2
+func:	ln<&2>^&3/&4^&5
+exp:	ln<&2>^&3/&4^&5
+exp:	&2
+unary:	ln<&2>^&3/&4^&5
+->		#1/&4^&5
+->		#1/#2
+->		#3
+output:	ln(log(x^(2*e^2+x)))^(1/5)/(x^3+2*x+9)^(1/3*e*x)
+```
+
+To reduce the complexity of the simplification process, the algorithm will first attempt fundamental operations (arithmetic calculations of rational/irrational numbers, special cases like `x^0` and `0/x`). Then, it will converts the mathematic expression to additional only exponential form. For example:
+```java
+BinaryOperation 
 ```
 
 #### The algorithm handles the following simplifiable forms:
