@@ -6,3 +6,6 @@ Type in `x^a*cos(b*x)` and see what happens along the way! Play around with the 
 Press `[TAB]` to hide/unhide function input
 Immense improvements to the CAS, though not as powerful, it is no longer considered experimental with bugs now gone and inheritance optimized.
 Completely original & intuitive way of performing algebra manipulations by an ORIGINAL composite tree structure that proved to be immensely powerful and ingenious.
+## Computer Algebra System (CAS)
+Powerful and bug-free multi-variable computer algebra system. Right now it handles simplification of many forms and beautify of output expression to a more human readable form. 
+### Simplification
