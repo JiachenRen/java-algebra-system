@@ -40,7 +40,7 @@ Operable op = Expression.interpret("a*a+a^2"); // constructs the binary operatio
 System.out.println(op.clone().simplify(); // prints "2*a^2"
 ```
 You can also set `Mode.DEBUG = true` to see how it actually performs the interpretation. `Expression.interpret("5+7-log<(11)>+e^2")` with debug on produces the following:
-```css
+```
 formatted input: 5+7-log<(11)>+e^2
 exp:	11
 func:	5+7-log<&0>+e^2
