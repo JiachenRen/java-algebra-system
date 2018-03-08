@@ -379,6 +379,23 @@ public class BinaryOperation extends Operation {
     }
 
     /**
+     * HELPER METHOD
+     * handles a*a^b = a^(b+1)
+     *
+     * @param op       generic Operation
+     * @param expBinOp BinaryOperation with operation == "^"
+     * @return simplified Operable
+     */
+    private Operable simplify(Operable op, BinaryOperation expBinOp) {
+        if (!operation.name.equals("*")) return null;
+        if (op.equals(expBinOp.getLeftHand()) && expBinOp.operation.equals("^")) {
+            BinaryOperation exp = new BinaryOperation(expBinOp.getRightHand(), "+", RawValue.ONE);
+            return new BinaryOperation(op, "^", exp).simplify();
+        }
+        return null;
+    }
+
+    /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
@@ -425,6 +442,14 @@ public class BinaryOperation extends Operation {
             BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
             BinaryOperation binOp2 = (BinaryOperation) getRightHand();
             Operable simplified = simplify(binOp1, binOp2);
+            if (simplified != null) return simplified;
+        }
+
+        if (getLeftHand() instanceof BinaryOperation) {
+            Operable simplified = simplify(getRightHand(), (BinaryOperation) getLeftHand());
+            if (simplified != null) return simplified;
+        } else if (getRightHand() instanceof BinaryOperation) {
+            Operable simplified = simplify(getLeftHand(), (BinaryOperation) getRightHand());
             if (simplified != null) return simplified;
         }
 
