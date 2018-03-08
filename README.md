@@ -30,7 +30,7 @@ BinaryOperation exp = new BinaryOperation(new Variable("a"), "^", new RawValue(2
 BinaryOperation add = new BinaryOperation(mult, "+", exp);
 System.out.println(add); // prints "a*a+a^2"
 ```
-Call to add.simplify() will subsequently invoke mult.simplify(), which takes a*a and returns `a^2` which then produces the expression `a^2+a^2`, which is then simplified to `2*a^2` by invocation of this.simplify().
+Call to `add.simplify()` will subsequently invoke `mult.simplify()`, which takes `a*a` and returns `a^2` which then produces the expression `a^2+a^2`, which is then simplified to `2*a^2` by invocation of `this.simplify()`.
 ```java
 System.out.println(add.clone().simplify()); // produces "2*a^2"
 ```
@@ -69,6 +69,15 @@ Operable op = Expression.interpret("a/3*2.5/n*b^2.5*a/4");
 System.out.println(op.clone().simplify()); // prints "a^2*n^(-1)*b^2.5*(5/24)"
 System.out.println(op.clone().simplify().beautify()); // prints "a^2*b^2.5*5/(n*24)"
 ```
+#### Extensibility
+The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
+##### Binary Operation
+BinaryOperation has a private nested class `RegisteredBinaryOperation` that is invisible outside of the `jmc.cas` package. It conforms to interface `BinEvaluable`, which specifies. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
+```java
+BinaryOperation.define("%", 2, (a, b) -> a % b); // defines the modular binary operation (which is nonstandard)
+```
+The first argument is the symbolic representation of binary operation. It can be any `String` that contains a single symbol. The second argument is the **priority** of the operation. The priority defines the order of binary operations - it can either be either `1`,`2`, or `3` with 3 being the highest. Addition and subtraction are of **priority 1** (lowest), while multiplification and division are of **priority 2** and exponentiation having **priority 3** (highest). In the code segment above, the `%` is defined to be having the same priority as `*` and `/`. The third argument is of type `BinEvaluable`. You can do any operation with the left/right operand as long as a double is returned.
+
 
 #### The algorithm handles the following simplifiable forms:
 BINARY OPERATIONS
