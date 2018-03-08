@@ -23,16 +23,18 @@ The simplification algorithm is based on a **composite binary tree**, an origina
         
 ```
 The algorithm handles the following simplifiable forms:
-- `(a*b)^#  -> a^#*b^#`
-- `a*a^b    -> a^(b+1)`
-- `0^0      -> undef`
-- `0*x      -> 0`
-- `x*x^2    -> x^3`
-- `0^x      -> 0`
-- `1^x      -> 1`
-- `x^1      -> x`
-- `a^b^c    -> a^(b*c)`
-- `x/1      -> x`
-- `0/x      -> 0`
-- `0^(-1)   -> undef`
-- `x/0      -> undef`
+```
+(a*b)^#  -> a^#*b^#
+a*a^b    -> a^(b+1)
+0^0      -> undef
+0*x      -> 0
+x*x^2    -> x^3
+0^x      -> 0
+1^x      -> 1
+x^1      -> x
+a^b^c    -> a^(b*c)
+x/1      -> x
+0/x      -> 0
+0^(-1)   -> undef
+x/0      -> undef
+```
