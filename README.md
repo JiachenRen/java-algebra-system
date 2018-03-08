@@ -103,7 +103,15 @@ BinaryOperation has a private nested class `RegisteredBinaryOperation` that is i
 BinaryOperation.define("%", 2, (a, b) -> a % b); // defines the modular binary operation (which is nonstandard)
 ```
 The first argument is the symbolic representation of binary operation. It can be any `String` that contains a single symbol. The second argument is the **priority** of the operation. The priority defines the order of binary operations - it can either be either `1`,`2`, or `3` with 3 being the highest. Addition and subtraction are of **priority 1** (lowest), while multiplification and division are of **priority 2** and exponentiation having **priority 3** (highest). In the code segment above, the `%` is defined to be having the same priority as `*` and `/`. The third argument is of type `BinEvaluable`. You can do any operation with the left/right operand as long as a double is returned.
-```
+```java
 System.out.println(Expression.interpret("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0"
 ```
-#### 
+#### Unary Operation
+Similar to `BinaryOperation`, `UnaryOperation` has a private nested class `RegisteredUnaryOperation`. Refer to BinaryOperation for how it works. Here's how to use it:
+```java
+UnaryOperation.define("digits", x -> Integer.toString((int) x).length()); // an unary operation that calculates the numer of digits in the integer part of a number.
+```
+The first argument is the name of the unary operation, like `log`, `cos`, etc. The name could only contain letters `[a-Z]` and **must has more than 2 characters**. Single letters are reserved for variable names. The second argument is of type `Evaluable`, which must takes in a double and return a double.
+```java
+Expression.interpret("digits(x)^2").eval(6666) // returns 16 since there are 4 digits in 6666 and 4^2 = 16.
+```
