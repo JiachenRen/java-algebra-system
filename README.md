@@ -23,7 +23,13 @@ The simplification algorithm is based on a **composite binary tree**, an origina
         
 ```
 #### How does it work?
-An emnormous advantage that this data structure offers is that it simplifies the process of designing recursive algorithms. Takes the binary operation `a*b+c` for example: the top level binary operation in this case would be the `+`.
+An emnormous advantage that this data structure offers is that it simplifies the process of designing recursive algorithms. Takes the binary operation `a*b+c` for example: the top level binary operation in this case would be the `+`. The following code segment demonstrates how the recursive simplification works.
+```java
+BinaryOperation mult = new BinaryOperation(new Variable("a"), "*", new Variable("b"));
+BinaryOperation add = new BinaryOperation(mult, "+", new Variable("c"));
+// call to add.simplify() will subsequently invoke mult.simplify()
+System.out.println(add.clone().simplify());
+```
 
 #### The algorithm handles the following simplifiable forms:
 BINARY OPERATIONS
