@@ -33,14 +33,10 @@ a*a^b    -> a^(b+1)     x-x      -> 0
 0^0      -> undef       x+x      -> 2*x
 0*x      -> 0           x*x      -> x^x
 x*x^2    -> x^3         x^0      -> 1
-0^x      -> 0
-1^x      -> 1
-x^1      -> x
-a^b^c    -> a^(b*c)
-x/1      -> x
-0/x      -> 0
-0^(-1)   -> undef
-x/0      -> undef
+0^x      -> 0           1^x      -> 1
+x^1      -> x           a^b^c    -> a^(b*c)
+x/1      -> x           0/x      -> 0
+0^(-1)   -> undef       x/0      -> undef
 ```
 IRRATIONAL/RATIONAL NUMBERS
 ```bash
