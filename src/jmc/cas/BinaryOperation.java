@@ -265,6 +265,40 @@ public class BinaryOperation extends Operation {
 
     /**
      * HELPER METHOD
+     * handles a^b^c = a^(b*c), (a*b)^# = a^#*b^#
+     *
+     * @param o right hand operand of the binary operation
+     * @return simplified self of type Operable
+     */
+    private Operable simplifyRightHand(Operable o) {
+        if (o instanceof RawValue && ((RawValue) o).isInteger()) {
+            RawValue r = (RawValue) o;
+            Operable simplified = simplifyRightHand(r.intValue());
+            if (simplified != null) return simplified;
+        }
+        if (getLeftHand() instanceof BinaryOperation) {
+            BinaryOperation binOp = (BinaryOperation) getLeftHand();
+            switch (operation.name) {
+                case "^":
+                    switch (binOp.operation.name) {
+                        case "*": // (a*b)^# = a^#*b^#
+                            if (o instanceof RawValue) {
+                                RawValue r = (RawValue) o;
+                                BinaryOperation left = new BinaryOperation(binOp.getLeftHand(), "^", r);
+                                BinaryOperation right = new BinaryOperation(binOp.getRightHand(), "^", r);
+                                return new BinaryOperation(left, "*", right).simplify();
+                            }
+                        case "^": // (a^b^c) = a^(b*c)
+                            BinaryOperation exp = new BinaryOperation(binOp.getRightHand(), "*", o);
+                            return new BinaryOperation(binOp.getLeftHand(), "^", exp).simplify();
+                    }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * HELPER METHOD
      * handles 0*x, x*0, x*1, 1*x, 0^x, x^0, 1^x, x^1
      *
      * @return simplified self
@@ -293,6 +327,61 @@ public class BinaryOperation extends Operation {
     }
 
     /**
+     * HELPER METHOD
+     *
+     * @param binOp1 left hand operand of type BinaryOperation
+     * @param binOp2 right hand operand of type BinaryOperation
+     * @return simplified self of type Operable
+     */
+    private Operable simplify(BinaryOperation binOp1, BinaryOperation binOp2) {
+        if (binOp1.operation.equals(binOp2.operation)) //e.g. x*a + x*b, "*" == "*"
+            switch (operation.name) {
+                case "+":
+                    switch (binOp1.operation.name) {
+                        case "*":
+                                /*
+                                1. for the form x*(a+b) + x*c, should it be simplified to x*(a+b+c)?
+                                2. for the form x*(a+b) + x*(b-a), it should definitely be simplified to 2*b*x.
+                                right now it does both 1 and 2.
+                                */
+                            for (int i = 1; i <= 2; i++) {
+                                Operable o1 = binOp1.get(i);
+                                int idx = binOp2.contains(o1);
+                                if (idx != 0) {
+                                    Operable add = new BinaryOperation(binOp1.getOther(i), "+", binOp2.getOther(idx)).simplify();
+                                    return new BinaryOperation(o1, "*", add).simplify();
+                                }
+                            }
+                            break;
+                        case "^":
+                            break;
+
+                    }
+                    break;
+                case "*":
+                    switch (binOp1.operation.name) {
+                        case "^":
+                                /*
+                                1. for the form x^(a+b) + x^c, should it be simplified to x^(a+b+c)?
+                                2. for the form x^(a+b) + x^(-a), it should definitely be simplified to 2*b*x.
+                                 */
+                            Operable op1Left = binOp1.getLeftHand();
+                            Operable op2Left = binOp2.getLeftHand();
+                            if (op1Left.equals(op2Left)) {
+                                Operable add = new BinaryOperation(binOp1.getRightHand(), "+", binOp2.getRightHand()).simplify();
+                                return new BinaryOperation(op1Left, "^", add);
+                            }
+                            break;
+                    }
+                    break;
+            }
+        else {
+
+        }
+        return null;
+    }
+
+    /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
@@ -311,10 +400,8 @@ public class BinaryOperation extends Operation {
 
         //at this point neither left hand nor right hand is undefined.
 
-        if (rightHand instanceof RawValue && ((RawValue) rightHand).isInteger()) {
-            Operable simplified = simplifyRightHand(((RawValue) rightHand).intValue());
-            if (simplified != null) return simplified;
-        }
+        Operable simplified1 = simplifyRightHand(getRightHand());
+        if (simplified1 != null) return simplified1;
 
 
         if (getLeftHand().equals(getRightHand())) {
@@ -322,11 +409,11 @@ public class BinaryOperation extends Operation {
                 case "+":
                     return new BinaryOperation(new RawValue(2), "*", getLeftHand());
                 case "-":
-                    return new RawValue(0);
+                    return RawValue.ZERO;
                 case "*":
                     return new BinaryOperation(getLeftHand(), "^", new RawValue(2));
                 case "/":
-                    return new RawValue(1);
+                    return RawValue.ONE;
             }
         }
 
@@ -334,53 +421,14 @@ public class BinaryOperation extends Operation {
         this.toAdditionOnly().toExponentialForm().simplifySubNodes();
 
         //handle special cases
-        Operable simplified = simplifyZeroOne();
-        if (simplified != null) return simplified;
+        Operable simplified2 = simplifyZeroOne();
+        if (simplified2 != null) return simplified2;
 
         if (getLeftHand() instanceof BinaryOperation && getRightHand() instanceof BinaryOperation) {
             BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
             BinaryOperation binOp2 = (BinaryOperation) getRightHand();
-            if (binOp1.operation.equals(binOp2.operation)) //e.g. x*a + x*b, "*" == "*"
-                switch (operation.name) {
-                    case "+":
-                        switch (binOp1.operation.name) {
-                            case "*":
-                                /*
-                                1. for the form x*(a+b) + x*c, should it be simplified to x*(a+b+c)?
-                                2. for the form x*(a+b) + x*(b-a), it should definitely be simplified to 2*b*x.
-                                right now it does both 1 and 2.
-                                */
-                                for (int i = 1; i <= 2; i++) {
-                                    Operable o1 = binOp1.get(i);
-                                    int idx = binOp2.contains(o1);
-                                    if (idx != 0) {
-                                        Operable add = new BinaryOperation(binOp1.getOther(i), "+", binOp2.getOther(idx)).simplify();
-                                        return new BinaryOperation(o1, "*", add).simplify();
-                                    }
-                                }
-                                break;
-                            case "^":
-                                break;
-
-                        }
-                        break;
-                    case "*":
-                        switch (binOp1.operation.name) {
-                            case "^":
-                                /*
-                                1. for the form x^(a+b) + x^c, should it be simplified to x^(a+b+c)?
-                                2. for the form x^(a+b) + x^(-a), it should definitely be simplified to 2*b*x.
-                                 */
-                                Operable op1Left = binOp1.getLeftHand();
-                                Operable op2Left = binOp2.getLeftHand();
-                                if (op1Left.equals(op2Left)) {
-                                    Operable add = new BinaryOperation(binOp1.getRightHand(), "+", binOp2.getRightHand()).simplify();
-                                    return new BinaryOperation(op1Left, "^", add);
-                                }
-                                break;
-                        }
-                        break;
-                }
+            Operable simplified = simplify(binOp1, binOp2);
+            if (simplified != null) return simplified;
         }
 
 
