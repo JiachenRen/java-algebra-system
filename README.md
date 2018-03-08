@@ -54,7 +54,7 @@ unary:	5+7-log<&0>+e^2
 output:	5+7-log(11)+e^2
 ```
 
-To reduce the complexity of the simplification process, the algorithm will first attempt fundamental operations (arithmetic calculations of rational/irrational numbers, special cases like `x^0` and `0/x`). Then, it will converts the mathematic expression to additional only exponential form. For example:
+To reduce the complexity of the simplification process, the algorithm will first attempt fundamental operations (arithmetic calculations of rational/irrational numbers, special cases like `x^0` and `0/x`). Then, it converts the mathematic expression to additional only exponential form. For example:
 ```java
 BinaryOperation binOp = (BinaryOperation) Expression.interpret("x*(a-b)/(c+d)^3");
 System.out.println(binOp); // prints "x*(a-b)/(c+d)^3"
@@ -63,7 +63,7 @@ System.out.println(binOp); // prints "x*(a+(-1)*b)/(c+d)^3"
 binOp.toExponentialForm(); // converts the expression to exponential form
 System.out.println(binOp); // prints "x*(a+(-1)*b)*(c+d)^(-3)"
 ```
-The expression `x*(a+(-1)*b)*(c+d)^(-3)` doesn't look much better than `x*(a-b)/(c+d)^3`, however, although it is considered "much simpler" by the computer, as for now it only needs to worry about handling `+,^,*` instead of `+,-,*,/,^` for this specific expression. However, to make it more readable to the human eye, it needs to be "beautified." You can do this by invoking `Operable::beautify()`, which works by reversing the doings of negative exponentiation and addition by negative number. Consider the expression `a/3*2.5/n*b^2.5*a/4`:
+The expression `x*(a+(-1)*b)*(c+d)^(-3)` doesn't look much better than `x*(a-b)/(c+d)^3`, however, although it is considered "much simpler" by the computer as now it only needs to worry about handling `+,^,*` instead of `+,-,*,/,^`. However, to make it more readable to human eyes, it needs to be "beautified." You can do this by invoking `Operable::beautify`, which works by reversing the doings of negative exponentiation and addition. Consider the expression `a/3*2.5/n*b^2.5*a/4`:
 ```java
 Operable op = Expression.interpret("a/3*2.5/n*b^2.5*a/4");
 System.out.println(op.clone().simplify()); // prints "a^2*n^(-1)*b^2.5*(5/24)"
