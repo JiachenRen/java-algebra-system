@@ -27,7 +27,9 @@ public class CasSimplificationTest {
             "0+0",
             "0/1",
             "x+1",
-            "x-1"
+            "x-1",
+            "1^x",
+            "0^1"
     };
 
     public static void main(String args[]) {

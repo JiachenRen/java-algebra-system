@@ -264,6 +264,35 @@ public class BinaryOperation extends Operation {
     }
 
     /**
+     * HELPER METHOD
+     * handles 0*x, x*0, x*1, 1*x, 0^x, x^0, 1^x, x^1
+     *
+     * @return simplified self
+     */
+    private Operable simplifyZeroOne() {
+        for (int i = 1; i <= 2; i++) {
+            if (get(i).val() == 0) {
+                switch (operation.name) {
+                    case "+":
+                        return getOther(i); //should this call .simplify()?
+                    case "*":
+                        return new RawValue(0);
+                    case "^":
+                        return i == 1 ? RawValue.ZERO : RawValue.ONE;
+                }
+            } else if (get(i).equals(RawValue.ONE)) {
+                switch (operation.name) {
+                    case "*":
+                        return getOther(i);
+                    case "^":
+                        return i == 1 ? RawValue.ONE : getLeftHand();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
@@ -304,24 +333,9 @@ public class BinaryOperation extends Operation {
         //converting to exponential form and additional only, allowing further simplification.
         this.toAdditionOnly().toExponentialForm().simplifySubNodes();
 
-
-        for (int i = 1; i <= 2; i++) {
-            if (get(i).val() == 0) {
-                switch (operation.name) {
-                    case "+":
-                        return getOther(i); //should this call .simplify()?
-                    case "*":
-                        return new RawValue(0);
-                    case "^":
-                        return i == 1 ? new RawValue(0) : new RawValue(1);
-                }
-            } else if (get(i).equals(RawValue.ONE)) {
-                switch (operation.name) {
-                    case "*":
-                        return getOther(i);
-                }
-            }
-        }
+        //handle special cases
+        Operable simplified = simplifyZeroOne();
+        if (simplified != null) return simplified;
 
         if (getLeftHand() instanceof BinaryOperation && getRightHand() instanceof BinaryOperation) {
             BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
