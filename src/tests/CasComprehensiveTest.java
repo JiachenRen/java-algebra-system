@@ -2,6 +2,7 @@ package tests;
 
 import jmc.cas.*;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -104,10 +105,19 @@ public class CasComprehensiveTest {
 
         l(Operable.numVars(Expression.interpret("a+b*x+a+b/ln(c+e+pi)")));
         l(Operable.isMultiVar(Expression.interpret("x*3+e")));
-        l(Expression.interpret("x*3+e").replace(new BinaryOperation(new Variable("x"),"*",new RawValue(3)), new Variable("a")));
+        l(Expression.interpret("x*3+e").replace(new BinaryOperation(new Variable("x"), "*", new RawValue(3)), new Variable("a")));
         l(Expression.interpret("x*3").equals(Expression.interpret("3*x")));
 
+        l(Expression.interpret("-6*x*-7").simplify().explicitNegativeForm());
+        l(Expression.interpret("-1*x").simplify().explicitNegativeForm());
 
+        Operable operable1 = Expression.interpret("(x+a)*-3*(x+a)").simplify();
+        l(operable1, operable1.explicitNegativeForm(), operable1);
+        l(RawValue.ONE);
+
+        l(BinaryOperation.expFormIdx(Expression.interpret("x^(-3/4)").simplify()));
+        l(BinaryOperation.expFormIdx(Expression.interpret("x^(-4)").simplify()));
+        l(BinaryOperation.expFormIdx(Expression.interpret("x^((-4)*x/3)").simplify()));
 
     }
 

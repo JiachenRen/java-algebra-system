@@ -109,7 +109,7 @@ public class UnaryOperation extends Operation implements LeafNode {
         if (getLeftHand() instanceof Operation) {
             //TODO: process trigonometric simplification
             //if this.operation = "atan" && getLeftHand().operation = "tan" then simplify
-            this.setLeftHand(((Operation) this.getLeftHand()).simplify());
+            this.setLeftHand((this.getLeftHand()).simplify());
             return this;
         } else return this;
     }
@@ -244,6 +244,14 @@ public class UnaryOperation extends Operation implements LeafNode {
         int i = getLeftHand().levelOf(o);
         if (i == -1) return -1;
         return i + 1;
+    }
+
+    public Operable beautify() {
+        return setLeftHand(getLeftHand().beautify());
+    }
+
+    public Operable explicitNegativeForm() {
+        return clone().setLeftHand(getLeftHand().explicitNegativeForm());
     }
 
     public Operable replace(Operable o, Operable r) {

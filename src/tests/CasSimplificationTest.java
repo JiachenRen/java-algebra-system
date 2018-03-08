@@ -8,6 +8,7 @@ import jmc.cas.RawValue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
+
 import static jmc.utils.ColorFormatter.*;
 import static tests.TestPrint.l;
 
@@ -35,7 +36,18 @@ public class CasSimplificationTest {
             "0^1",
             "x^3^a",
             "(a*b)^3",
-            "x^(x*3)^(1/3)"
+            "x^(x*3)^(1/3)",
+            "a*2*x^2 - a*x^2",
+            "a*2*b*x^2 - a*x^2",
+            "a^3*a",
+            "(2/3)^(3/4)",
+            "a/3+2.5/n+b^2.5",
+            "ln(-5)*x",
+            "x^(-1)",
+            "2.5/n",
+            "1/4*(3/x)",
+            "-a-b",
+            "ln(sin(x*a + x*b))"
     };
 
     public static void main(String args[]) {
@@ -47,7 +59,6 @@ public class CasSimplificationTest {
                 + boldBlack("\t->\t")
                 + lightGreen(operable.clone().simplify().toString())
                 + boldBlack("\t->\t")
-                + operable.clone().simplify().simplify()));
-        System.out.println(operables.contains(Expression.interpret("1*x")));
+                + operable.clone().simplify().beautify()));
     }
 }

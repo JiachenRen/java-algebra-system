@@ -55,6 +55,27 @@ public interface Operable extends Evaluable {
     double val();
 
     /**
+     * basically reversing the effects of toAdditionalOnly and toExponentialForm
+     * a*b^(-1) -> a/b,
+     * a*(1/3) -> a/3,
+     * a+(-1)*b -> a-b
+     * <p>
+     * before invoking this method, the Operable should already by at a stage where it is simplified,
+     * converted to additional only and in exponential form.
+     *
+     * @return beautified version of the original
+     */
+    Operable beautify();
+
+    /**
+     * (-#)*x will be converted to (-1)*#*x, where # denotes a number
+     * NOTE: does not modify self.
+     *
+     * @return explicit negative form of the original Operable
+     */
+    Operable explicitNegativeForm();
+
+    /**
      * @param o the Operable instance to be inspected.
      * @return number of variables in the expression represented by o.
      */

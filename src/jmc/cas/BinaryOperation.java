@@ -488,7 +488,7 @@ public class BinaryOperation extends Operation {
      */
     private Operable simplifySubNodes() {
         setLeftHand(getLeftHand().simplify());
-        rightHand = rightHand.simplify();
+        setRightHand(rightHand.simplify());
         return this;
     }
 
@@ -603,6 +603,138 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
+    /**
+     * basically reversing the effects of toAdditionalOnly and toExponentialForm
+     * a*b^(-1) -> a/b,
+     * a*(1/3) -> a/3,
+     * a+(-1)*b -> a-b
+     *
+     * @return beautified version of the original
+     */
+    public Operable beautify() {
+        Operable left = getLeftHand().beautify();
+        Operable right = getRightHand().beautify();
+        switch (operation.name) {
+            case "*":
+                ArrayList<Operable> numerators = new ArrayList<>();
+                ArrayList<Operable> denominators = new ArrayList<>();
+                separate(left, denominators, numerators);
+                separate(right, denominators, numerators);
+                Operable numerator = reconstruct(numerators);
+                Operable denominator = reconstruct(denominators);
+                if (denominator == null || denominator.equals(RawValue.ONE))
+                    return numerator;
+                else return new BinaryOperation(numerator, "/", denominator);
+        }
+        this.setLeftHand(left);
+        this.setRightHand(right);
+        return this.clone();
+    }
+
+    private Operable reconstruct(ArrayList<Operable> operables) {
+        if (operables.size() == 0) return null;
+        return operables.size() >= 2 ? reconstructBinTree(operables) : operables.get(0);
+    }
+
+    /**
+     * separates denominator and numerator
+     *
+     * @param o            the Operable to be separated
+     * @param denominators ArrayList containing denominators
+     * @param numerators   ArrayList containing numerators
+     */
+    private void separate(Operable o, ArrayList<Operable> denominators, ArrayList<Operable> numerators) {
+        if (o instanceof BinaryOperation) {
+            BinaryOperation binOp = (BinaryOperation) o;
+            if (isDivision(binOp)) {
+                numerators.add(binOp.getLeftHand());
+                denominators.add(binOp.getRightHand());
+                return;
+            }
+
+            int idx = expFormIdx(binOp);
+            switch (idx) {
+                case 0:
+                    numerators.add(binOp);
+                    break;
+                case 1:
+                    Fraction exp = ((Fraction) binOp.getRightHand()).negate();
+                    BinaryOperation b = new BinaryOperation(binOp.getLeftHand(), "^", exp);
+                    denominators.add(b); //TODO: rationalize irrational denominator
+                    break;
+                case 2:
+                    RawValue r = ((RawValue) binOp.getRightHand()).negate();
+                    if (r.equals(RawValue.ONE)) { //1/n^1 -> 1/n
+                        denominators.add(binOp.getLeftHand());
+                        break;
+                    }
+                    BinaryOperation b1 = new BinaryOperation(binOp.getLeftHand(), "^", r);
+                    denominators.add(b1);
+                    break;
+                case 3:
+                    Operable exp1 = new BinaryOperation(binOp.getRightHand(), "*", RawValue.ONE.negate()).simplify();
+                    BinaryOperation b2 = new BinaryOperation(binOp.getLeftHand(), "^", exp1);
+                    denominators.add(b2);
+                    break;
+            }
+        } else {
+            if (o instanceof Fraction) {
+                Fraction f = (Fraction) o;
+                if (f.getNumerator() != 1)
+                    numerators.add(new RawValue(f.getNumerator()));
+                if (f.getDenominator() != 1)
+                    denominators.add(new RawValue(f.getDenominator()));
+            } else if (o.val() != 1) {
+                numerators.add(o);
+            }
+        }
+    }
+
+    /**
+     * HELPER METHOD
+     * "a/b" returns true
+     *
+     * @return whether operation of o is "/"
+     */
+    private boolean isDivision(Operable o) {
+        return o instanceof BinaryOperation && ((BinaryOperation) o).operation.equals("/");
+    }
+
+    /**
+     * HELPER METHOD
+     * detects form a^(-[...])
+     * <p>
+     * 0 -> not exponential form
+     * 1 -> form x^(-a/b)
+     * 2 -> form x^-a
+     * 3 -> form x^([...]*-a)
+     *
+     * @return idx that represents the kind of exponential form
+     */
+    public static int expFormIdx(Operable o) {
+        if (!(o instanceof BinaryOperation)) return 0;
+        BinaryOperation binOp = (BinaryOperation) o;
+        if (!binOp.operation.equals("^")) return 0;
+        if (binOp.rightHand instanceof RawValue && binOp.rightHand.val() < 0)
+            return binOp.rightHand instanceof Fraction ? 1 : 2;
+        if (binOp.rightHand instanceof BinaryOperation) {
+            BinaryOperation binOp1 = ((BinaryOperation) binOp.rightHand);
+            if (binOp1.operation.equals("*")) {
+                ArrayList<Operable> pool = ((BinaryOperation) binOp1.explicitNegativeForm()).flattened();
+                if (Operable.contains(pool, RawValue.ONE.negate()))
+                    return 3;
+            }
+        }
+        return 0;
+    }
+
+    public Operable explicitNegativeForm() {
+        BinaryOperation clone = this.clone();
+        clone.setLeftHand(getLeftHand().explicitNegativeForm());
+        clone.setRightHand(getRightHand().explicitNegativeForm());
+        return clone;
+    }
+
     public Operable plugIn(Variable var, Operable replacement) {
         if (this.getLeftHand().equals(var))
             this.setLeftHand(replacement);
@@ -619,6 +751,7 @@ public class BinaryOperation extends Operation {
 
     public void setRightHand(Operable operable) {
         this.rightHand = operable;
+        simplifyParenthesis();
     }
 
     public boolean isUndefined() {
@@ -651,6 +784,13 @@ public class BinaryOperation extends Operation {
         clone.setLeftHand(clone.getLeftHand().replace(o, r));
         clone.setRightHand(clone.getRightHand().replace(o, r));
         return clone;
+    }
+
+    @Override
+    public Operable setLeftHand(Operable o) {
+        super.setLeftHand(o);
+        simplifyParenthesis();
+        return this;
     }
 
     public interface BinEvaluable {

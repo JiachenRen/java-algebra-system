@@ -304,6 +304,15 @@ public class Fraction extends RawValue {
         return (double) numerator / (double) denominator;
     }
 
+    public Operable beautify() {
+        return this;
+    }
+
+    public Operable explicitNegativeForm() {
+        if (doubleValue() > 0) return this;
+        else return new BinaryOperation(RawValue.ONE.negate(), "*", this.clone().negate());
+    }
+
     public long getNumerator() {
         return numerator;
     }

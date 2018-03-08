@@ -76,6 +76,14 @@ public class Variable implements Operable, LeafNode {
         return 1;
     }
 
+    public Operable beautify() {
+        return this;
+    }
+
+    public Operable explicitNegativeForm() {
+        return this.clone();
+    }
+
     public Operable replace(Operable o, Operable r) {
         return this.equals(o) ? r : this;
     }
