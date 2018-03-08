@@ -31,7 +31,8 @@ public class CasSimplificationTest {
             "1^x",
             "0^1",
             "x^3^a",
-            "(a*b)^3"
+            "(a*b)^3",
+            "x^(x*3)^(1/3)"
     };
 
     public static void main(String args[]) {

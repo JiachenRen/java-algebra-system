@@ -375,9 +375,6 @@ public class BinaryOperation extends Operation {
                     }
                     break;
             }
-        else {
-
-        }
         return null;
     }
 
@@ -531,7 +528,7 @@ public class BinaryOperation extends Operation {
     }
 
     private void flat(ArrayList<Operable> pool, Operable operable) {
-        if (operable instanceof UnaryOperation || operable instanceof RawValue || operable instanceof Variable) {
+        if (operable instanceof LeafNode) {
             pool.add(operable);
         } else if (operable instanceof BinaryOperation) {
             BinaryOperation binOp = ((BinaryOperation) operable);
