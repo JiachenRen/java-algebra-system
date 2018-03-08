@@ -22,6 +22,9 @@ The simplification algorithm is based on a **composite binary tree**, an origina
       Raw   Var                                                    3   x
         
 ```
+#### How does it work?
+An emnormous advantage that this data structure offers is that it simplifies the process of designing recursive algorithms. Takes the binary operation `a*b+c` for example: the top level binary operation in this case would be the `+`.
+
 #### The algorithm handles the following simplifiable forms:
 BINARY OPERATIONS
 ```java
