@@ -212,7 +212,7 @@ public class BinaryOperation extends Operation {
 
         if (r1.isInteger() && r2.isInteger()) {
             if (operation.name.equals("/")) {
-                return new Fraction(r1.intValue(), r2.intValue());
+                return new Fraction(r1.intValue(), r2.intValue()).reduce();
             } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
         } else if (!r1.isInteger() && !(r1 instanceof Fraction)) {
             RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
@@ -405,6 +405,8 @@ public class BinaryOperation extends Operation {
         simplifySubNodes();
         simplifyParenthesis();
 
+        if (!operation.isStandard())
+            return this; // nothing could be done with non-standard operations
         if (isUndefined()) return RawValue.UNDEF;
 
         if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
@@ -502,7 +504,7 @@ public class BinaryOperation extends Operation {
      * @param pool ArrayList containing flattened operables
      */
     private void crossSimplify(ArrayList<Operable> pool) {
-        if (getPriority() == 1) return;
+        if (!(operation.equals("*") || operation.equals("+"))) return;
         for (int i = 0; i < pool.size() - 1; i++) {
             Operable operable = pool.get(i);
             for (int k = i + 1; k < pool.size(); k++) {
@@ -545,7 +547,8 @@ public class BinaryOperation extends Operation {
      */
     public ArrayList<Operable> flattened() {
         ArrayList<Operable> pool = new ArrayList<>();
-        if (operation.priority == 1) return pool; //if the operation is ^, then no commutative property applies.
+        if (operation.priority == 1 || !operation.isStandard())
+            return pool; //if the operation is ^, then no commutative property applies.
         BinaryOperation clone = this.clone().toAdditionOnly().toExponentialForm();
         clone.flat(pool, clone.getLeftHand());
         clone.flat(pool, clone.getRightHand());
@@ -828,6 +831,7 @@ public class BinaryOperation extends Operation {
         private BinEvaluable binEvaluable;
         private String name;
         private int priority; //1 is the most prioritized
+        private String standardOperations = "+-*/^";
 
         static {
             registeredBinOps = new ArrayList<>();
@@ -837,6 +841,10 @@ public class BinaryOperation extends Operation {
             define("/", 2, (a, b) -> a / b);
             define("^", 1, Math::pow);
             System.out.println("# reserved binary operations declared");
+        }
+
+        private boolean isStandard() {
+            return standardOperations.contains(name);
         }
 
         private RegisteredBinaryOperation(String name, int priority, BinEvaluable evaluable) {

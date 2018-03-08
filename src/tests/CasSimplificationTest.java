@@ -42,7 +42,9 @@ public class CasSimplificationTest {
             "a^3*a",
             "(2/3)^(3/4)",
             "a/3+2.5/n+b^2.5",
+            "a/3*2.5/n*b^2.5*a/4",
             "ln(-5)*x",
+            "ln(5)*x % 3",
             "x^(-1)",
             "2.5/n",
             "1/4*(3/x)",
@@ -53,6 +55,7 @@ public class CasSimplificationTest {
     };
 
     public static void main(String args[]) {
+        BinaryOperation.define("%", 3, (a, b) -> a % b);
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;

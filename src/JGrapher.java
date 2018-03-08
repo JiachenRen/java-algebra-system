@@ -3,6 +3,7 @@ import jmc.extras.Element;
 import jmc.graph.Graph;
 import jmc.graph.GraphFunction;
 import jmc.graph.SuppliedVar;
+
 import jui.*;
 import jui.bundles.ColorSelector;
 import jui.bundles.ValueSelector;
@@ -17,6 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static jmc.utils.ColorFormatter.*;
+
+
 /**
  * Created by Jiachen on 22/05/2017.
  * JGrapher, created May 22nd. Breakthrough.
@@ -29,7 +33,7 @@ public class JGrapher extends PApplet {
     private HBox graphWrapper;
     private VBox suppliedVarWrapper;
     private TextInput modelInput;
-    private boolean casEnabled = false;
+    private boolean casEnabled = true;
 
     public static void main(String args[]) {
         System.out.println("Welcome to JGrapher, an extensive graphing/calculation system using original CAS and UI library. \n" +
@@ -190,14 +194,11 @@ public class JGrapher extends PApplet {
             try {
                 Operable original = Expression.interpret(funcTextInput.getStaticContent());
                 if (casEnabled) {
-                    if (original instanceof BinaryOperation)
-                        original = original.simplify();
-                    else if (original instanceof UnaryOperation)
-                        original = original.simplify();
+                    original = original.simplify().beautify();
                 }
                 funcTextInput.setContent(original.toString());
             } catch (RuntimeException e) {
-                System.out.println((char) 27 + "[1;34m" + "simplification failed -> incomplete input" + (char) 27 + "[0m");
+                System.out.println(lightRed("simplification failed -> incomplete input"));
             }
         }).setDefaultContent(" type in your function  here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
@@ -208,7 +209,7 @@ public class JGrapher extends PApplet {
                 updateSuppliedVarValueSelectors(shouldOverride);
                 updateAdvPanel.run();
             } catch (RuntimeException e) {
-                System.out.println((char) 27 + "[1;31m" + "interpretation failed -> missing operands..." + (char) 27 + "[0m");
+                System.out.println(lightRed("interpretation failed -> missing operands..."));
 //                e.printStackTrace();
             }
         });
@@ -652,9 +653,9 @@ public class JGrapher extends PApplet {
         }
     }
 
-    private Displayable get(String id) {
-        return JNode.getContainerById(id);
-    }
+//    private Displayable get(String id) {
+//        return JNode.getContainerById(id);
+//    }
 
     @SuppressWarnings("ConstantConditions")
     private GraphFunction getCurrentFunction() {
