@@ -29,7 +29,9 @@ BinaryOperation mult = new BinaryOperation(new Variable("a"), "*", new Variable(
 BinaryOperation exp = new BinaryOperation(new Variable("a"), "^", new RawValue(2));
 BinaryOperation add = new BinaryOperation(mult, "+", exp);
 System.out.println(add) // prints "a*a+a^2"
-// call to add.simplify() will subsequently invoke mult.simplify(), which takes a*a and returns a^2 which then produces the expression a^2+a^2, which is then simplified to 2*a^2 by invocation of this.simplify.
+```
+Call to add.simplify() will subsequently invoke mult.simplify(), which takes a*a and returns a^2 which then produces the expression a^2+a^2, which is then simplified to 2*a^2 by invocation of this.simplify.
+```
 System.out.println(add.clone().simplify()); // produces "2*a^2"
 ```
 
