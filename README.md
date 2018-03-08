@@ -9,7 +9,7 @@ Completely original & intuitive way of performing algebra manipulations by an OR
 ## Computer Algebra System (CAS)
 Powerful and bug-free multi-variable computer algebra system. Right now it handles simplification of many forms and convertion of output expression to a more human readable form. 
 ### Simplification
-The simplification algorithm is based on a composite binary tree, an original data structure.
+The simplification algorithm is based on a **composite binary tree**, an original data structure.
 ```
  e.g.           BinOp           would represent the expression          (ln(3^x)*(3/4) + (5/e+2.5))
               /       \                                                   /                  \
@@ -22,3 +22,9 @@ The simplification algorithm is based on a composite binary tree, an original da
       Raw   Var                                                    3   x
         
 ```
+The algorithm handles the following simplifiable forms:
+1) `(a*b)^#  -> a^#*b^#`
+2) `a*a^b    -> a^(b+1)`
+3) `0^0      -> undef`
+4) `0*x      -> 0`
+5) `x*x^2    -> x^3`
