@@ -72,6 +72,27 @@ public interface Operable extends Evaluable {
         return vars;
     }
 
+    static boolean contains(ArrayList<Operable> operables, Operable target) {
+        for (Operable operable : operables) {
+            if (operable.equals(target))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * invocation of commonTerms(o1 = "a*b*(c+d)*m", o2 = "f*(c+d)*m")
+     * returns [(c+d), m]
+     * o1 will be changed to "a*b" while o2 will be changed to "f"
+     *
+     * @param o1 Operable #1
+     * @param o2 Operable #2
+     * @return an ArrayList containing common terms of o1 and o2
+     */
+//    static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
+//
+//    }
+
     /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place

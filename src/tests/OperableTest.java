@@ -1,21 +1,19 @@
 package tests;
 
-import jmc.cas.BinaryOperation;
 import jmc.cas.Expression;
 import jmc.cas.Operable;
-import jmc.cas.RawValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
-import static jmc.utils.ColorFormatter.*;
+
 import static tests.TestPrint.l;
 
 /**
  * Created by Jiachen on 3/7/18.
- * Simplification Test
+ * Operable Test
  */
-public class CasSimplificationTest {
+public class OperableTest {
     private static String ops[] = new String[]{
             "1*x",
             "0*x",
@@ -43,11 +41,6 @@ public class CasSimplificationTest {
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
         operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
-        operables.forEach(operable -> l(operable
-                + boldBlack("\t->\t")
-                + lightGreen(operable.clone().simplify().toString())
-                + boldBlack("\t->\t")
-                + operable.clone().simplify().simplify()));
-        System.out.println(operables.contains(Expression.interpret("1*x")));
+        l(Operable.contains(operables, Expression.interpret("0-x")));
     }
 }

@@ -5,6 +5,8 @@ import jmc.MathContext;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import static tests.TestPrint.l;
+
 public class JMathContextTest {
 
     public static void main(String[] args) {
@@ -15,9 +17,6 @@ public class JMathContextTest {
 
     }
 
-    private static void l(Object o) {
-        System.out.println(o);
-    }
 
 
 }

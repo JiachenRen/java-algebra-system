@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static jmc.utils.ColorFormatter.*;
+import static tests.TestPrint.l;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -110,13 +111,4 @@ public class CasComprehensiveTest {
 
     }
 
-    private static void l(Object... objects) {
-        for (Object o : objects) {
-            l(o);
-        }
-    }
-
-    private static void l(Object o) {
-        System.out.println(o);
-    }
 }

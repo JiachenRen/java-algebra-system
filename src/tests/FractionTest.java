@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+import static tests.TestPrint.l;
+
 /**
  * Created by Jiachen on 3/6/18.
  * Fraction Test class
@@ -39,13 +41,4 @@ public class FractionTest {
 //        l(Fraction.extractRoot(-2,3));
     }
 
-    private static void l(Object... objects) {
-        for (Object o : objects) {
-            l(o);
-        }
-    }
-
-    private static void l(Object o) {
-        System.out.println(o);
-    }
 }

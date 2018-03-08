@@ -527,6 +527,14 @@ public class BinaryOperation extends Operation {
         return pool;
     }
 
+    /**
+     * this method is specific to binary operation because it tears down the binary tree
+     * and extracts nodes of the same binary operation priority, making applying commutative properties
+     * of + and * possible.
+     *
+     * @param pool     pool of flattened binary tree nodes.
+     * @param operable the binary tree to be flattened
+     */
     private void flat(ArrayList<Operable> pool, Operable operable) {
         if (operable instanceof LeafNode) {
             pool.add(operable);
@@ -556,7 +564,8 @@ public class BinaryOperation extends Operation {
                 && ((binOp.getLeftHand().equals(this.getLeftHand())
                 && binOp.getRightHand().equals(this.getRightHand()))
                 || (binOp.getLeftHand().equals(this.getRightHand())
-                && binOp.getRightHand().equals(this.getLeftHand())));
+                && binOp.getRightHand().equals(this.getLeftHand())
+                && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
     }
 
     public BinaryOperation toAdditionOnly() {
