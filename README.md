@@ -28,3 +28,7 @@ The algorithm handles the following simplifiable forms:
 3) `0^0      -> undef`
 4) `0*x      -> 0`
 5) `x*x^2    -> x^3`
+6) `0^x      -> 0`
+7) `1^x      -> 1`
+8) `x^1      -> x`
+9) `a^b^c    -> a^(b*c)`
