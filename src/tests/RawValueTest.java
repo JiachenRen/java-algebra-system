@@ -9,6 +9,9 @@ import jmc.cas.RawValue;
 public class RawValueTest {
     public static void main(String args[]) {
         l(RawValue.ZERO, RawValue.ONE, RawValue.UNDEF);
+        l(new RawValue(Double.NEGATIVE_INFINITY).isInfinite());
+        l(RawValue.ZERO.isInteger());
+        l(-RawValue.INFINITY.doubleValue() < 0);
     }
 
     private static void l(Object... objects) {

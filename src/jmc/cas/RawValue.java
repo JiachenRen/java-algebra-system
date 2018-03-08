@@ -10,6 +10,8 @@ public class RawValue implements Operable, LeafNode {
     public static RawValue UNDEF = new RawValue(Double.NaN);
     public static RawValue ONE = new RawValue(1);
     public static RawValue ZERO = new RawValue(0);
+    public static RawValue INFINITY = new RawValue(Double.POSITIVE_INFINITY);
+    public static RawValue NEG_INFINITY = new RawValue(Double.NEGATIVE_INFINITY);
     private Number number;
 
     public RawValue(Number number) {
@@ -23,7 +25,10 @@ public class RawValue implements Operable, LeafNode {
     public double eval(double x) {
         return doubleValue();
     }
-    public double val() {return doubleValue();}
+
+    public double val() {
+        return doubleValue();
+    }
 
     /**
      * Removes the extra ".0" at the end of the number
@@ -91,6 +96,10 @@ public class RawValue implements Operable, LeafNode {
 
     public boolean isZero() {
         return doubleValue() == 0;
+    }
+
+    public boolean isInfinite() {
+        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
     }
 
     public boolean isPositive() {

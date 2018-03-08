@@ -107,6 +107,7 @@ public class CasComprehensiveTest {
         l(Expression.interpret("x*3").equals(Expression.interpret("3*x")));
 
 
+
     }
 
     private static void l(Object... objects) {

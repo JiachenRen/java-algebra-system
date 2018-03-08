@@ -70,7 +70,11 @@ public class BinaryOperation extends Operation {
     }
 
     public String toString() {
-        String temp = getLeftHand().toString() + operation.name + rightHand.toString();
+        boolean k = getLeftHand() instanceof RawValue && getLeftHand().val() < 0;
+        boolean q = getRightHand() instanceof RawValue && getRightHand().val() < 0;
+        String left = k ? "("+getLeftHand().toString()+")" : getLeftHand().toString();
+        String right = q ? "("+getRightHand().toString()+")" : getRightHand().toString();
+        String temp = left + operation.name + right;
         return omitParenthesis ? temp : "(" + temp + ")";
     }
 
@@ -162,6 +166,65 @@ public class BinaryOperation extends Operation {
     }
 
     /**
+     * HELPER METHOD
+     *
+     * @param r1 RawValue #1
+     * @param r2 RawValue #2
+     * @return simplified r1 [RegisteredBinaryOperation] r2
+     */
+    private Operable simplify(RawValue r1, RawValue r2) {
+        if (getLeftHand() instanceof Fraction && 是加减乘除()) {
+            Fraction f = (Fraction) getLeftHand().clone();
+            RawValue r = (RawValue) rightHand.clone();
+            switch (operation.name) {
+                case "+":
+                    return f.add(r);
+                case "-":
+                    return f.sub(r);
+                case "*":
+                    return f.mult(r);
+                case "/":
+                    return f.div(r);
+            }
+        } else if (rightHand instanceof Fraction && 是加减乘除()) {
+            Fraction f = (Fraction) rightHand.clone();
+            RawValue r = (RawValue) getLeftHand().clone();
+            switch (operation.name) {
+                case "+":
+                    return f.add(r);
+                case "-":
+                    return f.negate().add(r);
+                case "*":
+                    return f.mult(r);
+                case "/":
+                    return f.inverse().mult(r);
+            }
+        } else if (operation.name.equals("^")) { //fractional mode
+            if (r1 instanceof Fraction) {
+                return ((Fraction) r1).exp(r2);
+            } else if (r2.val() == 0) { // 0^0
+                return r1.val() == 0 ? RawValue.UNDEF : new RawValue(1);
+            } else if (r2.val() < 0) { // x^-b = (1/x)^b
+                return new BinaryOperation(r1.inverse(), "^", r2.negate()).simplify();
+            }
+        }
+
+
+        if (r1.isInteger() && r2.isInteger()) {
+            if (operation.name.equals("/")) {
+                return new Fraction(r1.intValue(), r2.intValue());
+            } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
+        } else if (!r1.isInteger() && !(r1 instanceof Fraction)) {
+            RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
+            return new BinaryOperation(f1, operation, r2).simplify();
+        } else if (!r2.isInteger() && !(r2 instanceof Fraction)) {
+            RawValue f2 = Fraction.convertToFraction(r2.doubleValue(), Fraction.TOLERANCE);
+            return new BinaryOperation(r1, operation, f2).simplify();
+        }
+        return null;
+    }
+
+    /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
@@ -175,55 +238,30 @@ public class BinaryOperation extends Operation {
         if (isUndefined()) return RawValue.UNDEF;
 
         if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
-            RawValue r1 = (RawValue) getLeftHand();
-            RawValue r2 = (RawValue) rightHand;
-            if (getLeftHand() instanceof Fraction && 是加减乘除()) {
-                Fraction f = (Fraction) getLeftHand().clone();
-                RawValue r = (RawValue) rightHand.clone();
-                switch (operation.name) {
-                    case "+":
-                        return f.add(r);
-                    case "-":
-                        return f.sub(r);
-                    case "*":
-                        return f.mult(r);
-                    case "/":
-                        return f.div(r);
-                }
-            } else if (rightHand instanceof Fraction && 是加减乘除()) {
-                Fraction f = (Fraction) rightHand.clone();
-                RawValue r = (RawValue) getLeftHand().clone();
-                switch (operation.name) {
-                    case "+":
-                        return f.add(r);
-                    case "-":
-                        return f.negate().add(r);
-                    case "*":
-                        return f.mult(r);
-                    case "/":
-                        return f.inverse().mult(r);
-                }
-            } else if (operation.name.equals("^")) { //fractional mode
-                if (r1 instanceof Fraction) {
-                    return ((Fraction) r1).exp(r2);
-                } else if (r2.val() == 0) { // 0^0
-                    return r1.val() == 0 ? RawValue.UNDEF : new RawValue(1);
-                } else if (r2.val() < 0) { // x^-b = (1/x)^b
-                    return new BinaryOperation(r1.inverse(), "^", r2.negate()).simplify();
-                }
-            }
+            Operable simplified = simplify((RawValue) getLeftHand(), (RawValue) rightHand);
+            if (simplified != null) return simplified;
+        }
 
+        // at this point neither left hand nor right hand is undefined.
 
-            if (r1.isInteger() && r2.isInteger()) {
-                if (operation.name.equals("/")) {
-                    return new Fraction(r1.intValue(), r2.intValue());
-                } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
-            } else if (!r1.isInteger() && !(r1 instanceof Fraction)) {
-                RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
-                return new BinaryOperation(f1, operation, r2).simplify();
-            } else if (!r2.isInteger() && !(r2 instanceof Fraction)) {
-                RawValue f2 = Fraction.convertToFraction(r2.doubleValue(), Fraction.TOLERANCE);
-                return new BinaryOperation(r1, operation, f2).simplify();
+        if (rightHand instanceof RawValue && ((RawValue) rightHand).isInteger()) {
+            int i = ((RawValue) rightHand).intValue();
+            if (i == 0) {
+                switch (operation.name) {
+                    case "+": return getLeftHand();
+                    case "-": return getLeftHand();
+                    case "*": return RawValue.ZERO;
+                    case "/": return RawValue.UNDEF;
+                    case "^": return RawValue.ONE;
+                }
+            } else if (i == 1) {
+                switch (operation.name) {
+                    case "+": break;
+                    case "-": break;
+                    case "*": return getLeftHand();
+                    case "/": return getLeftHand();
+                    case "^": return getLeftHand();
+                }
             }
         }
 
@@ -247,11 +285,15 @@ public class BinaryOperation extends Operation {
             if (get(i).val() == 0) {
                 switch (operation.name) {
                     case "+":
-                        return getOther(i);
+                        return getOther(i); //should this call .simplify()?
                     case "*":
                         return new RawValue(0);
                     case "^":
                         return i == 1 ? new RawValue(0) : new RawValue(1);
+                }
+            } else if (get(i).equals(RawValue.ONE)) {
+                switch (operation.name) {
+                    case "*": return getOther(i);
                 }
             }
         }
