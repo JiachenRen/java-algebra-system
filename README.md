@@ -41,7 +41,7 @@ System.out.println(op.clone().simplify(); // prints "2*a^2"
 ```
 You can also set `Mode.DEBUG = true` to see how it actually performs the interpretation. `Expression.interpret("5+7-log<(11)>+e^2")` with debug on produces the following:
 ```
-formatted input: 5+7-log<(11)>+e^2
+formatted input: 5+7-log(11)+e^2
 exp:	11
 func:	5+7-log<&0>+e^2
 exp:	5+7-log<&0>+e^2
@@ -56,7 +56,12 @@ output:	5+7-log(11)+e^2
 
 To reduce the complexity of the simplification process, the algorithm will first attempt fundamental operations (arithmetic calculations of rational/irrational numbers, special cases like `x^0` and `0/x`). Then, it will converts the mathematic expression to additional only exponential form. For example:
 ```java
-BinaryOperation 
+BinaryOperation binOp = (BinaryOperation) Expression.interpret("x*(a-b)/(c+d)^3");
+System.out.println(binOp); // prints "x*(a-b)/(c+d)^3"
+binOp.toAdditionOnly(); // converts the expression to additional only form
+System.out.println(binOp); // prints "x*(a+(-1)*b)/(c+d)^3"
+binOp.toExponentialForm(); // converts the expression to exponential form
+System.out.println(binOp); // prints "x*(a+(-1)*b)*(c+d)^(-3)
 ```
 
 #### The algorithm handles the following simplifiable forms:
