@@ -61,7 +61,13 @@ System.out.println(binOp); // prints "x*(a-b)/(c+d)^3"
 binOp.toAdditionOnly(); // converts the expression to additional only form
 System.out.println(binOp); // prints "x*(a+(-1)*b)/(c+d)^3"
 binOp.toExponentialForm(); // converts the expression to exponential form
-System.out.println(binOp); // prints "x*(a+(-1)*b)*(c+d)^(-3)
+System.out.println(binOp); // prints "x*(a+(-1)*b)*(c+d)^(-3)"
+```
+The expression `x*(a+(-1)*b)*(c+d)^(-3)` doesn't look much better than `x*(a-b)/(c+d)^3`, however, although it is considered "much simpler" by the computer, as for now it only needs to worry about handling `+,^,*` instead of `+,-,*,/,^` for this specific expression. However, to make it more readable to the human eye, it needs to be "beautified." You can do this by invoking `Operable::beautify()`, which works by reversing the doings of negative exponentiation and addition by negative number. Consider the expression `a/3*2.5/n*b^2.5*a/4`:
+```java
+Operable op = Expression.interpret("a/3*2.5/n*b^2.5*a/4");
+System.out.println(op.clone().simplify()); // prints "a^2*n^(-1)*b^2.5*(5/24)"
+System.out.println(op.clone().simplify().beautify()); // prints "a^2*b^2.5*5/(n*24)"
 ```
 
 #### The algorithm handles the following simplifiable forms:
