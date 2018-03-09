@@ -210,7 +210,7 @@ public class UnaryOperation extends Operation implements LeafNode {
             define("asin", Math::asin);
             define("acos", Math::acos);
             define("abs", Math::abs);
-            define("ln", x -> log(x) / Constants.valueOf("e"));
+            define("ln", x -> log(x) / log(Constants.E.val()));
             define("sec", x -> 1 / cos(x));
             define("csc", x -> 1 / sin(x));
             define("cot", x -> 1 / tan(x));
