@@ -142,6 +142,22 @@ public interface Operable extends Evaluable {
         return terms;
     }
 
+    static Operable div(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "/", o2.clone());
+    }
+
+    static Operable mult(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "*", o2.clone());
+    }
+
+    static Operable add(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "+", o2.clone());
+    }
+
+    static Operable sub(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "-", o2.clone());
+    }
+
     /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place

@@ -107,11 +107,32 @@ public class UnaryOperation extends Operation implements LeafNode {
      */
     public Operable simplify() {
         if (getLeftHand() instanceof Operation) {
-            //TODO: process trigonometric simplification
-            //if this.operation = "atan" && getLeftHand().operation = "tan" then simplify
             this.setLeftHand((this.getLeftHand()).simplify());
-            return this;
-        } else return this;
+        }
+
+        if (getLeftHand() instanceof UnaryOperation) {
+            UnaryOperation op = (UnaryOperation) getLeftHand();
+            switch (this.operation.getName()) {
+                case "acos":
+                    switch (op.operation.getName()) {
+                        case "cos":
+                            return op.getLeftHand();
+                    }
+                    break;
+                case "asin":
+                    switch (op.operation.getName()) {
+                        case "sin":
+                            return op.getLeftHand();
+                    }
+                case "atan":
+                    switch (op.operation.getName()) {
+                        case "tan":
+                            return op.getLeftHand(); // what about tan(pi/2)?
+                    }
+            }
+        }
+
+        return this;
     }
 
     @Override
@@ -234,6 +255,11 @@ public class UnaryOperation extends Operation implements LeafNode {
 //                case "cot":
 //                case "sec":
 //                case "csc":
+            }
+        } else if (getLeftHand() instanceof Operation) {
+            switch (operation.getName()) {
+                case "tan":
+//                    Operable o = new BinaryOperation(getLeftHand().clone(), "/", )
             }
         }
         return false;
