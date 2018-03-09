@@ -125,3 +125,15 @@ System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
 System.out.println(Expression.interpret("seed*2-1").val()) // prints a random number between -1 and 1.
 ```
 
+### What can it do?
+As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
+
+* Commutative arithmatic & algebra
+* Nested unary operation simplification
+* Algebraic domain validation
+* Trignometric simplfication
+* Logarithmic exponential simplification
+* Basic irrational/rational number arithmetic
+
+For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section. 
+
