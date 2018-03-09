@@ -110,6 +110,8 @@ public class UnaryOperation extends Operation implements LeafNode {
             this.setLeftHand((this.getLeftHand()).simplify());
         }
 
+        if (this.isUndefined()) return RawValue.UNDEF;
+
         if (getLeftHand() instanceof UnaryOperation) {
             UnaryOperation op = (UnaryOperation) getLeftHand();
             switch (this.operation.getName()) {
@@ -259,7 +261,9 @@ public class UnaryOperation extends Operation implements LeafNode {
         } else if (getLeftHand() instanceof Operation) {
             switch (operation.getName()) {
                 case "tan":
-//                    Operable o = new BinaryOperation(getLeftHand().clone(), "/", )
+                    Operable o = Operable.div(this.getLeftHand(), Operable.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
+                    if (o instanceof RawValue && ((RawValue) o).isInteger())
+                        return true;
             }
         }
         return false;

@@ -11,9 +11,9 @@ public class RawValue implements Operable, LeafNode {
     public static RawValue UNDEF = new RawValue(Double.NaN);
     public static RawValue ONE = new RawValue(1);
     public static RawValue ZERO = new RawValue(0);
+    public static RawValue TWO = new RawValue(2);
     public static RawValue INFINITY = new RawValue(Double.POSITIVE_INFINITY);
-    public static RawValue NEG_ONE = new RawValue(-1);
-    public static RawValue NEG_INFINITY = new RawValue(Double.NEGATIVE_INFINITY);
+
     private Number number;
 
     public RawValue(Number number) {
