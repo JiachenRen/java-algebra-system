@@ -6,6 +6,7 @@ import jmc.MathContext;
 import java.util.ArrayList;
 
 import static java.lang.Math.*;
+import static jmc.MathContext.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -102,6 +103,8 @@ public class UnaryOperation extends Operation implements LeafNode {
 
     /**
      * Note: modifies self.
+     * TODO: ln(a) - ln(b) should be ln(a/b)
+     * TODO: log(225) should be 2log(15)
      *
      * @return a new Operable instance that is the simplified version of self.
      */
@@ -111,6 +114,10 @@ public class UnaryOperation extends Operation implements LeafNode {
         }
 
         if (this.isUndefined()) return RawValue.UNDEF;
+
+        double val = this.val();
+        if (RawValue.isInteger(val))
+            return new RawValue(val);
 
         if (getLeftHand() instanceof UnaryOperation) {
             UnaryOperation op = (UnaryOperation) getLeftHand();
@@ -151,6 +158,24 @@ public class UnaryOperation extends Operation implements LeafNode {
                             return RawValue.ZERO;
                     }
             }
+        } else if (getLeftHand() instanceof RawValue) {
+            RawValue r = (RawValue) getLeftHand();
+            if (r.isInteger()) {
+                switch (operation.getName()) {
+                    case "ln": // ln(a^3) = 3ln(a), where a is a^3 is an integer
+                    case "log":
+                        ArrayList<Long> factors = getFactors(r.intValue());
+                        if (factors.size() > 1) {
+                            ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
+                            int[] num = numOccurrences(uniqueFactors, factors);
+                            if (allTheSame(num)) {
+                                RawValue r1 = new RawValue(MathContext.mult(uniqueFactors));
+                                return Operable.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
+                            }
+                        }
+                }
+            }
+
         } else if (getLeftHand() instanceof BinaryOperation) {
             BinaryOperation binOp = (BinaryOperation) getLeftHand();
             switch (operation.getName()) {
@@ -161,9 +186,6 @@ public class UnaryOperation extends Operation implements LeafNode {
             }
         }
 
-        double val = this.val();
-        if (RawValue.isInteger(val))
-            return new RawValue(val);
 
         return this;
     }
@@ -297,7 +319,7 @@ public class UnaryOperation extends Operation implements LeafNode {
             case "sec":
                 o = Operable.div(this.getLeftHand(), Operable.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger()) {
-                    return ((RawValue) o).intValue() % 2 == 1;
+                    return Math.abs(((RawValue) o).intValue() % 2) == 1;
                 }
                 break;
             case "cot": // domain: x != n*pi

@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static jmc.MathContext.getFactors;
+import static jmc.MathContext.getUniqueFactors;
+
 /**
  * Created by Jiachen on 3/2/18.
  * Fraction
@@ -115,14 +118,7 @@ public class Fraction extends RawValue {
             n *= -1;
         }
         ArrayList<Long> factors = getFactors(n);
-        ArrayList<Long> uniqueFactors = new ArrayList<>();
-        long cur = 1;
-        for (Long f : factors) {
-            if (cur != f) {
-                uniqueFactors.add(f);
-                cur = f;
-            }
-        }
+        ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
         int[] num = new int[uniqueFactors.size()];
         int max = uniqueFactors.get(uniqueFactors.size() - 1).intValue();
         int[] map = new int[max + 1];
@@ -142,19 +138,6 @@ public class Fraction extends RawValue {
         BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r));
         BinaryOperation irr = new BinaryOperation(new RawValue(n1), "^", exp);
         return new BinaryOperation(new RawValue(ext), "*", irr);
-    }
-
-    /**
-     * @param n number
-     * @return factors of n in an ArrayList sorted from smallest to largest.
-     */
-    public static ArrayList<Long> getFactors(long n) {
-        BigInteger i = new BigInteger(Long.toString(n));
-        List<Long> factors = MathContext.factor(i).stream()
-                .map(BigInteger::longValue)
-                .sorted((a, b) -> a <= b ? -1 : 1)
-                .collect(Collectors.toList());
-        return (ArrayList<Long>) factors;
     }
 
     public RawValue sub(RawValue o) {

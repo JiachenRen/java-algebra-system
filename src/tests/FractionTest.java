@@ -1,5 +1,6 @@
 package tests;
 
+import jmc.MathContext;
 import jmc.cas.Expression;
 import jmc.cas.Fraction;
 import jmc.cas.Operable;
@@ -9,6 +10,7 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static tests.TestPrint.l;
+import static jmc.utils.ColorFormatter.*;
 
 /**
  * Created by Jiachen on 3/6/18.
@@ -30,7 +32,7 @@ public class FractionTest {
 
     public static void main(String args[]) {
         l(Fraction.extractRoot(350003000, 2));
-        l(Fraction.getFactors(35000));
+        l(MathContext.getFactors(35000));
 
         Fraction f1 = new Fraction(3, 4);
         Fraction f2 = new Fraction(4, 3);
@@ -41,7 +43,9 @@ public class FractionTest {
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
         operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
-        operables.forEach(operable -> l(operable + " -> "+operable.simplify()));
+        operables.forEach(operable -> l(operable + " -> " + operable.clone().simplify() + ", "
+                + boldBlack("status: ")
+                + ((operable.val() - operable.clone().simplify().val()) < 1E-10 ? lightGreen("PASSED") : lightRed("FAILED"))));
 
 //        l(Fraction.extractRoot(-2,3));
     }

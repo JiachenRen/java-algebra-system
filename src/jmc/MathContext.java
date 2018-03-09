@@ -3,6 +3,8 @@ package jmc;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jiachen on 03/05/2017.
@@ -102,6 +104,67 @@ public class MathContext {
         ArrayList<BigInteger> factors = new ArrayList<>();
         recursiveFactor(N, factors);
         return factors;
+    }
+
+    /**
+     * @param n number
+     * @return factors of n in an ArrayList sorted from smallest to largest.
+     */
+    public static ArrayList<Long> getFactors(long n) {
+        BigInteger i = new BigInteger(Long.toString(n));
+        List<Long> factors = MathContext.factor(i).stream()
+                .map(BigInteger::longValue)
+                .sorted((a, b) -> a <= b ? -1 : 1)
+                .collect(Collectors.toList());
+        return (ArrayList<Long>) factors;
+    }
+
+    public static ArrayList<Long> getUniqueFactors(ArrayList<Long> factors) {
+        ArrayList<Long> uniqueFactors = new ArrayList<>();
+        long cur = 1;
+        for (Long f : factors) {
+            if (cur != f) {
+                uniqueFactors.add(f);
+                cur = f;
+            }
+        }
+        return uniqueFactors;
+    }
+
+    /**
+     * e.g.
+     * targets: [3,5,7]
+     * list:    [3,5,3,7,3,3,5,5]
+     * return:  [4,3,1]
+     *
+     * @param targets ArrayList containing unique numbers
+     * @param pool    ArrayList containing repeated numbers
+     * @return an array having the same dimension as "targets" with each item
+     * being the num occurrences of # in targets at the corresponding index.
+     */
+    public static int[] numOccurrences(ArrayList<Long> targets, ArrayList<Long> pool) {
+        int[] num = new int[targets.size()];
+        int max = targets.get(targets.size() - 1).intValue();
+        int[] map = new int[max + 1];
+        for (int i = 0; i < targets.size(); i++) {
+            map[targets.get(i).intValue()] = i;
+        }
+        pool.forEach(f -> num[map[f.intValue()]] += 1);
+        return num;
+    }
+
+    public static boolean allTheSame(int[] arr) {
+        for (int i = 0; i < arr.length - 1; i++) {
+            if (arr[i] != arr[i + 1])
+                return false;
+        }
+        return true;
+    }
+
+    public static long mult(ArrayList<Long> longs) {
+        final long[] out = {1};
+        longs.forEach(l -> out[0] *= l);
+        return out[0];
     }
 
 }

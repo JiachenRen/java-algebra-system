@@ -7,24 +7,24 @@ import jui.JNode;
  * ColorFormatter class whose job is to color the String for the system outputs.
  */
 public class ColorFormatter {
-    public static String boldBlack(String s) {
-        return color(s, "[1m");
+    public static String boldBlack(Object o) {
+        return color(o.toString(), "[1m");
     }
 
-    public static String lightRed(String s) {
-        return color(s, AnsiColor.LIGHT_RED.toString());
+    public static String lightRed(Object o) {
+        return color(o.toString(), AnsiColor.LIGHT_RED.toString());
     }
 
-    public static String lightCyan(String s) {
-        return color(s, AnsiColor.LIGHT_CYAN.toString());
+    public static String lightCyan(Object o) {
+        return color(o.toString(), AnsiColor.LIGHT_CYAN.toString());
     }
 
-    public static String lightGreen(String s) {
-        return color(s, AnsiColor.LIGHT_GREEN.toString());
+    public static String lightGreen(Object o) {
+        return color(o.toString(), AnsiColor.LIGHT_GREEN.toString());
     }
 
-    public static String lightBlue(String s) {
-        return color(s, AnsiColor.LIGHT_BLUE.toString());
+    public static String lightBlue(Object o) {
+        return color(o.toString(), AnsiColor.LIGHT_BLUE.toString());
     }
 
     /**
