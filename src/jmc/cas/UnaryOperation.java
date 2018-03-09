@@ -132,6 +132,25 @@ public class UnaryOperation extends Operation implements LeafNode {
                             return op.getLeftHand(); // what about tan(pi/2)?
                     }
             }
+        } else if (getLeftHand() instanceof Constants.Constant) {
+            Constants.Constant c = (Constants.Constant) getLeftHand();
+            switch (c.getName()) {
+                case "e":
+                    switch (operation.getName()) {
+                        case "ln":
+                            return RawValue.ONE;
+                    }
+                    break;
+                case "pi":
+                    switch (operation.getName()) {
+                        case "cos":
+                        case "sec":
+                            return RawValue.ONE.negate();
+                        case "sin":
+                        case "tan":
+                            return RawValue.ZERO;
+                    }
+            }
         } else if (getLeftHand() instanceof BinaryOperation) {
             BinaryOperation binOp = (BinaryOperation) getLeftHand();
             switch (operation.getName()) {
@@ -254,8 +273,8 @@ public class UnaryOperation extends Operation implements LeafNode {
 
     public boolean isUndefined() {
         if (getLeftHand().isUndefined()) return true;
-        if (getLeftHand() instanceof RawValue) {
-            double n = ((RawValue) getLeftHand()).doubleValue();
+        if (getLeftHand().val() != Double.NaN) {
+            double n = getLeftHand().val();
             switch (operation.getName()) {
                 case "ln":
                     return n <= 0;
@@ -274,11 +293,12 @@ public class UnaryOperation extends Operation implements LeafNode {
 
         Operable o;
         switch (operation.getName()) {
-            case "tan": // domain: x != n*pi/2
+            case "tan": // domain: x != pi/2 + n*pi
             case "sec":
                 o = Operable.div(this.getLeftHand(), Operable.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
-                if (o instanceof RawValue && ((RawValue) o).isInteger())
-                    return true;
+                if (o instanceof RawValue && ((RawValue) o).isInteger()) {
+                    return ((RawValue) o).intValue() % 2 == 1;
+                }
                 break;
             case "cot": // domain: x != n*pi
             case "csc":

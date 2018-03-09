@@ -33,6 +33,7 @@ public class UnaryOperationTest {
             "csc(pi/2)",
             "log(10)",
             "log(100)",
+            "ln(225)", //should it be changed to 2ln(15)?
             "ln(e)",
             "int(3.5)",
             "ln(e^3)",
@@ -40,6 +41,9 @@ public class UnaryOperationTest {
             "ln(e^3*x)",
             "ln(x)",
             "ln(e^(3*x))",
+            "cos(pi)",
+            "sin(pi)",
+            "tan(pi)"
 
     };
 
