@@ -70,18 +70,8 @@ System.out.println(op.clone().simplify()); // prints "a^2*n^(-1)*b^2.5*(5/24)"
 System.out.println(op.clone().simplify().beautify()); // prints "a^2*b^2.5*5/(n*24)"
 ```
 #### The algorithm handles the following simplifiable forms:
-BINARY OPERATIONS
 
-Original   |   -> | Simplified |   |    Original     |   -> | Simplified |   |    Original     |   -> | Simplified 
- --------- | ---- | ---------- | - | --------------- | ---- | ---------- | - | --------------- | ---- | ---------- 
-(a*b)^#    |   -> | a^#*b^#    |   |     a^b*a^c     |   -> | a^(b+c)    |   |      x*x        |   -> | x^x
-a*a^b      |   -> | a^(b+1)    |   |      x-x        |   -> | 0          |   |      x/0        |   -> | undef
-0^0        |   -> | undef      |   |      x+x        |   -> | 2*x        |   |      0/x        |   -> | 0
-0*x        |   -> | 0          |   |      x^0        |   -> | 1          |   |      0^(-1)     |   -> | undef 
-x*x^2      |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |      x/1        |   -> | x          
-0^x        |   -> | 0          |   |      1^x        |   -> | 1          |   |      x^1        |   -> | x          
-
-IRRATIONAL/RATIONAL NUMBERS
+> Rational/Irrational Numbers
 ```css
 3^(-3)        -> (1/27)
 (2/3)^(-1/3)  -> (1/2)*3^(1/3)*2^(2/3)
@@ -93,6 +83,18 @@ IRRATIONAL/RATIONAL NUMBERS
 3/4*(5/7)     -> (15/28)
 3.5/4.7^2     -> (350/2209)
 ```
+> Binary Operations
+
+Original   |   -> | Simplified |   |    Original     |   -> | Simplified |   |    Original     |   -> | Simplified 
+ --------- | ---- | ---------- | - | --------------- | ---- | ---------- | - | --------------- | ---- | ---------- 
+(a*b)^#    |   -> | a^#*b^#    |   |     a^b*a^c     |   -> | a^(b+c)    |   |      x*x        |   -> | x^x
+a*a^b      |   -> | a^(b+1)    |   |      x-x        |   -> | 0          |   |      x/0        |   -> | undef
+0^0        |   -> | undef      |   |      x+x        |   -> | 2*x        |   |      0/x        |   -> | 0
+0*x        |   -> | 0          |   |      x^0        |   -> | 1          |   |      0^(-1)     |   -> | undef 
+x*x^2      |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |      x/1        |   -> | x          
+0^x        |   -> | 0          |   |      1^x        |   -> | 1          |   |      x^1        |   -> | x          
+
+
 
 ### Extensibility
 The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `BinaryOperation` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
