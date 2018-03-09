@@ -2,7 +2,6 @@ package tests;
 
 import jmc.cas.*;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -119,6 +118,10 @@ public class CasComprehensiveTest {
         l(BinaryOperation.expFormIdx(Expression.interpret("x^(-4)").simplify()));
         l(BinaryOperation.expFormIdx(Expression.interpret("x^((-4)*x/3)").simplify()));
 
+        l(Constants.E, Constants.PI, Constants.π);
+        l(Constants.E.equals(Constants.E), Constants.π.equals(Constants.PI));
+        l(RawValue.INFINITY.doubleValue());
+        l(RawValue.UNDEF.isInteger(), RawValue.INFINITY.negate().isInteger());
     }
 
 }

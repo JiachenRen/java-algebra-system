@@ -17,6 +17,7 @@ public class BinaryOperationTest {
         l(BinaryOperation.getPriority("&"),BinaryOperation.getPriority("+"));
         l(new BinaryOperation(RawValue.ZERO,"*", RawValue.ONE).getPriority());
         l(new BinaryOperation(RawValue.ZERO, "*", RawValue.ONE).flattened());
+        l(binOp.is("*"));
 
     }
 

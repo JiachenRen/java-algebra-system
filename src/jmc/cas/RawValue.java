@@ -73,6 +73,8 @@ public class RawValue implements Operable, LeafNode {
     }
 
     public boolean isInteger() {
+        double val = doubleValue();
+        if (Double.isNaN(val) || Double.isInfinite(val)) return false;
         String s = number.toString();
         return s.endsWith(".0") || !s.contains(".");
     }

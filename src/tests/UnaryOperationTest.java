@@ -35,6 +35,11 @@ public class UnaryOperationTest {
             "log(100)",
             "ln(e)",
             "int(3.5)",
+            "ln(e^3)",
+            "ln(e^3+x)",
+            "ln(e^3*x)",
+            "ln(x)",
+            "ln(e^(3*x))",
 
     };
 
@@ -53,6 +58,7 @@ public class UnaryOperationTest {
 
         System.out.println(Math.cos(Math.PI / 2)); // this is why we need CAS!
         System.out.println(RawValue.isInteger(3.0));
+        l(Expression.interpret("ln(x)").isUndefined());
     }
 
 

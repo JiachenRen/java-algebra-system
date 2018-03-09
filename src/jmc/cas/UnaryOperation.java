@@ -132,10 +132,19 @@ public class UnaryOperation extends Operation implements LeafNode {
                             return op.getLeftHand(); // what about tan(pi/2)?
                     }
             }
+        } else if (getLeftHand() instanceof BinaryOperation) {
+            BinaryOperation binOp = (BinaryOperation) getLeftHand();
+            switch (operation.getName()) {
+                case "ln":
+                    if (binOp.is("^") && binOp.getLeftHand().equals(Constants.getConstant("e"))) {
+                        return binOp.getRightHand();
+                    }
+            }
         }
 
         double val = this.val();
-        if (RawValue.isInteger(val)) return new RawValue(val);
+        if (RawValue.isInteger(val))
+            return new RawValue(val);
 
         return this;
     }

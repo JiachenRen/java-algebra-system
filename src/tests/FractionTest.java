@@ -29,7 +29,6 @@ public class FractionTest {
     };
 
     public static void main(String args[]) {
-        Fraction f = new Fraction(4050800, 1);
         l(Fraction.extractRoot(350003000, 2));
         l(Fraction.getFactors(35000));
 

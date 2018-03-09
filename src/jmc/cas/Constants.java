@@ -21,7 +21,12 @@ public class Constants {
         define("pi", () -> Math.PI);
         define("∞", () -> Double.POSITIVE_INFINITY);
         define("rand", Math::random);
+        define("π", () -> Math.PI);
     }
+
+    public static final Constant E = getConstant("e");
+    public static final Constant PI = getConstant("pi");
+    public static final Constant π = getConstant("π");
 
     public static boolean contains(String symbol) {
         for (Constant constant : constants) {
@@ -91,7 +96,8 @@ public class Constants {
         }
 
         public boolean equals(Operable other) {
-            return other instanceof Constant && ((Constant) other).getName().equals(getName());
+            return other instanceof Constant && (((Constant) other).getName().equals(getName())
+            || other.val() == this.val());
         }
 
         public Operable plugIn(Variable var, Operable nested) {

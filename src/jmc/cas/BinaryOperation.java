@@ -822,6 +822,10 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
+    public boolean is(String s) {
+        return operation.equals(s);
+    }
+
     public interface BinEvaluable {
         double eval(double a, double b);
     }
