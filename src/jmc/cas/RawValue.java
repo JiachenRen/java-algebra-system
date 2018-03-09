@@ -77,6 +77,10 @@ public class RawValue implements Operable, LeafNode {
         return s.endsWith(".0") || !s.contains(".");
     }
 
+    public static boolean isInteger(double n) {
+        return new RawValue(n).isInteger();
+    }
+
     public boolean isUndefined() {
         return new Double(number.doubleValue()).isNaN();
     }

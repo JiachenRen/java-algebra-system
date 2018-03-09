@@ -134,6 +134,9 @@ public class UnaryOperation extends Operation implements LeafNode {
             }
         }
 
+        double val = this.val();
+        if (RawValue.isInteger(val)) return new RawValue(val);
+
         return this;
     }
 
@@ -268,7 +271,7 @@ public class UnaryOperation extends Operation implements LeafNode {
                 if (o instanceof RawValue && ((RawValue) o).isInteger())
                     return true;
                 break;
-            case "cot":
+            case "cot": // domain: x != n*pi
             case "csc":
                 o = Operable.div(this.getLeftHand(), Constants.getConstant("pi")).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger())

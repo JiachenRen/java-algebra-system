@@ -24,7 +24,8 @@ public class FractionTest {
             "2/5+3/7",
             "2*5/7",
             "(3/4)*(5/7)",
-            "3.5/4.7^2"
+            "3.5/4.7^2",
+            "10^2.5"
     };
 
     public static void main(String args[]) {

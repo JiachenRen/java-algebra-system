@@ -2,6 +2,7 @@ package tests;
 
 import jmc.cas.Expression;
 import jmc.cas.Operable;
+import jmc.cas.RawValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,11 @@ public class UnaryOperationTest {
             "cot(0)",
             "csc(0)",
             "csc(100pi)",
-            "csc(pi/2)"
+            "csc(pi/2)",
+            "log(10)",
+            "log(100)",
+            "ln(e)",
+            "int(3.5)",
 
     };
 
@@ -47,6 +52,7 @@ public class UnaryOperationTest {
                 + operable.clone().simplify().beautify()));
 
         System.out.println(Math.cos(Math.PI / 2)); // this is why we need CAS!
+        System.out.println(RawValue.isInteger(3.0));
     }
 
 
