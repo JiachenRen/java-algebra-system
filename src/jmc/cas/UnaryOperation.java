@@ -258,14 +258,24 @@ public class UnaryOperation extends Operation implements LeafNode {
 //                case "sec":
 //                case "csc":
             }
-        } else if (getLeftHand() instanceof Operation) {
-            switch (operation.getName()) {
-                case "tan":
-                    Operable o = Operable.div(this.getLeftHand(), Operable.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
-                    if (o instanceof RawValue && ((RawValue) o).isInteger())
-                        return true;
-            }
         }
+
+        Operable o;
+        switch (operation.getName()) {
+            case "tan": // domain: x != n*pi/2
+            case "sec":
+                o = Operable.div(this.getLeftHand(), Operable.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
+                if (o instanceof RawValue && ((RawValue) o).isInteger())
+                    return true;
+                break;
+            case "cot":
+            case "csc":
+                o = Operable.div(this.getLeftHand(), Constants.getConstant("pi")).simplify();
+                if (o instanceof RawValue && ((RawValue) o).isInteger())
+                    return true;
+
+        }
+
         return false;
     }
 

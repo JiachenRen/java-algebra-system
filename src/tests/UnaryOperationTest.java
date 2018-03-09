@@ -18,8 +18,21 @@ import static tests.TestPrint.*;
 public class UnaryOperationTest {
     private static String ops[] = new String[]{
             "tan(3pi/2)",
-            "tan(3pi/2*x)"
+            "tan(3pi/2*x)",
+            "atan(tan(x))", //throw warnings after simplification!
+            "asin(sin(x))",
+            "acos(cos(2*ln(x)))",
+            "atan(tan(5pi/2))",
+            "tan(-3pi/2)",
+            "sec(-3pi/2)",
+            "cot(pi)",
+            "cot(0)",
+            "csc(0)",
+            "csc(100pi)",
+            "csc(pi/2)"
+
     };
+
     public static void main(String args[]) {
         l(Expression.interpret("tan(3pi/2)").isUndefined());
 
@@ -32,6 +45,8 @@ public class UnaryOperationTest {
                 + lightGreen(operable.clone().simplify().toString())
                 + boldBlack("\t->\t")
                 + operable.clone().simplify().beautify()));
+
+        System.out.println(Math.cos(Math.PI / 2)); // this is why we need CAS!
     }
 
 
