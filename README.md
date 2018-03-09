@@ -85,14 +85,14 @@ System.out.println(op.clone().simplify().beautify()); // prints "a^2*b^2.5*5/(n*
 ```
 > Binary Operations
 
-Original   |   -> | Simplified |   |    Original     |   -> | Simplified |   |    Original     |   -> | Simplified 
- --------- | ---- | ---------- | - | --------------- | ---- | ---------- | - | --------------- | ---- | ---------- 
-(a*b)^#    |   -> | a^#*b^#    |   |     a^b*a^c     |   -> | a^(b+c)    |   |      x*x        |   -> | x^x
-a*a^b      |   -> | a^(b+1)    |   |      x-x        |   -> | 0          |   |      x/0        |   -> | undef
-0^0        |   -> | undef      |   |      x+x        |   -> | 2*x        |   |      0/x        |   -> | 0
-0*x        |   -> | 0          |   |      x^0        |   -> | 1          |   |      0^(-1)     |   -> | undef 
-x*x^2      |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |      x/1        |   -> | x          
-0^x        |   -> | 0          |   |      1^x        |   -> | 1          |   |      x^1        |   -> | x          
+Original Exp |   -> | Simplified |   |  Original Exp   |   -> | Simplified |   |  Original Exp   |   -> | Simplified 
+:-----------:| ---- |:----------:| - |:---------------:| ---- |:----------:| - |:---------------:| ---- |:----------:
+(a*b)^#      |   -> | a^#*b^#    |   |     a^b*a^c     |   -> | a^(b+c)    |   |      x*x        |   -> | x^x
+a*a^b        |   -> | a^(b+1)    |   |      x-x        |   -> | 0          |   |      x/0        |   -> | undef
+0^0          |   -> | undef      |   |      x+x        |   -> | 2*x        |   |      0/x        |   -> | 0
+0*x          |   -> | 0          |   |      x^0        |   -> | 1          |   |      0^(-1)     |   -> | undef 
+x*x^2        |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |      x/1        |   -> | x          
+0^x          |   -> | 0          |   |      1^x        |   -> | 1          |   |      x^1        |   -> | x          
 
 
 
