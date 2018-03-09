@@ -70,19 +70,8 @@ System.out.println(op.clone().simplify()); // prints "a^2*n^(-1)*b^2.5*(5/24)"
 System.out.println(op.clone().simplify().beautify()); // prints "a^2*b^2.5*5/(n*24)"
 ```
 #### The algorithm handles the following simplifiable forms:
-BINARY OPERATIONS
-```java
-(a*b)^#       -> a^#*b^#          a^b*a^c       -> a^(b+c)
-a*a^b         -> a^(b+1)          x-x           -> 0
-0^0           -> undef            x+x           -> 2*x
-0*x           -> 0                x*x           -> x^x
-x*x^2         -> x^3              x^0           -> 1
-0^x           -> 0                1^x           -> 1
-x^1           -> x                a^b^c         -> a^(b*c)
-x/1           -> x                0/x           -> 0
-0^(-1)        -> undef            x/0           -> undef
-```
-IRRATIONAL/RATIONAL NUMBERS
+
+> Rational/Irrational Numbers
 ```css
 3^(-3)        -> (1/27)
 (2/3)^(-1/3)  -> (1/2)*3^(1/3)*2^(2/3)
@@ -94,12 +83,45 @@ IRRATIONAL/RATIONAL NUMBERS
 3/4*(5/7)     -> (15/28)
 3.5/4.7^2     -> (350/2209)
 ```
+> Binary Operations
+
+Original Exp |   -> | Simplified |   |  Original Exp   |   -> | Simplified |   |  Original Exp   |   -> | Simplified 
+:-----------:| ---- |:----------:| - |:---------------:| ---- |:----------:| - |:---------------:| ---- |:----------:
+(a*b)^#      |   -> | a^#*b^#    |   |     a^b*a^c     |   -> | a^(b+c)    |   |      x*x        |   -> | x^x
+a*a^b        |   -> | a^(b+1)    |   |      x-x        |   -> | 0          |   |      x/0        |   -> | undef
+0^0          |   -> | undef      |   |      x+x        |   -> | 2*x        |   |      0/x        |   -> | 0
+0*x          |   -> | 0          |   |      x^0        |   -> | 1          |   |      0^(-1)     |   -> | undef 
+x*x^2        |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |      x/1        |   -> | x          
+0^x          |   -> | 0          |   |      1^x        |   -> | 1          |   |      x^1        |   -> | x          
+
+
 
 ### Extensibility
-The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
+The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `BinaryOperation` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
 #### Binary Operation
-BinaryOperation has a private nested class `RegisteredBinaryOperation` that is invisible outside of the `jmc.cas` package. It conforms to interface `BinEvaluable`, which specifies. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
+BinaryOperation has a private nested class `RegisteredBinaryOperation` that is invisible outside of the `jmc.cas` package. It conforms to interface `BinEvaluable`, which specifies only one method `double eval(double a, double b)`. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
 ```java
 BinaryOperation.define("%", 2, (a, b) -> a % b); // defines the modular binary operation (which is nonstandard)
 ```
 The first argument is the symbolic representation of binary operation. It can be any `String` that contains a single symbol. The second argument is the **priority** of the operation. The priority defines the order of binary operations - it can either be either `1`,`2`, or `3` with 3 being the highest. Addition and subtraction are of **priority 1** (lowest), while multiplification and division are of **priority 2** and exponentiation having **priority 3** (highest). In the code segment above, the `%` is defined to be having the same priority as `*` and `/`. The third argument is of type `BinEvaluable`. You can do any operation with the left/right operand as long as a double is returned.
+```java
+System.out.println(Expression.interpret("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0"
+```
+#### Unary Operation
+Similar to `BinaryOperation`, `UnaryOperation` has a private nested class `RegisteredUnaryOperation`. Refer to BinaryOperation for how it works. Here's how to use it:
+```java
+UnaryOperation.define("digits", x -> Integer.toString((int) x).length()); // an unary operation that calculates the numer of digits in the integer part of a number.
+```
+The first argument is the name of the unary operation, like `log`, `cos`, etc. The name could only contain letters `[a-Z]` and **must has more than 2 characters**. Single letters are reserved for variable names. The second argument is of type `Evaluable`, which must takes in a double and return a double.
+```java
+Expression.interpret("digits(x)^2").eval(1234) // returns 16 since there are 4 digits in 1234 and 4^2 = 16.
+```
+#### Constants
+Aside from declaring custom binary/unary operations, you can also define constants. Constants in JMC behave differently from what you would expect, however, and here's how it works. All of the constants are managed under the `Constants` class, which contains 2 subclasses, `Constant` and `ComputedConst` with `Constant` being a nested class that is a subclass of `Variable` and `ComputedConst` being a nested interface. The `ComputedConst` interface declares a single method `double compute()` and is utilized by `Constant` to compute a value. Here is how it works in practice:
+```java
+Constants.define("π", () -> Math.PI); // a constant having the value π. ("pi" is the default name for π in JMC)
+Constants.define("seed", Math::random); // a "dynamic constant" that returns a random value between 0 and 1 when evaluated
+System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
+System.out.println(Expression.interpret("seed*2-1").val()) // prints a random number between -1 and 1.
+```
+
