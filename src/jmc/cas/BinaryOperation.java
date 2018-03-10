@@ -450,13 +450,14 @@ public class BinaryOperation extends Operation {
         if (getLeftHand() instanceof BinaryOperation) {
             Operable simplified = simplify(getRightHand(), (BinaryOperation) getLeftHand());
             if (simplified != null) return simplified;
-        } else if (getRightHand() instanceof BinaryOperation) {
+        }
+        if (getRightHand() instanceof BinaryOperation) {
             Operable simplified = simplify(getLeftHand(), (BinaryOperation) getRightHand());
             if (simplified != null) return simplified;
         }
 
 
-        if (getPriority() == 1) return this; //up to this point the ^ operator cannot be simplified.
+        if (getPriority() == 1) return this.beautify(); //up to this point the ^ operator cannot be simplified.
 
         //up to this point all simplifications should have been tried, except the recursive cross-simplification
         if (getLeftHand() instanceof LeafNode //e.g. ln(x) * x is not simplifiable
