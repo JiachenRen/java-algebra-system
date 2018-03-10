@@ -27,6 +27,18 @@ public class ColorFormatter {
         return color(o.toString(), AnsiColor.LIGHT_BLUE.toString());
     }
 
+    public static String yellow(Object o) {
+        return color(o.toString(), AnsiColor.YELLOW.toString());
+    }
+
+    public static String purple(Object o) {
+        return color(o.toString(), AnsiColor.PURPLE.toString());
+    }
+
+    public static String lightPurple(Object o) {
+        return color(o.toString(), AnsiColor.LIGHT_PURPLE.toString());
+    }
+
     /**
      * returns a colored line!
      *

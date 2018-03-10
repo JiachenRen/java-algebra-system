@@ -29,11 +29,12 @@ public class Expression extends Function {
      * method represents his life's work
      */
     public static Operable interpret(String expression) {
-        if (expression.equals("")) throw new IllegalArgumentException("cannot interpret an empty string");
+        if (expression.toLowerCase().contains("undef")) return RawValue.UNDEF;
+        if (expression.equals("")) throw new JMCException("cannot interpret an empty string");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
-            throw new IllegalArgumentException("incorrect format: '()' mismatch");
+            throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
-            throw new IllegalArgumentException("incorrect format: '<>' mismatch");
+            throw new JMCException("'<>' mismatch in " + "\"" + expression + "\"");
         expression = formatUnaryOperations(expression.replace(" ", "").replace("(-", "(0-"));
         String exp = formatCoefficients(expression);
         exp = handleParentheticalNotation(handleCalcPriority(exp));
@@ -196,11 +197,11 @@ public class Expression extends Function {
                 } else if (Constants.contains(string)) {
                     operands.add(Constants.getConstant(string));
                 } else {
-                    if (string.equals("")) throw new RuntimeException("missing operand(s)");
+                    if (string.equals("")) throw new JMCException("missing operand(s)");
                     try {
                         operands.add(new RawValue(Double.valueOf(string)));
                     } catch (NumberFormatException e) {
-                        throw new NumberFormatException("undefined operand \"" + string + "\"");
+                        throw new JMCException("undefined operand in \"" + string + "\"");
                     }
                 }
             }
