@@ -1,6 +1,5 @@
 package jui;
 
-import com.sun.istack.internal.Nullable;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;
@@ -443,35 +442,30 @@ public class JNode {
         return null;
     }
 
-    @Nullable
     public static ScrollField getScrollFieldById(String id) {
         for (ScrollField scrollField : scrollFields)
             if (Objects.equals(scrollField.getId(), id)) return scrollField;
         return null;
     }
 
-    @Nullable
     public static Button getButtonById(String id) {
         for (Button button : buttons)
             if (Objects.equals(button.getId(), id)) return button;
         return null;
     }
 
-    @Nullable
     public static Label getLabelById(String id) {
         for (Label label : labels)
             if (Objects.equals(label.getId(), id)) return label;
         return null;
     }
 
-    @Nullable
     public static MenuDropdown getMenuDropdownById(String id) {
         for (MenuDropdown menuDropdown : menuDropdowns)
             if (Objects.equals(menuDropdown.getId(), id)) return menuDropdown;
         return null;
     }
 
-    @Nullable
     public static Slider getSliderById(String id) {
         for (Slider slider : sliders)
             if (Objects.equals(slider.getId(), id)) return slider;
