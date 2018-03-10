@@ -845,7 +845,7 @@ public class BinaryOperation extends Operation {
             define("*", 2, (a, b) -> a * b);
             define("/", 2, (a, b) -> a / b);
             define("^", 1, Math::pow);
-            System.out.println("# reserved binary operations declared");
+            if (Mode.DEBUG) System.out.println("# reserved binary operations declared");
         }
 
         private boolean isStandard() {

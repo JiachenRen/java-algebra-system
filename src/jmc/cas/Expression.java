@@ -37,7 +37,7 @@ public class Expression extends Function {
         expression = formatUnaryOperations(expression.replace(" ", "").replace("(-", "(0-"));
         String exp = formatCoefficients(expression);
         exp = handleParentheticalNotation(handleCalcPriority(exp));
-        System.out.println(boldBlack("formatted input: ") + exp);
+        log(boldBlack("formatted input: ") + exp);
         ArrayList<Operable> components = new ArrayList<>();
         int hashId = 0;
         while (exp.indexOf(')') != -1) {
@@ -47,13 +47,13 @@ public class Expression extends Function {
             components.add(formulated);
             String left = innerIndices[0] > 0 ? exp.substring(0, innerIndices[0]) : "";
             exp = left + "&" + hashId + exp.substring(innerIndices[1] + 1);
-            System.out.println(lightCyan("func:\t") + colorMathSymbols(exp));
+            log(lightCyan("func:\t") + colorMathSymbols(exp));
             hashId++;
         }
         Operable operable = generateOperations(exp, components);
         if (operable instanceof BinaryOperation) ((BinaryOperation) operable).setOmitParenthesis(true);
         String colored = colorMathSymbols(operable.toString());
-        System.out.println(lightRed("output:\t") + colored);
+        log(lightRed("output:\t") + colored);
         return operable;
     }
 
@@ -133,7 +133,7 @@ public class Expression extends Function {
 
 
     private static Operable generateOperations(String segment, ArrayList<Operable> operables) {
-        System.out.println(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
+        log(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
         int operableHashId = 0;
         ArrayList<Operable> pendingOperations = new ArrayList<>();
         while (segment.indexOf('<') != -1) {
@@ -152,7 +152,7 @@ public class Expression extends Function {
             }
             pendingOperations.add(new UnaryOperation(innerOperable, unaryOperation));
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
-            System.out.println(lightBlue("unary:\t") + colorMathSymbols(segment));
+            log(lightBlue("unary:\t") + colorMathSymbols(segment));
             segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
             operableHashId++;
         }
@@ -167,7 +167,7 @@ public class Expression extends Function {
                     pendingOperations.add(operation);
                     String left = indices[0] == 0 ? "" : segment.substring(0, indices[0]);
                     segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
-                    System.out.println("->\t\t" + colorMathSymbols(segment));
+                    log("->\t\t" + colorMathSymbols(segment));
                     i = 0;
                     operableHashId++;
                 }
@@ -234,7 +234,7 @@ public class Expression extends Function {
                 break;
             }
         }
-        //System.out.println("single statement indices: " + lastOccurrence + " " + firstOccurrence);// debug completed May 16th
+        //log("single statement indices: " + lastOccurrence + " " + firstOccurrence);// debug completed May 16th
         return new int[]{lastOccurrence, firstOccurrence};
     }
 
@@ -340,6 +340,10 @@ public class Expression extends Function {
             }
         }
         return exp;
+    }
+
+    private static void log(Object o) {
+        if (Mode.DEBUG) System.out.println(o);
     }
 
     public Operable getOperable() {

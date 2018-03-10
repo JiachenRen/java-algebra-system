@@ -218,7 +218,7 @@ public class UnaryOperation extends Operation implements LeafNode {
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);
-            System.out.println("# reserved unary operations declared");
+            if (Mode.DEBUG) System.out.println("# reserved unary operations declared");
         }
 
         RegisteredUnaryOperation(String name) {
