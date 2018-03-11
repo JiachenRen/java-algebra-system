@@ -20,8 +20,16 @@ import static jmc.utils.ColorFormatter.*;
 public class AutoTest {
     public static void main(String args[]) {
         configureCAS();
+        l(boldBlack("\n---------> Binary Operations Test <---------\n"));
+        test("/tests/files/bin_ops.txt");
+        l(boldBlack("\n---------> Unary Operations Test <---------\n"));
+        test("/tests/files/u_ops.txt");
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/irr_num.txt");
+    }
 
-        String raw = Utils.read("/tests/files/bin_ops.txt");
+    private static void test(String fileName) {
+        String raw = Utils.read(fileName);
         ArrayList<String> lines = new ArrayList<>();
         assert raw != null;
 
@@ -58,20 +66,20 @@ public class AutoTest {
             }
             Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
             String diff = passOrPrint(o1.val() - o2.val());
-            l(ensureLength("", maxLength) + yellow("RAW DIFF: ") + diff);
+            l(ensureLength("", maxLength) + lightPurple("RAW DIFF: ") + diff);
             String diff0 = passOrPrint(o1.eval(0) - o2.eval(0));
-            l(ensureLength("", maxLength) + yellow("DIFF(x=0): ") + diff0);
+            l(ensureLength("", maxLength) + purple("DIFF(x=0): ") + diff0);
             String diff1 = passOrPrint(o1.eval(1) - o2.eval(1));
-            l(ensureLength("", maxLength) + yellow("DIFF(x=1): ") + diff1);
+            l(ensureLength("", maxLength) + purple("DIFF(x=1): ") + diff1);
             lines.set(i, line + "-> " + now + "\n");
         }
 
         Optional<String> content = lines.stream().reduce((a, b) -> a + b);
-        content.ifPresent(c -> Utils.write("/tests/files/bin_ops.txt", c));
+        content.ifPresent(c -> Utils.write(fileName, c));
     }
 
     private static String passOrPrint(double d) {
-        if (Double.isNaN(d)) return boldBlack("NO RESULT");
+        if (Double.isNaN(d)) return boldBlack("NaN");
         else if (d == 0 || d < 1E-15) return lightGreen("PASSED");
         else return lightRed(Double.toString(d));
     }
