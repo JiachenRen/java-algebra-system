@@ -66,9 +66,11 @@ public class AutoTest {
             }
             Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
             if (Operable.numVars(o1) > 0) {
-                for (int k = 0; k <= 3; k++) {
-                    String diffx = passOrPrint(o1.eval(k) - o2.eval(k));
-                    l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + k + "): ") + diffx);
+                for (int k = 0; k <= 10; k++) {
+                    double diffx = o1.eval(k) - o2.eval(k);
+                    if (diffx != 0) {
+                        l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + k + "): ") + passOrPrint(diffx));
+                    }
                 }
             } else {
                 String diff = passOrPrint(o1.val() - o2.val());
@@ -84,7 +86,7 @@ public class AutoTest {
 
     private static String passOrPrint(double d) {
         if (Double.isNaN(d)) return boldBlack("NaN");
-        else if (d == 0 || d < 1E-10) return lightGreen(Double.toString(d));
+        else if (d == 0 || Math.abs(d) < 1E-10) return lightGreen(Double.toString(d));
         else return lightRed(Double.toString(d));
     }
 

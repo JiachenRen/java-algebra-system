@@ -113,21 +113,21 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
         if (getLeftHand() instanceof UnaryOperation) {
             UnaryOperation op = (UnaryOperation) getLeftHand();
-            switch (this.operation.getName()) {
-                case "acos":
+            switch (this.operation.getName()) { // TODO: domain!!!
+                case "cos":
                     switch (op.operation.getName()) {
-                        case "cos":
+                        case "acos":
                             return op.getLeftHand();
                     }
                     break;
-                case "asin":
+                case "sin":
                     switch (op.operation.getName()) {
-                        case "sin":
+                        case "asin":
                             return op.getLeftHand();
                     }
-                case "atan":
+                case "tan":
                     switch (op.operation.getName()) {
-                        case "tan":
+                        case "atan":
                             return op.getLeftHand(); // what about tan(pi/2)?
                     }
             }
