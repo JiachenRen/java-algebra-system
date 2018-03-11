@@ -88,14 +88,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return this;
     }
 
-    /**
-     * @param operable the Operable instance to be negated. IT IS NOT MODIFIED.
-     * @return a new Operable instance that represents the negated version of the original
-     */
-    public static Operable negate(Operable operable) {
-        return new BinaryOperation(new RawValue(-1), "*", operable);
-    }
-
 
     public String toString() {
         return operation.getName() + "(" + getLeftHand().toString() + ")";

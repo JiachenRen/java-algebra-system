@@ -28,4 +28,8 @@ abstract class LeafNode implements BinLeafNode, Operable {
     public Operable replace(Operable o, Operable r) {
         return this.equals(o) ? r : this;
     }
+
+    public Operable negate() {
+        return Operation.mult(RawValue.ONE.negate(), this.clone());
+    }
 }
