@@ -37,7 +37,9 @@ public class BinaryOperation extends Operation {
             if (op.getPriority() < this.getPriority()) {
                 op.setOmitParenthesis(true);
             } else if (op.getPriority() == this.getPriority()) {
-                op.setOmitParenthesis(op.operation.equals(operation) || !isRightHand);
+                if (op.operation.equals(operation) && op.operation.equals("^"))
+                    op.setOmitParenthesis(false);
+                else op.setOmitParenthesis(op.operation.equals(operation) || !isRightHand);
             } else {
                 op.setOmitParenthesis(false);
             }
@@ -206,6 +208,14 @@ public class BinaryOperation extends Operation {
                 return r1.val() == 0 ? RawValue.UNDEF : new RawValue(1);
             } else if (r2.val() < 0) { // x^-b = (1/x)^b
                 return new BinaryOperation(r1.inverse(), "^", r2.negate()).simplify();
+            } else if (r2 instanceof Fraction) {
+                double v2 = r2.val();
+                if (v2 > 1) {
+                    int t = (int) r2.val();
+                    Operation o1 = Operation.exp(r1, new RawValue(t));
+                    Operation o2 = Operation.exp(r1, Operation.sub(r2, new RawValue(t)));
+                    return Operation.mult(o1, o2).simplify();
+                }
             }
         }
 
@@ -403,7 +413,7 @@ public class BinaryOperation extends Operation {
 
     /**
      * HELPER METHOD
-     * handles a*a^b = a^(b+1)
+     * handles a*a^b = a^(b+1) when a is not a number
      *
      * @param op       generic Operation
      * @param expBinOp BinaryOperation with operation == "^"
@@ -412,8 +422,10 @@ public class BinaryOperation extends Operation {
     private Operable simplify(Operable op, BinaryOperation expBinOp) {
         if (!operation.name.equals("*")) return null;
         if (op.equals(expBinOp.getLeftHand()) && expBinOp.operation.equals("^")) {
-            BinaryOperation exp = new BinaryOperation(expBinOp.getRightHand(), "+", RawValue.ONE);
-            return new BinaryOperation(op, "^", exp).simplify();
+            if (!(op instanceof RawValue)) { //only when a is a variable or expression, a*a^b = a^(b+1) applies
+                BinaryOperation exp = new BinaryOperation(expBinOp.getRightHand(), "+", RawValue.ONE);
+                return new BinaryOperation(op, "^", exp).simplify();
+            }
         }
         return null;
     }
