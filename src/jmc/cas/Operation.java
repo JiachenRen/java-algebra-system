@@ -61,6 +61,18 @@ public abstract class Operation implements Operable {
         return new BinaryOperation(o1.clone(), "*", o2.clone());
     }
 
+    public static Operation mult(Number a, Number b) {
+        return mult(new RawValue(a), new RawValue(b));
+    }
+
+    public static Operation mult(Operable a, Number b) {
+        return mult(a, new RawValue(b));
+    }
+
+    public static Operation mult(Number a, Operable b) {
+        return mult(new RawValue(a), b);
+    }
+
     public static Operation add(Operable o1, Operable o2) {
         return new BinaryOperation(o1.clone(), "+", o2.clone());
     }
@@ -75,5 +87,13 @@ public abstract class Operation implements Operable {
 
     public static Operation exp(Number a, Number b) {
         return exp(new RawValue(a), new RawValue(b));
+    }
+
+    public static Operation exp(Operable a, Number b) {
+        return exp(a, new RawValue(b));
+    }
+
+    public static Operation exp(Number a, Operable b) {
+        return exp(new RawValue(a), b);
     }
 }

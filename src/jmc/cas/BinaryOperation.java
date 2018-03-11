@@ -1,7 +1,10 @@
 package jmc.cas;
 
 
+import jmc.MathContext;
+
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -204,11 +207,32 @@ public class BinaryOperation extends Operation {
         } else if (operation.name.equals("^")) { //fractional mode
             if (r1 instanceof Fraction) {
                 return ((Fraction) r1).exp(r2);
-            } else if (r2.val() == 0) { // 0^0
+            } else if (r1.isInteger() && r2 instanceof Fraction) {
+                ArrayList<int[]> pairs = MathContext.toBaseExponentPairs(r1.intValue());
+                Optional<Operation> reduced = pairs.stream()
+                        .filter(p -> p[1] > 1)
+                        .map(p -> Operation.exp(p[0], Operation.mult(p[1], r2)))
+                        .reduce(Operation::mult);
+                if (reduced.isPresent()) {
+                    Optional<Integer> retained = pairs.stream()
+                            .filter(p -> p[1] == 1)
+                            .map(p -> p[0])
+                            .reduce((a, b) -> a * b);
+                    if (retained.isPresent()) {
+                        return Operation.mult(Operation.exp(retained.get(), r2), reduced.get()).simplify();
+                    } else {
+                        return reduced.get().simplify();
+                    }
+                }
+            }
+
+            if (r2.val() == 0) { // 0^0
                 return r1.val() == 0 ? RawValue.UNDEF : new RawValue(1);
             } else if (r2.val() < 0) { // x^-b = (1/x)^b
                 return new BinaryOperation(r1.inverse(), "^", r2.negate()).simplify();
-            } else if (r2 instanceof Fraction) {
+            }
+
+            if (r2 instanceof Fraction) {
                 double v2 = r2.val();
                 if (v2 > 1) {
                     int t = (int) r2.val();
