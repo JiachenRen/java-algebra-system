@@ -61,8 +61,6 @@ public class JGrapher extends PApplet {
             while ((temp = input.readLine()) != null) response += temp;
             if (response.contains("(blocks, -c) 0")) {
                 System.err.println("# Fatal Error: Core Dump Failed --> Resurrecting... Failed");
-                //enableCoreDump();
-                //exit();
             } else System.out.println("# Core Dump Successfully Enabled");
         } catch (IOException e) {
             e.printStackTrace();
