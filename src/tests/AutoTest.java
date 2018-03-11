@@ -65,12 +65,16 @@ public class AutoTest {
                         + lightCyan(now));
             }
             Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
-            String diff = passOrPrint(o1.val() - o2.val());
-            l(ensureLength("", maxLength) + lightPurple("RAW DIFF: ") + diff);
-            String diff0 = passOrPrint(o1.eval(0) - o2.eval(0));
-            l(ensureLength("", maxLength) + purple("DIFF(x=0): ") + diff0);
-            String diff1 = passOrPrint(o1.eval(1) - o2.eval(1));
-            l(ensureLength("", maxLength) + purple("DIFF(x=1): ") + diff1);
+            if (Operable.numVars(o1) > 0) {
+                for (int k = 0; k <= 3; k++) {
+                    String diffx = passOrPrint(o1.eval(k) - o2.eval(k));
+                    l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + k + "): ") + diffx);
+                }
+            } else {
+                String diff = passOrPrint(o1.val() - o2.val());
+                l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + diff);
+            }
+
             lines.set(i, line + "-> " + now + "\n");
         }
 
@@ -80,7 +84,7 @@ public class AutoTest {
 
     private static String passOrPrint(double d) {
         if (Double.isNaN(d)) return boldBlack("NaN");
-        else if (d == 0 || d < 1E-15) return lightGreen("PASSED");
+        else if (d == 0 || d < 1E-10) return lightGreen(Double.toString(d));
         else return lightRed(Double.toString(d));
     }
 
