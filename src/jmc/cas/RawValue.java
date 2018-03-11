@@ -56,7 +56,7 @@ public class RawValue extends LeafNode {
         return this;
     }
 
-    public RawValue clone() {
+    public RawValue copy() {
         return new RawValue(number);
     }
 
@@ -126,6 +126,6 @@ public class RawValue extends LeafNode {
 
     public Operable explicitNegativeForm() {
         if (this.equals(RawValue.ONE.negate())) return this;
-        return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.clone().negate()) : this.clone();
+        return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate()) : this.copy();
     }
 }

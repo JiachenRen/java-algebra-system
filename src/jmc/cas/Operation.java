@@ -38,7 +38,7 @@ public abstract class Operation implements Operable {
     }
 
     public Operation negate() {
-        return Operation.mult(RawValue.ONE.negate(), this.clone());
+        return Operation.mult(RawValue.ONE.negate(), this.copy());
     }
 
     /**
@@ -49,16 +49,16 @@ public abstract class Operation implements Operable {
         return new BinaryOperation(new RawValue(-1), "*", operable);
     }
 
-    public abstract Operation clone();
+    public abstract Operation copy();
 
     public abstract Operable toAdditionOnly();
 
     public static Operation div(Operable o1, Operable o2) {
-        return new BinaryOperation(o1.clone(), "/", o2.clone());
+        return new BinaryOperation(o1.copy(), "/", o2.copy());
     }
 
     public static Operation mult(Operable o1, Operable o2) {
-        return new BinaryOperation(o1.clone(), "*", o2.clone());
+        return new BinaryOperation(o1.copy(), "*", o2.copy());
     }
 
     public static Operation mult(Number a, Number b) {
@@ -74,15 +74,15 @@ public abstract class Operation implements Operable {
     }
 
     public static Operation add(Operable o1, Operable o2) {
-        return new BinaryOperation(o1.clone(), "+", o2.clone());
+        return new BinaryOperation(o1.copy(), "+", o2.copy());
     }
 
     public static Operation sub(Operable o1, Operable o2) {
-        return new BinaryOperation(o1.clone(), "-", o2.clone());
+        return new BinaryOperation(o1.copy(), "-", o2.copy());
     }
 
     public static Operation exp(Operable o1, Operable o2) {
-        return new BinaryOperation(o1.clone(), "^", o2.clone());
+        return new BinaryOperation(o1.copy(), "^", o2.copy());
     }
 
     public static Operation exp(Number a, Number b) {

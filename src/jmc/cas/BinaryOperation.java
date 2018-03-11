@@ -179,8 +179,8 @@ public class BinaryOperation extends Operation {
      */
     private Operable simplify(RawValue r1, RawValue r2) {
         if (getLeftHand() instanceof Fraction && 是加减乘除()) {
-            Fraction f = (Fraction) getLeftHand().clone();
-            RawValue r = (RawValue) rightHand.clone();
+            Fraction f = (Fraction) getLeftHand().copy();
+            RawValue r = (RawValue) rightHand.copy();
             switch (operation.name) {
                 case "+":
                     return f.add(r);
@@ -192,8 +192,8 @@ public class BinaryOperation extends Operation {
                     return f.div(r);
             }
         } else if (rightHand instanceof Fraction && 是加减乘除()) {
-            Fraction f = (Fraction) rightHand.clone();
-            RawValue r = (RawValue) getLeftHand().clone();
+            Fraction f = (Fraction) rightHand.copy();
+            RawValue r = (RawValue) getLeftHand().copy();
             switch (operation.name) {
                 case "+":
                     return f.add(r);
@@ -610,7 +610,7 @@ public class BinaryOperation extends Operation {
         ArrayList<Operable> pool = new ArrayList<>();
         if (operation.priority == 1 || !operation.isStandard())
             return pool; //if the operation is ^, then no commutative property applies.
-        BinaryOperation clone = this.clone().toAdditionOnly().toExponentialForm();
+        BinaryOperation clone = this.copy().toAdditionOnly().toExponentialForm();
         clone.flat(pool, clone.getLeftHand());
         clone.flat(pool, clone.getRightHand());
         return pool;
@@ -642,8 +642,8 @@ public class BinaryOperation extends Operation {
     }
 
     @Override
-    public BinaryOperation clone() {
-        return new BinaryOperation(getLeftHand().clone(), operation, rightHand.clone());
+    public BinaryOperation copy() {
+        return new BinaryOperation(getLeftHand().copy(), operation, rightHand.copy());
     }
 
     public boolean equals(Operable other) {
@@ -819,7 +819,7 @@ public class BinaryOperation extends Operation {
     }
 
     public Operable explicitNegativeForm() {
-        BinaryOperation clone = this.clone();
+        BinaryOperation clone = this.copy();
         clone.setLeftHand(getLeftHand().explicitNegativeForm());
         clone.setRightHand(getRightHand().explicitNegativeForm());
         return clone;
@@ -870,7 +870,7 @@ public class BinaryOperation extends Operation {
 
     public Operable replace(Operable o, Operable r) {
         if (this.equals(o)) return r;
-        BinaryOperation clone = this.clone();
+        BinaryOperation clone = this.copy();
         clone.setLeftHand(clone.getLeftHand().replace(o, r));
         clone.setRightHand(clone.getRightHand().replace(o, r));
         return clone;

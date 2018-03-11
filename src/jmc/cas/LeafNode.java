@@ -9,7 +9,7 @@ abstract class LeafNode implements BinLeafNode, Operable {
 
     public abstract boolean isUndefined();
 
-    public abstract Operable clone();
+    public abstract Operable copy();
 
     public abstract Operable explicitNegativeForm();
 
@@ -30,6 +30,6 @@ abstract class LeafNode implements BinLeafNode, Operable {
     }
 
     public Operable negate() {
-        return Operation.mult(RawValue.ONE.negate(), this.clone());
+        return Operation.mult(RawValue.ONE.negate(), this.copy());
     }
 }

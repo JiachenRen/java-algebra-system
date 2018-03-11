@@ -49,13 +49,13 @@ public class CasComprehensiveTest {
 
         Fraction f7 = new Fraction(11, 7);
         Fraction f8 = new Fraction(6, 14);
-        l(f7 + " + " + f8 + " = " + f7.clone().add(f8));
-        l(f8 + " - " + f7 + " = " + f8.clone().sub(f7));
-        l(raw1 + " + " + f7 + " = " + f7.clone().add(raw1));
-        l(f7 + " x " + f8 + " = " + f7.clone().mult(f8));
-        l(f8 + " x " + raw1 + " = " + f8.clone().mult(raw1));
-        l(f8 + " / " + raw1 + " = " + f8.clone().div(raw1));
-        l(f8 + " / " + f7 + " = " + f8.clone().div(f7));
+        l(f7 + " + " + f8 + " = " + f7.copy().add(f8));
+        l(f8 + " - " + f7 + " = " + f8.copy().sub(f7));
+        l(raw1 + " + " + f7 + " = " + f7.copy().add(raw1));
+        l(f7 + " x " + f8 + " = " + f7.copy().mult(f8));
+        l(f8 + " x " + raw1 + " = " + f8.copy().mult(raw1));
+        l(f8 + " / " + raw1 + " = " + f8.copy().div(raw1));
+        l(f8 + " / " + f7 + " = " + f8.copy().div(f7));
 
         Operation op1 = (Operation) Expression.interpret("(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3");
         l(((BinaryOperation) op1).flattened());
@@ -79,14 +79,14 @@ public class CasComprehensiveTest {
         operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(op -> {
             l(boldBlack("original: ") + Expression.colorMathSymbols(op.toString()));
-            l(boldBlack("plug in 5 for x: ") + op.clone().plugIn(new Variable("x"), new RawValue(5)));
-            l(boldBlack("evaluated at 5: ") + op.clone().plugIn(new Variable("x"), new RawValue(5)).val());
+            l(boldBlack("plug in 5 for x: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)));
+            l(boldBlack("evaluated at 5: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)).val());
             l(lightCyan("arbitrary value: ") + op.val());
             l(boldBlack("# vars: ") + Operable.numVars(op));
             l(lightRed("undefined: ") + op.isUndefined());
             l(lightBlue("level of x: ") + op.levelOf(new Variable("x")));
             if (op instanceof Operation) {
-                l(lightGreen("simplified: ") + Expression.colorMathSymbols(op.clone().simplify().toString()));
+                l(lightGreen("simplified: ") + Expression.colorMathSymbols(op.copy().simplify().toString()));
             }
             l("");
         });

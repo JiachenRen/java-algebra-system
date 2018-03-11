@@ -67,8 +67,8 @@ public class CasSimplificationTest {
         operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(operable -> l(operable
                 + boldBlack("\t->\t")
-                + lightGreen(operable.clone().simplify().toString())
+                + lightGreen(operable.copy().simplify().toString())
                 + boldBlack("\t->\t")
-                + operable.clone().simplify().beautify()));
+                + operable.copy().simplify().beautify()));
     }
 }

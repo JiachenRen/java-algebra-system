@@ -4,8 +4,6 @@ import jmc.MathContext;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static jmc.MathContext.getFactors;
 import static jmc.MathContext.getUniqueFactors;
@@ -50,7 +48,7 @@ public class Fraction extends RawValue {
         if (!(o instanceof Fraction)) {
             if (o.isInteger()) o = new Fraction(o.intValue(), 1);
             else o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
-        } else o = o.clone();
+        } else o = o.copy();
         Fraction f = (Fraction) o;
 
         long lcm = lcm(denominator, f.denominator);
@@ -141,7 +139,7 @@ public class Fraction extends RawValue {
     }
 
     public RawValue sub(RawValue o) {
-        return this.add(o.clone().negate());
+        return this.add(o.copy().negate());
     }
 
     public RawValue mult(RawValue o) {
@@ -178,7 +176,7 @@ public class Fraction extends RawValue {
     }
 
     public Fraction negate() {
-        Fraction clone = this.clone();
+        Fraction clone = this.copy();
         clone.numerator *= -1;
         clone.reduce();
         return clone;
@@ -263,7 +261,7 @@ public class Fraction extends RawValue {
         return this;
     }
 
-    public Fraction clone() {
+    public Fraction copy() {
         return new Fraction(numerator, denominator);
     }
 
@@ -294,7 +292,7 @@ public class Fraction extends RawValue {
 
     public Operable explicitNegativeForm() {
         if (doubleValue() > 0) return this;
-        else return new BinaryOperation(RawValue.ONE.negate(), "*", this.clone().negate());
+        else return new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate());
     }
 
     public long getNumerator() {

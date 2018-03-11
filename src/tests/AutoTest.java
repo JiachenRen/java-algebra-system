@@ -56,7 +56,7 @@ public class AutoTest {
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i), prev = simplifiedStrs.get(i).replace(" ", "");
-            String now = ops.get(i).clone().simplify().toString();
+            String now = ops.get(i).copy().simplify().toString();
             if (prev.equals(now)) {
                 l(line + lightGreen("PASSED") + boldBlack(" = ") + lightBlue(prev + " "));
             } else {
@@ -67,14 +67,17 @@ public class AutoTest {
             Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
             if (Operable.numVars(o1) > 0) {
                 for (int k = 0; k <= 10; k++) {
+                    int t = (int) Math.pow(k, 2);
                     double diffx = o1.eval(k) - o2.eval(k);
                     if (diffx != 0) {
-                        l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + k + "): ") + passOrPrint(diffx));
+                        l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + t + "): ") + passOrPrint(diffx));
                     }
                 }
             } else {
-                String diff = passOrPrint(o1.val() - o2.val());
-                l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + diff);
+                double v = o1.val() - o2.val();
+                if (v != 0.0) {
+                    l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + passOrPrint(v));
+                }
             }
 
             lines.set(i, line + "-> " + now + "\n");

@@ -36,6 +36,10 @@ public class FractionTest {
 
         Fraction f1 = new Fraction(3, 4);
         Fraction f2 = new Fraction(4, 3);
+        f1.setNumerator(100).setDenominator(3);
+        l(f1.getNumerator(), f1.getDenominator());
+
+
         Operable o = f1.exp(f2);
         l(o);
 
@@ -43,11 +47,12 @@ public class FractionTest {
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
         operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
-        operables.forEach(operable -> l(operable + " -> " + operable.clone().simplify() + ", "
+        operables.forEach(operable -> l(operable + " -> " + operable.copy().simplify() + ", "
                 + boldBlack("status: ")
-                + ((operable.val() - operable.clone().simplify().val()) < 1E-10 ? lightGreen("PASSED") : lightRed("FAILED"))));
+                + ((operable.val() - operable.copy().simplify().val()) < 1E-10 ? lightGreen("PASSED") : lightRed("FAILED"))));
 
 //        l(Fraction.extractRoot(-2,3));
+        l(((Fraction) Expression.interpret("3/4").simplify()).exp(-3));
     }
 
 }

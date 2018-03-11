@@ -3,6 +3,7 @@ package tests;
 import jmc.cas.Expression;
 import jmc.cas.Operable;
 import jmc.cas.RawValue;
+import jmc.cas.UnaryOperation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,13 +57,19 @@ public class UnaryOperationTest {
         operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
         operables.forEach(operable -> l(operable
                 + boldBlack("\t->\t")
-                + lightGreen(operable.clone().simplify().toString())
+                + lightGreen(operable.copy().simplify().toString())
                 + boldBlack("\t->\t")
-                + operable.clone().simplify().beautify()));
+                + operable.copy().simplify().beautify()));
 
-        System.out.println(Math.cos(Math.PI / 2)); // this is why we need CAS!
-        System.out.println(RawValue.isInteger(3.0));
+        l(Math.cos(Math.PI / 2)); // this is why we need CAS!
+        l(RawValue.isInteger(3.0));
+
         l(Expression.interpret("ln(x)").isUndefined());
+
+        UnaryOperation.registeredOperations().forEach(o -> l(o.getName()));
+
+        UnaryOperation.define("$", "x*1000");
+        l(Expression.interpret("$(x)").eval(3));
     }
 
 

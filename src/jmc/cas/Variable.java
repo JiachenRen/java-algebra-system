@@ -37,7 +37,7 @@ public class Variable extends LeafNode {
      *
      * @return new Variable instance that is identical to self.
      */
-    public Variable clone() {
+    public Variable copy() {
         return new Variable(name);
     }
 
@@ -69,7 +69,7 @@ public class Variable extends LeafNode {
     }
 
     public Operable explicitNegativeForm() {
-        return this.clone();
+        return this.copy();
     }
 
 }

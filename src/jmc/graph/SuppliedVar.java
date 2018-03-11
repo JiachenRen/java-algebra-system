@@ -31,8 +31,8 @@ public class SuppliedVar extends Variable {
     }
 
     @Override
-    public SuppliedVar clone() {
-        super.clone();
+    public SuppliedVar copy() {
+        super.copy();
         return new SuppliedVar(this.getName()).setVal(this.val);
     }
 

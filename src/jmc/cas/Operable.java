@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public interface Operable extends Evaluable {
     String toString();
 
-    Operable clone();
+    Operable copy();
 
     boolean equals(Operable other);
 
@@ -120,14 +120,14 @@ public interface Operable extends Evaluable {
         ArrayList<Operable> terms = new ArrayList<>();
         if (o1 instanceof BinLeafNode && o2 instanceof BinLeafNode) {
             if (o1.equals(o2)) {
-                terms.add(o1.clone());
+                terms.add(o1.copy());
             }
         } else if (((o1 instanceof BinaryOperation) && (o2 instanceof BinLeafNode)) || ((o1 instanceof BinLeafNode) && (o2 instanceof BinaryOperation))) {
             BinaryOperation binOp = (BinaryOperation) (o1 instanceof BinaryOperation ? o1 : o2);
             Operable op = o1 instanceof BinaryOperation ? o2 : o1;
             ArrayList<Operable> pool = binOp.flattened();
             if (Operable.contains(pool, op))
-                terms.add(op.clone());
+                terms.add(op.copy());
         } else if (o1 instanceof BinaryOperation && o2 instanceof BinaryOperation) {
             BinaryOperation binOp1 = (BinaryOperation) o1;
             BinaryOperation binOp2 = (BinaryOperation) o2;
@@ -140,7 +140,7 @@ public interface Operable extends Evaluable {
                     if (op1.equals(op2)) {
                         pool1.remove(i);
                         pool2.remove(k);
-                        terms.add(op1.clone());
+                        terms.add(op1.copy());
                         break;
                     }
                 }

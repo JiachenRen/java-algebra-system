@@ -183,7 +183,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     @Override
-    public UnaryOperation clone() {
+    public UnaryOperation copy() {
         return new UnaryOperation(getLeftHand(), operation);
     }
 
@@ -341,12 +341,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     public Operable explicitNegativeForm() {
-        return clone().setLeftHand(getLeftHand().explicitNegativeForm());
+        return copy().setLeftHand(getLeftHand().explicitNegativeForm());
     }
 
     public Operable replace(Operable o, Operable r) {
         if (this.equals(o)) return r;
-        UnaryOperation clone = this.clone();
+        UnaryOperation clone = this.copy();
         return clone.setLeftHand(clone.getLeftHand().replace(o, r));
     }
 

@@ -91,7 +91,7 @@ public class Constants {
         }
 
         @Override
-        public Constant clone() {
+        public Constant copy() {
             return new Constant(getName(), computedConst);
         }
 
