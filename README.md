@@ -94,6 +94,10 @@ a*a^b        |   -> | a^(b+1)    |   |      x-x        |   -> | 0          |   |
 x*x^2        |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |      x/1        |   -> | x          
 0^x          |   -> | 0          |   |      1^x        |   -> | 1          |   |      x^1        |   -> | x          
 
+> Unary Operations
+Original Exp |   -> | Simplified |   |  Original Exp   |   -> | Simplified |   |  Original Exp   |   -> | Simplified 
+:-----------:| ---- |:----------:| - |:---------------:| ---- |:----------:| - |:---------------:| ---- |:----------:
+ln(#^n)      |   -> | n*ln(#)    |   |     log(#^n)    |   -> | n*log(#)   |   |      ln(e^n)    |   -> | n
 
 
 ### Extensibility
