@@ -36,7 +36,7 @@ public class FractionTest {
 
         Fraction f1 = new Fraction(3, 4);
         Fraction f2 = new Fraction(4, 3);
-        f1.setNumerator(100).setDenominator(3);
+        f1.setNumerator(100).setDenominator(3).setDenominator(5).setNumerator(7);
         l(f1.getNumerator(), f1.getDenominator());
 
 

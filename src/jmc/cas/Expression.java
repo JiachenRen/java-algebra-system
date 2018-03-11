@@ -118,18 +118,10 @@ public class Expression extends Function {
      * @return the indices of the innermost opening parenthesis and the closing parenthesis
      * @since May 16th
      */
-    public static int[] extractInnerParenthesis(String exp, char open, char close) {
+    private static int[] extractInnerParenthesis(String exp, char open, char close) {
         int closeIndex = exp.indexOf(close);
         int openIndex = exp.substring(0, closeIndex).lastIndexOf(open);
         return new int[]{openIndex, closeIndex};
-    }
-
-    private static ArrayList<Operable> clone(ArrayList<Operable> operables) {
-        ArrayList<Operable> cloned = new ArrayList<>();
-        for (Operable operable : operables) {
-            cloned.add(operable);
-        }
-        return cloned;
     }
 
 
@@ -140,7 +132,7 @@ public class Expression extends Function {
         while (segment.indexOf('<') != -1) {
             int indices[] = extractInnerParenthesis(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
-            Operable innerOperable = generateOperations(extracted, operables); //TODO DEBUG
+            Operable innerOperable = generateOperations(extracted, operables); //TODO: DEBUG
             String unaryOperation = segment.substring(0, indices[0]);
             int startIndex = 0;
             for (int i = indices[0] - 1; i >= 0; i--) {
@@ -211,7 +203,7 @@ public class Expression extends Function {
 
 
     /**
-     * TODO DEBUG
+     * TODO: DEBUG
      *
      * @param segment the segment of expression
      * @param index   index of the binary operation
@@ -319,7 +311,7 @@ public class Expression extends Function {
      * @return the matching index in which the closure correspond to init terminates.
      * @since May 19th most efficient method I've ever wrote.
      */
-    public static int findMatchingIndex(String exp, int init, char lookingFor) {
+    private static int findMatchingIndex(String exp, int init, char lookingFor) {
         char start = exp.charAt(init);
         for (int i = init + 1; i < exp.length(); i++) {
             char cur = exp.charAt(i);

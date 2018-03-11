@@ -1,7 +1,5 @@
 package jmc.cas;
 
-import jmc.utils.ColorFormatter;
-
 import java.util.ArrayList;
 
 /**
@@ -119,6 +117,6 @@ public class Constants {
             if (constant.getName().equals(name))
                 return constant;
         }
-        return null;
+        throw new JMCException("constant + \""+name+"\" does not exist");
     }
 }

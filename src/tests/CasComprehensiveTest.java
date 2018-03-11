@@ -122,6 +122,8 @@ public class CasComprehensiveTest {
         l(Constants.E.equals(Constants.E), Constants.π.equals(Constants.PI));
         l(RawValue.INFINITY.doubleValue());
         l(RawValue.UNDEF.isInteger(), RawValue.INFINITY.negate().isInteger());
+        l(Constants.getConstant("e").val());
+        l(Constants.valueOf(Constants.E.getName()));
     }
 
 }
