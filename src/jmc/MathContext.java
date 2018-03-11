@@ -1,5 +1,8 @@
 package jmc;
 
+import jmc.cas.JMCException;
+import tests.TestPrint;
+
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -165,6 +168,20 @@ public class MathContext {
         final long[] out = {1};
         longs.forEach(l -> out[0] *= l);
         return out[0];
+    }
+
+    public static ArrayList<int[]> toBaseExponentPairs(long n) {
+        ArrayList<int[]> pairs = new ArrayList<>();
+        if (n < 0) throw new JMCException("input must be positive");
+        else if (n == 0 || n == 1) return pairs;
+        ArrayList<Long> factors = getFactors(n);
+        ArrayList<Long> uFactors = getUniqueFactors(factors);
+        int[] num = numOccurrences(uFactors, factors);
+        for (int i = 0; i < uFactors.size(); i++) {
+            Long factor = uFactors.get(i);
+            pairs.add(new int[]{factor.intValue(), num[i]});
+        }
+        return pairs;
     }
 
 }

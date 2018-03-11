@@ -72,4 +72,8 @@ public abstract class Operation implements Operable {
     public static Operation exp(Operable o1, Operable o2) {
         return new BinaryOperation(o1.clone(), "^", o2.clone());
     }
+
+    public static Operation exp(Number a, Number b) {
+        return exp(new RawValue(a), new RawValue(b));
+    }
 }
