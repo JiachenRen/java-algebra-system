@@ -111,11 +111,11 @@ public interface Operable extends Evaluable {
      */
     static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
         ArrayList<Operable> terms = new ArrayList<>();
-        if (o1 instanceof LeafNode && o2 instanceof LeafNode) {
+        if (o1 instanceof BinLeafNode && o2 instanceof BinLeafNode) {
             if (o1.equals(o2)) {
                 terms.add(o1.clone());
             }
-        } else if (((o1 instanceof BinaryOperation) && (o2 instanceof LeafNode)) || ((o1 instanceof LeafNode) && (o2 instanceof BinaryOperation))) {
+        } else if (((o1 instanceof BinaryOperation) && (o2 instanceof BinLeafNode)) || ((o1 instanceof BinLeafNode) && (o2 instanceof BinaryOperation))) {
             BinaryOperation binOp = (BinaryOperation) (o1 instanceof BinaryOperation ? o1 : o2);
             Operable op = o1 instanceof BinaryOperation ? o2 : o1;
             ArrayList<Operable> pool = binOp.flattened();

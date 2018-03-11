@@ -7,7 +7,7 @@ import jmc.graph.Graph;
  * Wrapper class for a number
  * This class should NEVER modify a instance after it is created. Be sure to make new ones for every single operation.
  */
-public class RawValue implements Operable, LeafNode {
+public class RawValue extends LeafNode {
     public static RawValue UNDEF = new RawValue(Double.NaN);
     public static RawValue ONE = new RawValue(1);
     public static RawValue ZERO = new RawValue(0);
@@ -123,24 +123,8 @@ public class RawValue implements Operable, LeafNode {
         return this;
     }
 
-    public int numNodes() {
-        return 1;
-    }
-
-    public int levelOf(Operable o) {
-        return this.equals(o) ? 0 : -1;
-    }
-
-    public Operable beautify() {
-        return this;
-    }
-
     public Operable explicitNegativeForm() {
         if (this.equals(RawValue.ONE.negate())) return this;
         return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.clone().negate()) : this.clone();
-    }
-
-    public Operable replace(Operable o, Operable r) {
-        return this.equals(o) ? r : this;
     }
 }

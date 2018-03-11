@@ -4,7 +4,7 @@ package jmc.cas;
  * Created by Jiachen on 16/05/2017.
  * Variable class
  */
-public class Variable implements Operable, LeafNode {
+public class Variable extends LeafNode {
     private String name;
 
     public Variable(String name) {
@@ -68,23 +68,8 @@ public class Variable implements Operable, LeafNode {
         return other;
     }
 
-    public int levelOf(Operable o) {
-        return this.equals(o) ? 0 : -1;
-    }
-
-    public int numNodes() {
-        return 1;
-    }
-
-    public Operable beautify() {
-        return this;
-    }
-
     public Operable explicitNegativeForm() {
         return this.clone();
     }
 
-    public Operable replace(Operable o, Operable r) {
-        return this.equals(o) ? r : this;
-    }
 }

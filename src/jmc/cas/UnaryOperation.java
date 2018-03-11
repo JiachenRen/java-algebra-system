@@ -13,7 +13,7 @@ import static jmc.MathContext.*;
  * code refactored May 20th, performance enhanced with static function lib and method reference.
  * breakthrough May 20th.
  */
-public class UnaryOperation extends Operation implements LeafNode {
+public class UnaryOperation extends Operation implements BinLeafNode {
 
     private Function operation;
 

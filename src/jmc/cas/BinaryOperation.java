@@ -483,14 +483,14 @@ public class BinaryOperation extends Operation {
         if (getPriority() == 1) return this.beautify(); //up to this point the ^ operator cannot be simplified.
 
         //up to this point all simplifications should have been tried, except the recursive cross-simplification
-        if (getLeftHand() instanceof LeafNode //e.g. ln(x) * x is not simplifiable
-                && rightHand instanceof LeafNode) {
+        if (getLeftHand() instanceof BinLeafNode //e.g. ln(x) * x is not simplifiable
+                && rightHand instanceof BinLeafNode) {
             return this; //no more could be done.
-        } else if (getLeftHand() instanceof LeafNode //e.g. x * (3.5x + 4) is not simplifiable
+        } else if (getLeftHand() instanceof BinLeafNode //e.g. x * (3.5x + 4) is not simplifiable
                 && rightHand instanceof BinaryOperation
                 && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
             return this;
-        } else if (getRightHand() instanceof LeafNode //e.g. (3.5x + 4) * x  is not simplifiable
+        } else if (getRightHand() instanceof BinLeafNode //e.g. (3.5x + 4) * x  is not simplifiable
                 && getLeftHand() instanceof BinaryOperation
                 && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()) {
             return this;
@@ -588,7 +588,7 @@ public class BinaryOperation extends Operation {
      * @param operable the binary tree to be flattened
      */
     private void flat(ArrayList<Operable> pool, Operable operable) {
-        if (operable instanceof LeafNode) {
+        if (operable instanceof BinLeafNode) {
             pool.add(operable);
         } else if (operable instanceof BinaryOperation) {
             BinaryOperation binOp = ((BinaryOperation) operable);
