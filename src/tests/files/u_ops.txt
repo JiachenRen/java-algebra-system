@@ -1,8 +1,8 @@
 tan(3*pi/2)        -> undef
 tan(3*pi/2*x)      -> tan(pi*(3/2)*x)
-atan(tan(x))       -> x
-asin(sin(x))       -> x
-acos(cos(2*ln(x))) -> 2*ln(x)
+atan(tan(x))       -> atan(tan(x))
+asin(sin(x))       -> asin(sin(x))
+acos(cos(2*ln(x))) -> acos(cos(2*ln(x)))
 atan(tan(5*pi/2))  -> undef
 tan(0-3*pi/2)      -> undef
 sec(0-3*pi/2)      -> undef
@@ -24,3 +24,9 @@ ln(e^(3*x))        -> (3*x)
 cos(pi)            -> -1
 sin(pi)            -> 0
 tan(pi)            -> 0
+100^log(5)         -> 25
+1000^log(5)        -> 125
+(e^3)^ln(3)        -> 27
+e^ln(5)            -> 5
+ln((2/3)^(3/2))    -> ln((2/9)*2^(1/2)*3^(1/2))
+ln(2^(3/2))        -> ln(2*2^(1/2))
