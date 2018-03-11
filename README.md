@@ -96,9 +96,10 @@ x*x^2        |   -> | x^3        |   |      a^b^c      |   -> | a^(b*c)    |   |
 
 > Unary Operations
 
-Original Exp |   -> | Simplified |   |  Original Exp   |   -> | Simplified |   |  Original Exp   |   -> | Simplified 
-:-----------:| ---- |:----------:| - |:---------------:| ---- |:----------:| - |:---------------:| ---- |:----------:
-ln(#^n)      |   -> | n*ln(#)    |   |     log(#^n)    |   -> | n*log(#)   |   |      ln(e^n)    |   -> | n
+Original Exp  |   -> | Simplified |   |  Original Exp   |   -> | Simplified |   |  Original Exp   |   -> | Simplified 
+:------------:| ---- |:----------:| - |:---------------:| ---- |:----------:| - |:---------------:| ---- |:----------:
+ln(#^n)       |   -> | n*ln(#)    |   |     log(#^n)    |   -> | n*log(#)   |   |      ln(e^n)    |   -> | n
+sec(pi/2+pi*n)|   -> | undef      |   |   cot(pi*n)     |   -> | undef      |   |    csc(pi*n)    |   -> | undef
 
 
 ### Extensibility
