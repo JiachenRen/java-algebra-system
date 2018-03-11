@@ -229,6 +229,7 @@ public class JGrapher extends PApplet {
             graph.setWindow(displayables.get(0).getFloatValue(), displayables.get(1).getFloatValue(), displayables.get(2).getFloatValue(), displayables.get(3).getFloatValue());
         };
 
+
         Label windowModelLabel = new Label();
         windowModelLabel.setContent("Max X")
                 .inheritOutlook(modelLabel)
