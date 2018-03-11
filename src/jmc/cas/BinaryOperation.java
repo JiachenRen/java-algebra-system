@@ -275,6 +275,29 @@ public class BinaryOperation extends Operation {
             RawValue r = (RawValue) o;
             Operable simplified = simplifyRightHand(r.intValue());
             if (simplified != null) return simplified;
+        } else if (o instanceof UnaryOperation) {
+            UnaryOperation uop = (UnaryOperation) o;
+            switch (operation.name) {
+                case "^":
+                    switch (uop.getName()) {
+                        case "log": // (10^n)^log(b) = b^n
+                            if (getLeftHand() instanceof RawValue) {
+                                RawValue r = (RawValue) getLeftHand();
+                                double n = new UnaryOperation(r, "log").val();
+                                if (r.isInteger() && RawValue.isInteger(n)) {
+                                    return Operation.exp(uop.getLeftHand(), new RawValue(n)).simplify();
+                                }
+                            }
+                        case "ln": // (e^a)^ln(b) = b^a
+                            Operable k = new UnaryOperation(getLeftHand(), "ln").simplify();
+                            if (k instanceof RawValue) {
+                                RawValue r1 = (RawValue) k;
+                                if (r1.isInteger()) {
+                                    return Operation.exp(uop.getLeftHand(), r1).simplify();
+                                }
+                            }
+                    }
+            }
         }
         if (getLeftHand() instanceof BinaryOperation) {
             BinaryOperation binOp = (BinaryOperation) getLeftHand();

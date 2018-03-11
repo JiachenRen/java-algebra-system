@@ -40,4 +40,24 @@ public abstract class Operation implements Operable {
     public abstract Operation clone();
 
     public abstract Operable toAdditionOnly();
+
+    public static Operation div(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "/", o2.clone());
+    }
+
+    public static Operation mult(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "*", o2.clone());
+    }
+
+    public static Operation add(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "+", o2.clone());
+    }
+
+    public static Operation sub(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "-", o2.clone());
+    }
+
+    public static Operation exp(Operable o1, Operable o2) {
+        return new BinaryOperation(o1.clone(), "^", o2.clone());
+    }
 }

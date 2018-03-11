@@ -170,7 +170,7 @@ public class UnaryOperation extends Operation implements LeafNode {
                             int[] num = numOccurrences(uniqueFactors, factors);
                             if (allTheSame(num)) {
                                 RawValue r1 = new RawValue(MathContext.mult(uniqueFactors));
-                                return Operable.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
+                                return Operation.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
                             }
                         }
                 }
@@ -317,14 +317,14 @@ public class UnaryOperation extends Operation implements LeafNode {
         switch (operation.getName()) {
             case "tan": // domain: x != pi/2 + n*pi
             case "sec":
-                o = Operable.div(this.getLeftHand(), Operable.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
+                o = Operation.div(this.getLeftHand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger()) {
                     return Math.abs(((RawValue) o).intValue() % 2) == 1;
                 }
                 break;
             case "cot": // domain: x != n*pi
             case "csc":
-                o = Operable.div(this.getLeftHand(), Constants.getConstant("pi")).simplify();
+                o = Operation.div(this.getLeftHand(), Constants.getConstant("pi")).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger())
                     return true;
 
@@ -338,6 +338,10 @@ public class UnaryOperation extends Operation implements LeafNode {
         int i = getLeftHand().levelOf(o);
         if (i == -1) return -1;
         return i + 1;
+    }
+
+    public String getName() {
+        return operation.getName();
     }
 
     public Operable beautify() {

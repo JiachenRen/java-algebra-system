@@ -2,6 +2,7 @@ package tests;
 
 import jmc.cas.Expression;
 import jmc.cas.Operable;
+import jmc.cas.Operation;
 import jmc.cas.Variable;
 
 import java.util.ArrayList;
@@ -46,9 +47,10 @@ public class OperableTest {
         l(Operable.commonTerms(Expression.interpret("x*2*b*a*b*x^2/x"), Expression.interpret("b*x^2*b*x*1")));
         l(Operable.commonTerms(Expression.interpret("x"), Expression.interpret("b*x^2*b*x*1")));
         l(Operable.commonTerms(Expression.interpret("x"), Expression.interpret("b")));
-        l(Operable.div(new Variable("x"), new Variable("p")));
-        l(Operable.add(new Variable("x"), new Variable("p")));
-        l(Operable.sub(new Variable("x"), new Variable("p")));
-        l(Operable.mult(new Variable("x"), new Variable("p")));
+        l(Operation.div(new Variable("x"), new Variable("p")));
+        l(Operation.add(new Variable("x"), new Variable("p")));
+        l(Operation.sub(new Variable("x"), new Variable("p")));
+        l(Operation.mult(new Variable("x"), new Variable("p")));
+        l(Operation.exp(new Variable("x"), new Variable("p")));
     }
 }

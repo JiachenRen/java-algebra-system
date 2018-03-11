@@ -1,26 +1,26 @@
-tan(3pi/2)
-tan(3pi/2*x)
-atan(tan(x))
-asin(sin(x))
-acos(cos(2*ln(x)))
-atan(tan(5pi/2))
-tan(-3pi/2)
-sec(-3pi/2)
-cot(pi)
-cot(0)
-csc(0)
-csc(100pi)
-csc(pi/2)
-log(10)
-log(100)
-ln(225)
-ln(e)
-int(3.5)
-ln(e^3)
-ln(e^3+x)
-ln(e^3*x)
-ln(x)
-ln(e^(3*x))
-cos(pi)
-sin(pi)
-tan(pi)
+tan(3*pi/2)        -> undef
+tan(3*pi/2*x)      -> tan(pi*(3/2)*x)
+atan(tan(x))       -> x
+asin(sin(x))       -> x
+acos(cos(2*ln(x))) -> 2*ln(x)
+atan(tan(5*pi/2))  -> undef
+tan(0-3*pi/2)      -> undef
+sec(0-3*pi/2)      -> undef
+cot(pi)            -> undef
+cot(0)             -> undef
+csc(0)             -> undef
+csc(100*pi)        -> undef
+csc(pi/2)          -> 1
+log(10)            -> 1
+log(100)           -> 2
+ln(225)            -> 2*ln(15)
+ln(e)              -> 1
+int(3.5)           -> 3
+ln(e^3)            -> 3
+ln(e^3+x)          -> ln(e^3+x)
+ln(e^3*x)          -> ln(e^3*x)
+ln(x)              -> ln(x)
+ln(e^(3*x))        -> (3*x)
+cos(pi)            -> -1
+sin(pi)            -> 0
+tan(pi)            -> 0
