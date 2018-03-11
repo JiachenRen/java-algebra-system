@@ -97,7 +97,7 @@ Original Exp  |   -> | Simplified |   |  Original Exp   |   -> | Simplified |   
 :------------:| ---- |:----------:| - |:---------------:| ---- |:----------:| - |:---------------:| ---- |:----------:
 ln(#^n)       |   -> | n*ln(#)    |   |     log(#^n)    |   -> | n*log(#)   |   |      ln(e^n)    |   -> | n
 sec(pi/2+pi*n)|   -> | undef      |   |   cot(pi*n)     |   -> | undef      |   |    csc(pi*n)    |   -> | undef
-acos(cos(x))  |   -> | x          |   |  asin(cos(x))   |   -> | x          |   |  atan(tan(x))   |   -> | x
+cos(acos(x))  |   -> | x          |   |  sin(asin(x))   |   -> | x          |   |  tan(atan(x))   |   -> | x
 tan(pi/2+pi*n)|   -> | undef      |   |     log(-#)     |   -> | undef      |   |      ln(-#)     |   -> | undef
 
 
