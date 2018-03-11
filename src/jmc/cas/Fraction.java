@@ -178,9 +178,10 @@ public class Fraction extends RawValue {
     }
 
     public Fraction negate() {
-        this.numerator *= -1;
-        this.reduce();
-        return this;
+        Fraction clone = this.clone();
+        clone.numerator *= -1;
+        clone.reduce();
+        return clone;
     }
 
     private void simult(long n) {

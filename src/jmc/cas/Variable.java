@@ -8,7 +8,7 @@ public class Variable extends LeafNode {
     private String name;
 
     public Variable(String name) {
-        if (name.equals("")) throw new IllegalArgumentException("variable name cannot be empty");
+        if (name.equals("")) throw new JMCException("variable name cannot be empty");
         this.name = name;
     }
 

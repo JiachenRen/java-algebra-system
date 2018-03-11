@@ -24,6 +24,13 @@ public interface Operable extends Evaluable {
     int numNodes();
 
     /**
+     * negates the original expression
+     *
+     * @return new instance that is the negated version of the original
+     */
+    Operable negate();
+
+    /**
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
      *
      * @param o the Operable instance that you are looking for.

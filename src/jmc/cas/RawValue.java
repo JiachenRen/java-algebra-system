@@ -60,6 +60,7 @@ public class RawValue extends LeafNode {
         return new RawValue(number);
     }
 
+    @Override
     public RawValue negate() {
         return new RawValue(this.doubleValue() * -1);
     }

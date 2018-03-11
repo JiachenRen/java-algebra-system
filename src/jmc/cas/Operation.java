@@ -37,6 +37,18 @@ public abstract class Operation implements Operable {
         return this;
     }
 
+    public Operation negate() {
+        return Operation.mult(RawValue.ONE.negate(), this.clone());
+    }
+
+    /**
+     * @param operable the Operable instance to be negated. IT IS NOT MODIFIED.
+     * @return a new Operable instance that represents the negated version of the original
+     */
+    public static Operable negate(Operable operable) {
+        return new BinaryOperation(new RawValue(-1), "*", operable);
+    }
+
     public abstract Operation clone();
 
     public abstract Operable toAdditionOnly();
