@@ -541,7 +541,8 @@ public class BinaryOperation extends Operation {
                     pool.remove(i);
                     pool.remove(k - 1);
                     pool.add(op);
-                    crossSimplify(pool); //result maybe bin tree or just Operable.
+                    crossSimplify(pool);//result maybe bin tree or just Operable.
+                    break;
                 } else if (pool.size() <= 2) return;
             }
         }

@@ -52,5 +52,7 @@ public class OperableTest {
         l(Operation.sub(new Variable("x"), new Variable("p")));
         l(Operation.mult(new Variable("x"), new Variable("p")));
         l(Operation.exp(new Variable("x"), new Variable("p")));
+        l(new Variable("x").negate());
+        l(Expression.interpret("(-1)*((2x^2)*a^(-1))").simplify().beautify());
     }
 }
