@@ -17,7 +17,7 @@
             <Insets />
         </opaqueInsets>
         <Label text="JMC CAS Experimental" />
-        <TextField fx:id="input" onKeyTyped="#textFieldInput" promptText="Expression">
+        <TextField fx:id="input" onKeyTyped="#textFieldInput" promptText="Enter Expression">
             <VBox.margin>
                 <Insets />
             </VBox.margin>

@@ -439,19 +439,57 @@ public class BinaryOperation extends Operation {
      * HELPER METHOD
      * handles a*a^b = a^(b+1) when a is not a number
      *
-     * @param op       generic Operation
-     * @param expBinOp BinaryOperation with operation == "^"
+     * @param op    generic Operation
+     * @param binOp BinaryOperation with operation == "^"
      * @return simplified Operable
      */
-    private Operable simplify(Operable op, BinaryOperation expBinOp) {
-        if (!operation.name.equals("*")) return null;
-        if (op.equals(expBinOp.getLeftHand()) && expBinOp.operation.equals("^")) {
-            if (!(op instanceof RawValue)) { //only when a is a variable or expression, a*a^b = a^(b+1) applies
-                BinaryOperation exp = new BinaryOperation(expBinOp.getRightHand(), "+", RawValue.ONE);
-                return new BinaryOperation(op, "^", exp).simplify();
-            }
+    private Operable simplify(Operable op, BinaryOperation binOp) {
+        switch (operation.name) {
+            case "*":
+                if (op.equals(binOp.getLeftHand()) && binOp.operation.equals("^")) {
+                    if (!(op instanceof RawValue)) { //only when a is a variable or expression, a*a^b = a^(b+1) applies
+                        BinaryOperation exp = new BinaryOperation(binOp.getRightHand(), "+", RawValue.ONE);
+                        return new BinaryOperation(op, "^", exp).simplify();
+                    }
+                }
+                break; // I always forget to put break!!!! So many bugs were born simply because I forgot to put this statement!!!!
+            case "+":
+//                return binOp.ambiguousIteration((o1, o2, operator) -> {
+//                    if (o1.equals(op) && operator.equals("*")) {
+//                        return Operation.mult(op, Operation.add(o2, 1));
+//                    }
+//                    return null;
+//                });
+                if (binOp.operation.equals("*")) {
+                    if (binOp.getLeftHand().equals(op)) {
+                        return Operation.mult(op, Operation.add(binOp.getRightHand(), 1)).simplify(); // again, should x+x*a be simplified to x*(a+1)?
+                    } else if (binOp.getRightHand().equals(op)) {
+                        return Operation.mult(op, Operation.add(binOp.getLeftHand(), 1)).simplify();
+                    }
+                }
         }
         return null;
+    }
+
+
+    /**
+     * perform ambiguous iteration of left-hand and right-hand. The order does not matter.
+     *
+     * @param ao an ambiguous operation that does something with left-hand and right-hand
+     */
+    private Operable ambiguousIteration(AmbiguousOperation ao) {
+        for (int i = 1; i <= 2; i++) {
+            Operable o = ao.operate(get(i), getOther(i), operation);
+            if (o != null) return o;
+        }
+        return null;
+    }
+
+    /**
+     * a series of operations in which the order of left, right hands is unimportant.
+     */
+    private interface AmbiguousOperation {
+        Operable operate(Operable o1, Operable o2, RegisteredBinaryOperation operator);
     }
 
     /**

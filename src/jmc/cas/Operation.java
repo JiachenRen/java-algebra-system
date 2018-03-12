@@ -77,6 +77,10 @@ public abstract class Operation implements Operable {
         return new BinaryOperation(o1.copy(), "+", o2.copy());
     }
 
+    public static Operation add(Operable o1, Number n) {
+        return new BinaryOperation(o1.copy(), "+", new RawValue(n));
+    }
+
     public static Operation sub(Operable o1, Operable o2) {
         return new BinaryOperation(o1.copy(), "-", o2.copy());
     }
