@@ -454,19 +454,12 @@ public class BinaryOperation extends Operation {
                 }
                 break; // I always forget to put break!!!! So many bugs were born simply because I forgot to put this statement!!!!
             case "+":
-//                return binOp.ambiguousIteration((o1, o2, operator) -> {
-//                    if (o1.equals(op) && operator.equals("*")) {
-//                        return Operation.mult(op, Operation.add(o2, 1));
-//                    }
-//                    return null;
-//                });
-                if (binOp.operation.equals("*")) {
-                    if (binOp.getLeftHand().equals(op)) {
-                        return Operation.mult(op, Operation.add(binOp.getRightHand(), 1)).simplify(); // again, should x+x*a be simplified to x*(a+1)?
-                    } else if (binOp.getRightHand().equals(op)) {
-                        return Operation.mult(op, Operation.add(binOp.getLeftHand(), 1)).simplify();
+                return binOp.ambiguousIteration((o1, o2, operator) -> {
+                    if (o1.equals(op) && operator.equals("*")) {
+                        return Operation.mult(op, Operation.add(o2, 1)).simplify();
                     }
-                }
+                    return null;
+                });
         }
         return null;
     }
