@@ -42,10 +42,10 @@ public class RawValue extends LeafNode {
             return "undef";
         } else if (isInteger()) {
             String s = Integer.toString(intValue());
-            if (s.length() <= 6) return s;
+            if (s.length() <= 10) return s;
         } else {
             String s = Double.toString(doubleValue());
-            if (s.length() <= 6) return s;
+            if (s.length() <= 10) return s;
         }
         double extracted = number.doubleValue();
         String formatted = Graph.formatForDisplay(extracted);
