@@ -79,6 +79,10 @@ public class Constants {
             return getName();
         }
 
+        public int complexity() {
+            return 2;
+        }
+
         public double eval(double x) {
             return computedConst.compute();
         }
@@ -95,7 +99,7 @@ public class Constants {
 
         public boolean equals(Operable other) {
             return other instanceof Constant && (((Constant) other).getName().equals(getName())
-            || other.val() == this.val());
+                    || other.val() == this.val());
         }
 
         public Operable plugIn(Variable var, Operable nested) {
@@ -117,6 +121,6 @@ public class Constants {
             if (constant.getName().equals(name))
                 return constant;
         }
-        throw new JMCException("constant + \""+name+"\" does not exist");
+        throw new JMCException("constant + \"" + name + "\" does not exist");
     }
 }

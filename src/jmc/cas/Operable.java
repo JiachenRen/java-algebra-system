@@ -39,6 +39,12 @@ public interface Operable extends Evaluable {
     int levelOf(Operable o);
 
     /**
+     * @return level of complexity of the expression represented by an integer with 1 being
+     * the most simplistic
+     */
+    int complexity();
+
+    /**
      * plugs in the operable nested for all variables in the expression
      * NOTE: the method returns the operable with the desired nested operable plugged in, but
      * the operable itself is not altered.

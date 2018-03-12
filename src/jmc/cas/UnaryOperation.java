@@ -42,6 +42,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.eval(getLeftHand().eval(x));
     }
 
+    public int complexity() {
+        return getLeftHand().complexity() + 1;
+    }
+
 
     public static void define(String name, String expression) {
         UnaryOperation.define(name, Expression.interpret(expression));

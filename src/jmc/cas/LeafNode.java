@@ -21,6 +21,8 @@ abstract class LeafNode implements BinLeafNode, Operable {
         return 1;
     }
 
+    public abstract int complexity();
+
     public Operable beautify() {
         return this;
     }

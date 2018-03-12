@@ -602,9 +602,9 @@ public class BinaryOperation extends Operation {
                 Operable other = pool.get(k);
                 String operation = getPriority() == 2 ? "*" : "+";
                 BinaryOperation binOp = new BinaryOperation(operable, operation, other);
-                int n1 = binOp.numNodes();
+                int n1 = binOp.complexity();
                 Operable op = binOp.simplify(); //be careful, avoid stack overflow
-                if (op.numNodes() < n1) { //simplifiable
+                if (op.complexity() < n1) { //simplifiable
                     pool.remove(i);
                     pool.remove(k - 1);
                     pool.add(op);
@@ -897,6 +897,10 @@ public class BinaryOperation extends Operation {
         if (left == -1 && right == -1) return -1;
         if (left == -1 || right == -1) return left == -1 ? right + 1 : left + 1;
         return left > right ? right + 1 : left + 1;
+    }
+
+    public int complexity() {
+        return getLeftHand().complexity() + getRightHand().complexity() + 1;
     }
 
     public Operable replace(Operable o, Operable r) {

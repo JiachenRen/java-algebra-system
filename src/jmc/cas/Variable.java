@@ -28,6 +28,10 @@ public class Variable extends LeafNode {
         return name;
     }
 
+    public int complexity() {
+        return 3;
+    }
+
     public Operable simplify() {
         return this;
     }

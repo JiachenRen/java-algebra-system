@@ -114,6 +114,10 @@ public class RawValue extends LeafNode {
         return doubleValue() > 0;
     }
 
+    public int complexity() {
+        return 1;
+    }
+
     /**
      * Since plugIn only applies to variable, a RawValue type should only return itself.
      *
