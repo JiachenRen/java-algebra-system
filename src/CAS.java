@@ -38,7 +38,9 @@ public class CAS extends Application {
             controller.beautified.setText(operable.copy().simplify().beautify().toString());
         });
         primaryStage.setTitle("JMC Computer Algebra System");
-        primaryStage.setScene(new Scene(root, 400, 300));
+        primaryStage.setScene(new Scene(root, 400, 200));
+        primaryStage.setMinHeight(200);
+        primaryStage.setMinWidth(400);
         primaryStage.show();
     }
 }
