@@ -57,6 +57,10 @@ public abstract class Operation implements Operable {
         return new BinaryOperation(o1.copy(), "/", o2.copy());
     }
 
+    public static Operable div(Number a, Number b) {
+        return div(new RawValue(a), new RawValue(b));
+    }
+
     public static Operation mult(Operable o1, Operable o2) {
         return new BinaryOperation(o1.copy(), "*", o2.copy());
     }

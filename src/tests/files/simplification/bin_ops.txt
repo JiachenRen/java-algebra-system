@@ -46,4 +46,3 @@ x+3*x                      -> x*4
 x*a+3+x*b                  -> 3+x*(a+b)
 x*a*x                      -> a*x^2
 x+a+x                      -> a+2*x
-x*b*x*b
