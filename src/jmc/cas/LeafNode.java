@@ -27,6 +27,14 @@ abstract class LeafNode implements BinLeafNode, Operable {
         return this;
     }
 
+    public Operable toAdditionOnly() {
+        return this;
+    }
+
+    public Operable toExponentialForm() {
+        return this;
+    }
+
     public Operable replace(Operable o, Operable r) {
         return this.equals(o) ? r : this;
     }

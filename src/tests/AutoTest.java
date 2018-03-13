@@ -27,22 +27,29 @@ public class AutoTest {
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates("additional/", "exponential/", "simplification/");
 
-        l(purple("\n---------------------------> Simplification <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <---------\n"));
-        test("/tests/files/simplification/bin_ops.txt", "simplify");
-        l(boldBlack("\n---------> Unary Operations Test <---------\n"));
-        test("/tests/files/simplification/u_ops.txt", "simplify");
+        l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/simplification/bin_ops.txt", "simplify", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/simplification/u_ops.txt", "simplify", true);
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/simplification/irr_num.txt", "simplify");
+        test("/tests/files/simplification/irr_num.txt", "simplify", true);
 
-        l(purple("\n---------------------------> Simplification <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <---------\n"));
-        test("/tests/files/simplification/bin_ops.txt", "simplify");
-        l(boldBlack("\n---------> Unary Operations Test <---------\n"));
-        test("/tests/files/simplification/u_ops.txt", "simplify");
+        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/simplification/irr_num.txt", "simplify");
+        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
 
+        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
 
     }
 
@@ -106,7 +113,7 @@ public class AutoTest {
         return l.contains("->") ? l.substring(l.indexOf("->") + 2) : "";
     }
 
-    private static void test(String fileName, String method) throws Exception {
+    private static void test(String fileName, String method, boolean testValue) throws Exception {
         ArrayList<String> lines = getLines(Utils.read(fileName));
 
         ArrayList<Operable> ops = (ArrayList<Operable>) lines.stream()
@@ -131,8 +138,8 @@ public class AutoTest {
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i), prev = simplifiedStrs.get(i).replace(" ", "");
-            Operable manipulated = (Operable) getMethod(Operable.class, method).invoke(ops.get(i).copy());
-            String now = manipulated.toString();
+            Object obj = getMethod(Operable.class, method).invoke(ops.get(i).copy());
+            String now = obj.toString();
             if (prev.equals(now)) {
                 l(line + lightGreen("PASSED") + boldBlack(" = ") + lightBlue(prev + " "));
             } else {
@@ -140,19 +147,21 @@ public class AutoTest {
                         + lightBlue(prev) + lightRed(" ≠ ")
                         + lightCyan(now));
             }
-            Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
-            if (Operable.numVars(o1) > 0) {
-                for (int k = 0; k <= 10; k++) {
-                    int t = (int) Math.pow(k, 2);
-                    double diffx = o1.eval(k) - o2.eval(k);
-                    if (diffx != 0) {
-                        l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + t + "): ") + passOrPrint(diffx));
+            if (testValue) {
+                Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
+                if (Operable.numVars(o1) > 0) {
+                    for (int k = 0; k <= 10; k++) {
+                        int t = (int) Math.pow(k, 2);
+                        double diffx = o1.eval(k) - o2.eval(k);
+                        if (diffx != 0) {
+                            l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + t + "): ") + passOrPrint(diffx));
+                        }
                     }
-                }
-            } else {
-                double v = o1.val() - o2.val();
-                if (v != 0.0) {
-                    l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + passOrPrint(v));
+                } else {
+                    double v = o1.val() - o2.val();
+                    if (v != 0.0) {
+                        l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + passOrPrint(v));
+                    }
                 }
             }
 

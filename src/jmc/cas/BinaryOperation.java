@@ -115,10 +115,10 @@ public class BinaryOperation extends Operation {
      */
     @Override
     public BinaryOperation toExponentialForm() {
-        if (getLeftHand() instanceof Operation) ((Operation) getLeftHand()).toExponentialForm();
-        if (rightHand instanceof Operation) ((Operation) rightHand).toExponentialForm();
+        if (getLeftHand() instanceof Operation) getLeftHand().toExponentialForm();
+        if (rightHand instanceof Operation) rightHand.toExponentialForm();
         if (!this.operation.equals("/")) return this;
-        if (rightHand.equals(new RawValue(0))) throw new ArithmeticException("division by zero: jmc");
+        if (rightHand.equals(new RawValue(0))) return this;
         if (rightHand instanceof BinaryOperation && ((BinaryOperation) rightHand).operation.equals("*")) {
             BinaryOperation enclosed = ((BinaryOperation) rightHand);
             enclosed.setLeftHand(new BinaryOperation(enclosed.getLeftHand(), "^", new RawValue(-1)));

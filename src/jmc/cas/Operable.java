@@ -155,6 +155,10 @@ public interface Operable extends Evaluable {
         return terms;
     }
 
+    Operable toAdditionOnly();
+
+    Operable toExponentialForm();
+
     /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place
