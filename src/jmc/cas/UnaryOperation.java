@@ -84,7 +84,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      *
      * @return a new Operable instance that is the addition only form of self.
      */
-    public Operable toAdditionOnly() {
+    public UnaryOperation toAdditionOnly() {
         if (getLeftHand() instanceof Operation) {
             this.setLeftHand(((Operation) this.getLeftHand()).toAdditionOnly());
             return this;

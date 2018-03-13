@@ -51,7 +51,7 @@ public abstract class Operation implements Operable {
 
     public abstract Operation copy();
 
-    public abstract Operable toAdditionOnly();
+    public abstract Operation toAdditionOnly();
 
     public static Operation div(Operable o1, Operable o2) {
         return new BinaryOperation(o1.copy(), "/", o2.copy());

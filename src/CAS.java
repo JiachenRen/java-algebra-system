@@ -33,8 +33,12 @@ public class CAS extends Application {
             System.out.println(oldValue + " " + newValue);
             try {
                 Operable operable = Expression.interpret(newValue);
-                controller.addition.setText(operable instanceof Operation ? ((Operation) operable).copy().toAdditionOnly().toString() : operable.toString());
-                controller.exponential.setText(operable instanceof Operation ? ((Operation) operable).copy().toExponentialForm().toString() : operable.toString());
+                String addExp = "";
+                if (operable instanceof Operation) {
+                    Operation operation = (Operation) operable;
+                    addExp = operation.copy().toAdditionOnly().toExponentialForm().toString();
+                }
+                controller.additionOnlyExp.setText(addExp);
 
                 int nodes1 = operable.numNodes(), complexity1 = operable.complexity();
                 controller.nodesBefore.setText(String.valueOf(nodes1));

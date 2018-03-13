@@ -14,8 +14,7 @@ public class CasController {
     public Label simplified;
     public TextField input;
     public Label beautified;
-    public Label addition;
-    public Label exponential;
+    public Label additionOnlyExp;
     public Label nodesBefore;
     public Label complexityBefore;
     public Label complexityAfter;
@@ -28,8 +27,7 @@ public class CasController {
         System.out.println(keyEvent.getEventType());
         simplified.setVisible(true);
         beautified.setVisible(true);
-        addition.setVisible(true);
-        exponential.setVisible(true);
+        additionOnlyExp.setVisible(true);
         nodesBefore.setVisible(true);
         complexityBefore.setVisible(true);
         complexityAfter.setVisible(true);
@@ -48,12 +46,12 @@ public class CasController {
 
     void error(String msg) {
         String str = "...";
-        this.addition.setText(str);
-        this.exponential.setText(str);
+//        this.addition.setText(str);
+//        this.exponential.setText(str);
         this.nodesBefore.setText(str);
         this.complexityBefore.setText(str);
-        this.simplified.setText(str);
-        this.beautified.setText(str);
+//        this.simplified.setText(str);
+//        this.beautified.setText(str);
         this.complexityAfter.setText(str);
         this.nodesAfter.setText(str);
         errMsg.setText(msg);

@@ -48,8 +48,18 @@ public class JGrapher extends PApplet {
     }
 
     public void settings() {
-        size(1100, 780, renderer);
-        if (!renderer.equals(defaultRenderer)) pixelDensity(2);
+        if (JNode.OS.contains("windows")) {
+            fullScreen();
+        } else {
+            size(1100, 780, renderer);
+        }
+        try {
+            if (!renderer.equals(defaultRenderer)) pixelDensity(2);
+        } catch (Exception ignore) {
+
+        }
+        if (surface != null) surface.setResizable(true);
+        if (frame != null) frame.setResizable(true);
     }
 
     private static void enableCoreDump() {
