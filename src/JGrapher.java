@@ -1,4 +1,3 @@
-import javafx.embed.swt.FXCanvas;
 import jmc.cas.*;
 import jmc.extras.Element;
 import jmc.graph.Graph;
@@ -81,21 +80,14 @@ public class JGrapher extends PApplet {
         }
     }
 
-
-    public void setup() {
+    private void initJNode() {
         JNode.init(this);
         if (!JNode.OS.contains("windows")) JGrapher.enableCoreDump();
+    }
 
-        JNode.DISPLAY_CONTOUR = true;
-        JNode.CONTOUR_THICKNESS = 0.1f;
-//        JNode.CONTOUR_COLOR = color(0, 0, 100);
-        JNode.BACKGROUND_COLOR = color(255, 255, 255, 50);
-        JNode.TEXT_COLOR = color(255, 255, 255, 255);
-        JNode.MOUSE_OVER_TEXT_COLOR = color(255, 255, 255, 255);
-        JNode.MOUSE_PRESSED_TEXT_COLOR = color(255, 255, 255, 255);
-        JNode.MOUSE_OVER_BACKGROUND_COLOR = color(255, 255, 255, 100);
-        JNode.MOUSE_PRESSED_BACKGROUND_COLOR = color(255, 255, 255, 75);
-        JNode.ROUNDED = false;
+
+    public void setup() {
+        initJNode();
 
         parent = new HBox(0, 0, width, height);
         parent.setCollapseInvisible(true)
@@ -408,10 +400,9 @@ public class JGrapher extends PApplet {
                             tmp.setContent(funcName).setVisible(true);
                             tmp.onClick(() -> {
                                 funcNameTextInput.setContent(funcName);
+                                updateSuppliedVarValueSelectors(true);
                                 //noinspection ConstantConditions
                                 JNode.getTextInputById("f(x)").setContent(operable);
-                                updateSuppliedVarValueSelectors(true);
-
                             });
                         } else {
                             funcsWrapper.getDisplayables().get(i).setVisible(false);
