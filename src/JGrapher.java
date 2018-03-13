@@ -1,3 +1,4 @@
+import javafx.embed.swt.FXCanvas;
 import jmc.cas.*;
 import jmc.extras.Element;
 import jmc.graph.Graph;
@@ -34,18 +35,21 @@ public class JGrapher extends PApplet {
     private VBox suppliedVarWrapper;
     private TextInput modelInput;
     private boolean casEnabled = true;
+    private static String defaultRenderer = "processing.javafx.PGraphicsFX2D";
+    private static String renderer = defaultRenderer;
 
     public static void main(String args[]) {
         System.out.println("Welcome to JGrapher, an extensive graphing/calculation system using original CAS and UI library. \n" +
                 "Copyright (c) 2018, Jiachen Ren. \n" +
                 "MIT license applies. \n");
+        if (args != null && args.length > 0) renderer = args[0];
         String sketch = Thread.currentThread().getStackTrace()[1].getClassName();
-        Thread proc = new Thread(() -> PApplet.main(sketch));
-        proc.start();
+        PApplet.main(sketch);
     }
 
     public void settings() {
-        size(1100, 780, FX2D);
+        size(1100, 780, renderer);
+        if (!renderer.equals(defaultRenderer)) pixelDensity(2);
     }
 
     private static void enableCoreDump() {

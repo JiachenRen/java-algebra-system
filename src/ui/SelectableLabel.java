@@ -1,12 +1,13 @@
-package ui; /**
- * Created by Jiachen on 3/12/18.
- * JavaFX label is not selectable! Here's workaround found on StackOverflow...
- */
+package ui;
 
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+/**
+ * Created by Jiachen on 3/12/18.
+ * JavaFX label is not selectable! Here's workaround found on StackOverflow...
+ */
 public class SelectableLabel extends TextArea {
 
     public SelectableLabel() {

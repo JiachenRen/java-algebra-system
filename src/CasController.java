@@ -1,3 +1,5 @@
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
@@ -37,6 +39,11 @@ public class CasController {
         vars.setVisible(true);
         System.out.println(input.textProperty().get());
         System.out.println(input.textProperty().get());
+    }
+
+    public void launchJGrapher(ActionEvent actionEvent) {
+        System.out.println(actionEvent);
+        Platform.runLater(() -> JGrapher.main(new String[]{"processing.awt.PGraphicsJava2D"}));
     }
 
     void error(String msg) {
