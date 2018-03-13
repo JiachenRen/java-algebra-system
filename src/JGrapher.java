@@ -198,7 +198,7 @@ public class JGrapher extends PApplet {
             try {
                 Operable original = Expression.interpret(funcTextInput.getStaticContent());
                 if (casEnabled) {
-                    original = original.simplify();
+                    original = original.simplify().beautify();
                 }
                 funcTextInput.setContent(original.toString());
             } catch (RuntimeException e) {

@@ -1,6 +1,8 @@
 package ui;
 
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -25,6 +27,8 @@ public class SelectableLabel extends TextArea {
         this.setEditable(false);
         this.setFocusTraversable(false);
         this.setWrapText(true);
+        this.setBackground(Background.EMPTY);
+        this.setBorder(Border.EMPTY);
 
         sizeToText();
 
