@@ -191,6 +191,16 @@
                                 <Font name="Wawati SC Regular" size="13.0" />
                             </font>
                         </Label>
+                        <Label text="Expanded:" GridPane.rowIndex="10">
+                            <font>
+                                <Font name="Wawati SC Regular" size="13.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="expanded" text="expanded" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
+                            <font>
+                                <Font name="Wawati SC Regular" size="13.0" />
+                            </font>
+                        </Label>
                     </children>
                     <padding>
                         <Insets left="5.0" right="5.0" />

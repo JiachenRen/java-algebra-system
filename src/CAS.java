@@ -47,6 +47,8 @@ public class CAS extends Application {
                 operable = operable.simplify();
                 controller.simplified.setText(operable.toString()); //should conform to MVC, setText should be in controller.
 
+                controller.expanded.setText(operable.copy().expand().simplify().beautify().toString());
+
                 operable = operable.beautify();
                 controller.beautified.setText(operable.toString());
 

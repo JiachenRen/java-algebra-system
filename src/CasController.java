@@ -22,6 +22,7 @@ public class CasController {
     public Label errMsg;
     public Label val;
     public Label vars;
+    public Label expanded;
 
     public void textFieldInput(KeyEvent keyEvent) {
         System.out.println(keyEvent.getEventType());
@@ -35,6 +36,7 @@ public class CasController {
         errMsg.setVisible(true);
         val.setVisible(true);
         vars.setVisible(true);
+        expanded.setVisible(true);
         System.out.println(input.textProperty().get());
         System.out.println(input.textProperty().get());
     }
