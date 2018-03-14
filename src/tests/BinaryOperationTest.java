@@ -24,6 +24,7 @@ public class BinaryOperationTest {
         l(Operation.exp(Math.random(), new RawValue(3)));
         l(Operation.exp(new RawValue(3), Math.random()));
         l(Expression.interpret("x+x*a").simplify());
+        ((BinaryOperation) Expression.interpret("x^b")).flattened().forEach(TestPrint::l);
     }
 
     private static void l(Object... objects) {

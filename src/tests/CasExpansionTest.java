@@ -49,7 +49,7 @@ public class CasExpansionTest {
         ArrayList<Operable> operables = new ArrayList<>();
         for (String expression : testSubjects) {
             Operable extracted = Expression.interpret(expression);
-//            extracted = Operable.expand(extracted);
+            extracted = extracted.copy().expand();
             operables.add(extracted);
         }
         for (int i = 0; i < operables.size(); i++) {

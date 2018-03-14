@@ -348,6 +348,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return copy().setLeftHand(getLeftHand().explicitNegativeForm());
     }
 
+    public Operable expand() {
+        return setLeftHand(getLeftHand().expand());
+    }
+
     public Operable replace(Operable o, Operable r) {
         if (this.equals(o)) return r;
         UnaryOperation clone = this.copy();

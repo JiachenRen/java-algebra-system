@@ -672,6 +672,68 @@ public class BinaryOperation extends Operation {
         return "+-*/".contains(operation.name);
     }
 
+    public Operable expand() {
+        this.toAdditionOnly().toExponentialForm();
+        this.expandSubNodes();
+        return expandBase().simplify();
+    }
+
+    /**
+     * base method of the recursively defined expand()
+     *
+     * @return expanded expression of type Operable
+     */
+    private Operable expandBase() {
+        switch (operation.name) {
+            case "*":
+                Operable result = this.ambiguousIteration((o1, o2, operation) -> {
+                    if (isAddition(o1) && isAddition(o2)) {
+                        BinaryOperation b1 = ((BinaryOperation) o1);
+                        BinaryOperation b2 = ((BinaryOperation) o2);
+                        return crossExpand(b1, b2);
+                    } else if (isAddition(o1)) {
+                        return ((BinaryOperation) o1).flattened().stream()
+                                .map(o -> Operation.mult(o, o2))
+                                .reduce(Operation::add).get();
+                    }
+                    return null;
+                });
+                if (result != null) return result;
+                break;
+        }
+        return this;
+    }
+
+    /**
+     * HELPER METHOD
+     * this's operation should be "*" to invoke this method
+     * (a+b)*(a+ln(c)+d) -> a*a + a*ln(c) + a*d + b*a + b*ln(c) + b*d
+     *
+     * @param o1 binary operation "+"
+     * @param o2 binary operation "+"
+     * @return o1*o2 expanded
+     */
+    private static Operable crossExpand(BinaryOperation o1, BinaryOperation o2) {
+        ArrayList<Operable> f1 = o1.flattened(), f2 = o2.flattened();
+        final Operable[] result = new Operable[1];
+        f1.stream().map(o -> f2.stream()
+                .map(p -> Operation.mult(p, o))
+                .reduce(Operation::add).get())
+                .reduce(Operation::add)
+                .ifPresent(o -> result[0] = o);
+        return result[0];
+    }
+
+    private static boolean isAddition(Operable op) {
+        return op instanceof BinaryOperation && ((BinaryOperation) op).operation.equals("+");
+    }
+
+
+    private void expandSubNodes() {
+        setLeftHand(getLeftHand().expand());
+        setRightHand(getRightHand().expand());
+    }
+
     @Override
     public BinaryOperation copy() {
         return new BinaryOperation(getLeftHand().copy(), operation, rightHand.copy());

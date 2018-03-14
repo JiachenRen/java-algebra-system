@@ -159,6 +159,8 @@ public interface Operable extends Evaluable {
 
     Operable toExponentialForm();
 
+    Operable expand();
+
     /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place

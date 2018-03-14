@@ -25,31 +25,39 @@ public class AutoTest {
         configureCAS();
 
         l(boldBlack("Updating expression library... this takes a while..."));
-        updateCandidates("additional/", "exponential/", "simplification/");
+        updateCandidates("additional/", "exponential/", "simplification/", "expansion/");
 
-        l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/simplification/bin_ops.txt", "simplify", true);
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/simplification/u_ops.txt", "simplify", true);
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/simplification/irr_num.txt", "simplify", true);
+//        l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
+//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+//        test("/tests/files/simplification/bin_ops.txt", "simplify", true);
+//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+//        test("/tests/files/simplification/u_ops.txt", "simplify", true);
+//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+//        test("/tests/files/simplification/irr_num.txt", "simplify", true);
 
-        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
+        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
+        test("/tests/files/simplification/bin_ops.txt", "expand", true);
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
+        test("/tests/files/simplification/u_ops.txt", "expand", true);
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
+        test("/tests/files/simplification/irr_num.txt", "expand", true);
 
-        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
+//        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
+//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+//        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
+//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+//        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
+//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+//        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
+
+//        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
+//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+//        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
+//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+//        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
+//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+//        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
 
     }
 
