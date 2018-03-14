@@ -62,3 +62,7 @@ x+2h
 (a+b)(a-d)
 (a+2b)(a-d)
 (x+a)*x^2
+x^(a+b)
+(x*b)^3
+(a+b)^3
+x^a*x^b-x^(a+b)

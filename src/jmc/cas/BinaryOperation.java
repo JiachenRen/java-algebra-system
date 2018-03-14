@@ -675,17 +675,18 @@ public class BinaryOperation extends Operation {
     public Operable expand() {
         this.toAdditionOnly().toExponentialForm();
         this.expandSubNodes();
-        return expandBase().simplify();
+        return expandBase();
     }
 
     /**
+     * HELPER METHOD
      * base method of the recursively defined expand()
      *
      * @return expanded expression of type Operable
      */
     private Operable expandBase() {
         switch (operation.name) {
-            case "*":
+            case "*": // (a+b)*c || (a+b+...)*(c+d+...) = a*c + a*d + ...
                 Operable result = this.ambiguousIteration((o1, o2, operation) -> {
                     if (isAddition(o1) && isAddition(o2)) {
                         BinaryOperation b1 = ((BinaryOperation) o1);
@@ -700,6 +701,29 @@ public class BinaryOperation extends Operation {
                 });
                 if (result != null) return result;
                 break;
+            case "^":
+                if (getRightHand() instanceof RawValue && ((RawValue) getRightHand()).isInteger()) {
+                    int num = ((RawValue) getRightHand()).intValue();
+                    if (getLeftHand() instanceof BinaryOperation) {
+                        BinaryOperation binOp = ((BinaryOperation) getLeftHand());
+                        switch (binOp.operation.name) {
+                            case "*": //(a*b)^# = a^#*b^#
+                                Optional<Operation> op1 = binOp.flattened().stream()
+                                        .map(o -> Operation.exp(o, num))
+                                        .reduce(Operation::mult);
+                                if (op1.isPresent()) return op1.get();
+                                break;
+                            case "+": // (a+b)^# = ...
+                                ArrayList<Operable> pool = new ArrayList<>();
+                                for (int i = 0; i < num; i++) {
+                                    pool.add(binOp.copy());
+                                }
+                                Optional<Operable> op = pool.stream().reduce(Operation::mult);
+                                if (op.isPresent()) return op.get().expand();
+                                break;
+                        }
+                    }
+                }
         }
         return this;
     }
