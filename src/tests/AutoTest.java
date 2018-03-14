@@ -27,21 +27,21 @@ public class AutoTest {
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates("additional/", "exponential/", "simplification/", "expansion/");
 
-//        l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
-//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-//        test("/tests/files/simplification/bin_ops.txt", "simplify", true);
-//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-//        test("/tests/files/simplification/u_ops.txt", "simplify", true);
-//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-//        test("/tests/files/simplification/irr_num.txt", "simplify", true);
-
-        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
+        l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/expansion/bin_ops.txt", "expand", true);
+        test("/tests/files/simplification/bin_ops.txt", "simplify", true);
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/expansion/u_ops.txt", "expand", true);
+        test("/tests/files/simplification/u_ops.txt", "simplify", true);
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/expansion/irr_num.txt", "expand", true);
+        test("/tests/files/simplification/irr_num.txt", "simplify", true);
+
+//        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
+//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+//        test("/tests/files/expansion/bin_ops.txt", "expand", true);
+//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+//        test("/tests/files/expansion/u_ops.txt", "expand", true);
+//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+//        test("/tests/files/expansion/irr_num.txt", "expand", true);
 
 //        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
 //        l(boldBlack("\n---------> Binary Operations Test <----------\n"));

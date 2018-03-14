@@ -399,14 +399,16 @@ public class BinaryOperation extends Operation {
                                 /*
                                 1. for the form x*(a+b) + x*c, should it be simplified to x*(a+b+c)?
                                 2. for the form x*(a+b) + x*(b-a), it should definitely be simplified to 2*b*x.
-                                right now it does both 1 and 2.
+                                right now it does only 2.
                                 */
                             for (int i = 1; i <= 2; i++) {
                                 Operable o1 = binOp1.get(i);
                                 int idx = binOp2.contains(o1);
                                 if (idx != 0) {
-                                    Operable add = new BinaryOperation(binOp1.getOther(i), "+", binOp2.getOther(idx)).simplify();
-                                    return new BinaryOperation(o1, "*", add).simplify();
+                                    Operable add = new BinaryOperation(binOp1.getOther(i), "+", binOp2.getOther(idx));
+                                    Operable simplified = add.copy().simplify();
+                                    if (simplified.complexity() < add.complexity())
+                                        return new BinaryOperation(o1, "*", simplified).simplify();
                                 }
                             }
                             break;
@@ -419,14 +421,17 @@ public class BinaryOperation extends Operation {
                     switch (binOp1.operation.name) {
                         case "^":
                                 /*
-                                1. for the form x^(a+b) + x^c, should it be simplified to x^(a+b+c)?
-                                2. for the form x^(a+b) + x^(-a), it should definitely be simplified to 2*b*x.
+                                1. for the form x^(a+b) * x^c, should it be simplified to x^(a+b+c)?
+                                2. for the form x^(a+b) * x^(-a), it should definitely be simplified to 2*b*x.
+                                right now it does only 2.
                                  */
                             Operable op1Left = binOp1.getLeftHand();
                             Operable op2Left = binOp2.getLeftHand();
                             if (op1Left.equals(op2Left)) {
-                                Operable add = new BinaryOperation(binOp1.getRightHand(), "+", binOp2.getRightHand()).simplify();
-                                return new BinaryOperation(op1Left, "^", add);
+                                Operable add = Operation.add(binOp1.getRightHand(), binOp2.getRightHand());
+                                Operable simplified = add.copy().simplify();
+                                if (simplified.complexity() < add.complexity())
+                                    return new BinaryOperation(op1Left, "^", simplified).simplify();
                             }
                             break;
                     }
