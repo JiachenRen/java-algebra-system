@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import ui.*?>
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -18,7 +12,7 @@
 
 <!--<?import ui.SelectableLabel?>-->
 
-<GridPane alignment="CENTER" minHeight="400.0" minWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CasController">
+<GridPane alignment="CENTER" minHeight="400.0" minWidth="400.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CasController">
     <columnConstraints>
         <ColumnConstraints />
     </columnConstraints>
@@ -89,122 +83,132 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints />
                     </rowConstraints>
                     <children>
                         <Label fx:id="additionOnlyExp" text="Exponential Form" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label fx:id="simplified" text="Simplified" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label fx:id="beautified" text="Beautified" textFill="#20a822" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Add. Exp. Form:">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label text="Simplified:" GridPane.rowIndex="3">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label text="Beautified:" GridPane.rowIndex="4">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label text="# Nodes:" GridPane.rowIndex="1">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="nodesBefore" text="# nodes" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Complexity:" GridPane.rowIndex="2">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="complexityBefore" text="complexity" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="# Nodes (Simplified):" GridPane.rowIndex="5">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="nodesAfter" text="nodes (after)" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Complexity (Simplified):" GridPane.rowIndex="6">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="complexityAfter" text="complexity (after)" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Error Message:" GridPane.rowIndex="7">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="errMsg" text="&quot;&quot;" textFill="#f80909" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Raw Value:" GridPane.rowIndex="8">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="val" text="val" textFill="#0c49ff" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Variables:" GridPane.rowIndex="9">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
                         </Label>
                         <Label fx:id="vars" text="vars" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                         <Label text="Expanded:" GridPane.rowIndex="10">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana" size="13.0" />
+                     </font>
+                     <GridPane.margin>
+                        <Insets top="5.0" />
+                     </GridPane.margin>
                         </Label>
                         <Label fx:id="expanded" text="expanded" visible="false" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
-                            <font>
-                                <Font name="Wawati SC Regular" size="13.0" />
-                            </font>
+                     <font>
+                        <Font name="Verdana Bold" size="11.0" />
+                     </font>
                         </Label>
                     </children>
                     <padding>
                         <Insets left="5.0" right="5.0" />
                     </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
                 </GridPane>
             </children>
         </VBox>
