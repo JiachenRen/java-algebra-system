@@ -3,10 +3,8 @@ package tests;
 import jmc.cas.BinaryOperation;
 import jmc.cas.Expression;
 import jmc.cas.Operable;
-import jmc.cas.Operation;
 import jmc.utils.Utils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +23,7 @@ public class AutoTest {
         configureCAS();
 
         l(boldBlack("Updating expression library... this takes a while..."));
-        updateCandidates("additional/", "exponential/", "simplification/", "expansion/");
+        updateCandidates("additional/", "exponential/", "simplification/", "expansion/", "nodes/");
 
         l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
@@ -35,29 +33,37 @@ public class AutoTest {
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
         test("/tests/files/simplification/irr_num.txt", "simplify", true);
 
-//        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
-//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-//        test("/tests/files/expansion/bin_ops.txt", "expand", true);
-//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-//        test("/tests/files/expansion/u_ops.txt", "expand", true);
-//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-//        test("/tests/files/expansion/irr_num.txt", "expand", true);
+        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/expansion/bin_ops.txt", "expand", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/expansion/u_ops.txt", "expand", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/expansion/irr_num.txt", "expand", true);
 
-//        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
-//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-//        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
-//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-//        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
-//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-//        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
+        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
 
-//        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
-//        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-//        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
-//        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-//        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
-//        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-//        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
+        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
+
+        l(lightPurple("\n---------------------------> Number of Nodes <-------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/nodes/bin_ops.txt", "numNodes", false);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/nodes/u_ops.txt", "numNodes", false);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/nodes/irr_num.txt", "numNodes", false);
 
     }
 

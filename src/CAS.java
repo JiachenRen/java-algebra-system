@@ -30,7 +30,6 @@ public class CAS extends Application {
         expression = new SimpleStringProperty("");
         expression.bind(controller.input.textProperty());
         expression.addListener((observable, oldValue, newValue) -> {
-            System.out.println(oldValue + " " + newValue);
             try {
                 Operable operable = Expression.interpret(newValue);
                 String addExp = "";
