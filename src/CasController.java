@@ -25,7 +25,8 @@ public class CasController {
     public Label expanded;
 
     public void textFieldInput(KeyEvent keyEvent) {
-        System.out.println(keyEvent.getEventType());
+        keyEvent.getEventType();
+//        System.out.println(keyEvent.getEventType());
         simplified.setVisible(true);
         beautified.setVisible(true);
         additionOnlyExp.setVisible(true);
@@ -37,8 +38,8 @@ public class CasController {
         val.setVisible(true);
         vars.setVisible(true);
         expanded.setVisible(true);
-        System.out.println(input.textProperty().get());
-        System.out.println(input.textProperty().get());
+//        System.out.println(input.textProperty().get());
+//        System.out.println(input.textProperty().get());
     }
 
     public void launchJGrapher(ActionEvent actionEvent) {
