@@ -18,6 +18,7 @@ import static jmc.utils.ColorFormatter.*;
  * Created by Jiachen on 3/10/18.
  * Automatic Test
  */
+@SuppressWarnings("unused")
 public class AutoTest {
     public static void main(String args[]) throws Exception {
         configureCAS();
@@ -25,6 +26,19 @@ public class AutoTest {
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates("additional/", "exponential/", "simplification/", "expansion/", "nodes/");
 
+        String tests[] = new String[]{
+                "testSimplify",
+                "testNumNodes",
+                "testExpand",
+                "testToExponentialForm",
+                "testToAdditionOnly",
+        };
+        for (String test: tests) {
+            getMethod(AutoTest.class,test).invoke(null);
+        }
+    }
+
+    private static void testSimplify() throws Exception {
         l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
         test("/tests/files/simplification/bin_ops.txt", "simplify", true);
@@ -32,31 +46,9 @@ public class AutoTest {
         test("/tests/files/simplification/u_ops.txt", "simplify", true);
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
         test("/tests/files/simplification/irr_num.txt", "simplify", true);
+    }
 
-        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/expansion/bin_ops.txt", "expand", true);
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/expansion/u_ops.txt", "expand", true);
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/expansion/irr_num.txt", "expand", true);
-
-        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
-
-        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
-
+    private static void testNumNodes() throws Exception {
         l(lightPurple("\n---------------------------> Number of Nodes <-------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
         test("/tests/files/nodes/bin_ops.txt", "numNodes", false);
@@ -64,10 +56,41 @@ public class AutoTest {
         test("/tests/files/nodes/u_ops.txt", "numNodes", false);
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
         test("/tests/files/nodes/irr_num.txt", "numNodes", false);
-
     }
 
-    private static Method getMethod(Class<Operable> c, String name) {
+    private static void testExpand() throws Exception {
+        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/expansion/bin_ops.txt", "expand", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/expansion/u_ops.txt", "expand", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/expansion/irr_num.txt", "expand", true);
+    }
+
+    private static void testToExponentialForm() throws Exception {
+        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
+    }
+
+    private static void testToAdditionOnly() throws Exception {
+        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static Method getMethod(Class c, String name) {
         try {
             return c.getDeclaredMethod(name);
         } catch (NoSuchMethodException e) {
