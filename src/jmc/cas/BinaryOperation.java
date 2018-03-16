@@ -55,6 +55,10 @@ public class BinaryOperation extends Operation {
         }
     }
 
+    public Operable getLeft() {
+        return getOperand();
+    }
+
     public int getPriority() {
         return operation.priority;
     }
@@ -638,10 +642,6 @@ public class BinaryOperation extends Operation {
         return null;
     }
 
-    public int numNodes() {
-        return getLeft().numNodes() + getRight().numNodes() + 1;
-    }
-
     /**
      * HELPER METHOD
      *
@@ -651,6 +651,10 @@ public class BinaryOperation extends Operation {
         setOperand(getLeft().simplify());
         setRight(rightHand.simplify());
         return this;
+    }
+
+    public int numNodes() {
+        return getLeft().numNodes() + getRight().numNodes() + 1;
     }
 
     /**
@@ -736,12 +740,6 @@ public class BinaryOperation extends Operation {
         return "+-*/".contains(operation.name);
     }
 
-    public Operable expand() {
-        this.toAdditionOnly().toExponentialForm();
-        this.expandSubNodes();
-        return expandBase();
-    }
-
     /**
      * HELPER METHOD
      * base method of the recursively defined expand()
@@ -797,6 +795,12 @@ public class BinaryOperation extends Operation {
         setRight(getRight().expand());
     }
 
+    public Operable expand() {
+        this.toAdditionOnly().toExponentialForm();
+        this.expandSubNodes();
+        return expandBase();
+    }
+
     private boolean isVirtuallyNegative(Operable binOp) {
         return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), RawValue.ONE.negate());
     }
@@ -804,17 +808,6 @@ public class BinaryOperation extends Operation {
     private Operable reconstruct(ArrayList<Operable> operables) {
         if (operables.size() == 0) return null;
         return operables.size() >= 2 ? reconstructBinTree(operables) : operables.get(0);
-    }
-
-    public boolean equals(Operable other) {
-        if (!(other instanceof BinaryOperation)) return false;
-        BinaryOperation binOp = (BinaryOperation) other;
-        return binOp.operation.equals(operation)
-                && ((binOp.getLeft().equals(this.getLeft())
-                && binOp.getRight().equals(this.getRight()))
-                || (binOp.getLeft().equals(this.getRight())
-                && binOp.getRight().equals(this.getLeft())
-                && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
     }
 
     /**
@@ -881,6 +874,38 @@ public class BinaryOperation extends Operation {
         return o instanceof BinaryOperation && ((BinaryOperation) o).operation.equals("/");
     }
 
+    public String getName() {
+        return operation.name;
+    }
+
+    public boolean equals(Operable other) {
+        if (!(other instanceof BinaryOperation)) return false;
+        BinaryOperation binOp = (BinaryOperation) other;
+        return binOp.operation.equals(operation)
+                && ((binOp.getLeft().equals(this.getLeft())
+                && binOp.getRight().equals(this.getRight()))
+                || (binOp.getLeft().equals(this.getRight())
+                && binOp.getRight().equals(this.getLeft())
+                && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
+    }
+
+    public boolean is(String s) {
+        return operation.equals(s);
+    }
+
+    public Operable setLeft(Operable operable) {
+        super.setOperand(operable);
+        this.simplifyParenthesis();
+        return this;
+    }
+
+    /**
+     * a series of operations in which the order of left, right hands is unimportant.
+     */
+    private interface AmbiguousOperation {
+        Operable operate(Operable o1, Operable o2, RegisteredBinaryOperation operator);
+    }
+
     /**
      * basically reversing the effects of toAdditionalOnly and toExponentialForm
      * a*b^(-1) -> a/b,
@@ -929,21 +954,6 @@ public class BinaryOperation extends Operation {
         this.setLeft(left);
         this.setRight(right);
         return this;
-    }
-
-    public String getName() {
-        return operation.name;
-    }
-
-    public boolean is(String s) {
-        return operation.equals(s);
-    }
-
-    /**
-     * a series of operations in which the order of left, right hands is unimportant.
-     */
-    private interface AmbiguousOperation {
-        Operable operate(Operable o1, Operable o2, RegisteredBinaryOperation operator);
     }
 
     public interface BinEvaluable {
@@ -1011,16 +1021,17 @@ public class BinaryOperation extends Operation {
             return this.name.equals(other.name);
         }
 
-        public String getName() {
-            return name;
-        }
-
         public boolean equals(String s) {
             return this.name.equals(s);
         }
 
+        public String getName() {
+            return name;
+        }
+
 
     }
+
 
     public Operable explicitNegativeForm() {
         BinaryOperation clone = this.copy();
@@ -1029,15 +1040,6 @@ public class BinaryOperation extends Operation {
         return clone;
     }
 
-    public Operable getLeft() {
-        return getOperand();
-    }
-
-    public Operable setLeft(Operable operable) {
-        super.setOperand(operable);
-        this.simplifyParenthesis();
-        return this;
-    }
 
     public Operable plugIn(Variable var, Operable replacement) {
         if (this.getLeft().equals(var))
