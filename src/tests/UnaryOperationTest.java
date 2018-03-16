@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.*;
+import jmc.cas.Compiler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,12 +47,12 @@ public class UnaryOperationTest {
     };
 
     public static void main(String args[]) {
-        l(Expression.interpret("tan(3pi/2)").isUndefined());
+        l(Compiler.compile("tan(3pi/2)").isUndefined());
 
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
+        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
         operables.forEach(operable -> l(operable
                 + boldBlack("\t->\t")
                 + lightGreen(operable.copy().simplify().toString())
@@ -61,7 +62,7 @@ public class UnaryOperationTest {
         l(Math.cos(Math.PI / 2)); // this is why we need CAS!
         l(RawValue.isInteger(3.0));
 
-        l(Expression.interpret("ln(x)").isUndefined());
+        l(Compiler.compile("ln(x)").isUndefined());
 
         UnaryOperation.registeredOperations().forEach(o -> l(o.getName()));
 
@@ -70,7 +71,7 @@ public class UnaryOperationTest {
         l(uOp.getOperand());
         uOp.setOperand(new Variable("a"));
         l(uOp.getOperand());
-        l(Expression.interpret("$(x)").eval(3));
+        l(Compiler.compile("$(x)").eval(3));
     }
 
 

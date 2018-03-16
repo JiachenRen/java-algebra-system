@@ -1,7 +1,7 @@
 package tests;
 
 import jmc.cas.BinaryOperation;
-import jmc.cas.Expression;
+import jmc.cas.Compiler;
 import jmc.cas.Operable;
 import jmc.utils.Utils;
 
@@ -135,7 +135,7 @@ public class AutoTest {
     private static boolean contains(ArrayList<String> lines, String s) {
         for (String line : lines) {
             String original = getOriginal(line);
-            if (Expression.interpret(original).equals(Expression.interpret(getOriginal(s)))) {
+            if (Compiler.compile(original).equals(Compiler.compile(getOriginal(s)))) {
                 return true;
             }
         }
@@ -154,7 +154,7 @@ public class AutoTest {
         ArrayList<String> lines = getLines(Utils.read(fileName));
 
         ArrayList<Operable> ops = (ArrayList<Operable>) lines.stream()
-                .map(l -> Expression.interpret(getOriginal(l)))
+                .map(l -> Compiler.compile(getOriginal(l)))
                 .collect(Collectors.toList());
 
         ArrayList<String> simplifiedStrs = (ArrayList<String>) lines.stream()
@@ -185,7 +185,7 @@ public class AutoTest {
                         + lightCyan(now));
             }
             if (testValue) {
-                Operable o1 = Expression.interpret(line), o2 = Expression.interpret(now);
+                Operable o1 = Compiler.compile(line), o2 = Compiler.compile(now);
                 if (Operable.numVars(o1) > 0) {
                     for (int k = 0; k <= 10; k++) {
                         int t = (int) Math.pow(k, 2);

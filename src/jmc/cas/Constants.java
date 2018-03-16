@@ -32,7 +32,6 @@ public class Constants {
 
     /**
      * add or define a Constant object into the static ArrayList Constants.
-     * TODO debug
      *
      * @param name          the name of the constant
      * @param computedConst the new computed const instance

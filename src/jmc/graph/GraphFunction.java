@@ -6,7 +6,7 @@ import jmc.cas.*;
 import java.util.ArrayList;
 
 /**
- * GraphFunction class acts as a bridge links Expression with UI in JGrapher
+ * GraphFunction class acts as a bridge links Compiler with UI in JGrapher
  */
 public class GraphFunction extends Function {
     private boolean isVisible;

@@ -35,7 +35,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     public static void define(String name, String expression) {
-        UnaryOperation.define(name, Expression.interpret(expression));
+        UnaryOperation.define(name, Compiler.compile(expression));
     }
 
     public static void define(String name, Evaluable evaluable) {

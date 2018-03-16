@@ -1,7 +1,7 @@
 package tests;
 
 import jmc.Function;
-import jmc.cas.Expression;
+import jmc.cas.Compiler;
 
 /**
  * Created by Jiachen on 04/05/2017.
@@ -11,7 +11,7 @@ import jmc.cas.Expression;
 public class SpeedTest {
     private final static double start = 0, end = 1000, step = 0.1;
     private final static String expStr = "sin(cos(x^(x+sec(x)^3))+12x)";
-    private static Function interpretedFunc = Function.implement(Expression.interpret(expStr));
+    private static Function interpretedFunc = Function.implement(Compiler.compile(expStr));
     private static Function javaCompiledFunction = Function.implement(val -> Math.sin(Math.cos(Math.pow(val, val + Math.pow(1 / Math.cos(val), 3)) + 12 * val)));
 
     //Java compiled function that is the same as "sin(cos(x^(x+sec(x)^3))+12x)"
@@ -36,7 +36,7 @@ public class SpeedTest {
     private static Thread trd3 = new Thread(() -> {
         final long initAbsMillis = System.currentTimeMillis();
         for (double i = start; i <= end; i += step)
-            Expression.interpret(expStr).eval(i);
+            Compiler.compile(expStr).eval(i);
         System.out.print("Runtime compiled JMC function finished within " + (System.currentTimeMillis() - initAbsMillis) + " ms");
     });
 

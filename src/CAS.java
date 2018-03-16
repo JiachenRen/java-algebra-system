@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jmc.cas.*;
+import jmc.cas.Compiler;
 
 import java.util.NoSuchElementException;
 
@@ -31,7 +32,7 @@ public class CAS extends Application {
         expression.bind(controller.input.textProperty());
         expression.addListener((observable, oldValue, newValue) -> {
             try {
-                Operable operable = Expression.interpret(newValue);
+                Operable operable = Compiler.compile(newValue);
                 String addExp = "";
                 if (operable instanceof Operation) {
                     Operation operation = (Operation) operable;

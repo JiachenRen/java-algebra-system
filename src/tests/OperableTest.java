@@ -1,6 +1,6 @@
 package tests;
 
-import jmc.cas.Expression;
+import jmc.cas.Compiler;
 import jmc.cas.Operable;
 import jmc.cas.Operation;
 import jmc.cas.Variable;
@@ -42,18 +42,18 @@ public class OperableTest {
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
-        l(Operable.contains(operables, Expression.interpret("0-x")));
-        l(Operable.commonTerms(Expression.interpret("x*2*b*a*b*x^2/x"), Expression.interpret("b*x^2*b*x*1")));
-        l(Operable.commonTerms(Expression.interpret("x"), Expression.interpret("b*x^2*b*x*1")));
-        l(Operable.commonTerms(Expression.interpret("x"), Expression.interpret("b")));
+        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
+        l(Operable.contains(operables, Compiler.compile("0-x")));
+        l(Operable.commonTerms(Compiler.compile("x*2*b*a*b*x^2/x"), Compiler.compile("b*x^2*b*x*1")));
+        l(Operable.commonTerms(Compiler.compile("x"), Compiler.compile("b*x^2*b*x*1")));
+        l(Operable.commonTerms(Compiler.compile("x"), Compiler.compile("b")));
         l(Operation.div(new Variable("x"), new Variable("p")));
         l(Operation.add(new Variable("x"), new Variable("p")));
         l(Operation.sub(new Variable("x"), new Variable("p")));
         l(Operation.mult(new Variable("x"), new Variable("p")));
         l(Operation.exp(new Variable("x"), new Variable("p")));
         l(new Variable("x").negate());
-        l(Expression.interpret("(-1)*((2x^2)*a^(-1))").simplify().beautify());
+        l(Compiler.compile("(-1)*((2x^2)*a^(-1))").simplify().beautify());
         Operable o = Operation.div(12, 3);
         l(o);
     }

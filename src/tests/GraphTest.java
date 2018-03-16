@@ -1,7 +1,7 @@
 package tests;
 
+import jmc.cas.Compiler;
 import jmc.graph.GraphFunction;
-import jmc.cas.Expression;
 import jmc.graph.Graph;
 import jui.JNode;
 import processing.core.PApplet;
@@ -25,7 +25,7 @@ public class GraphTest extends PApplet {
         JNode.init(this);
         JNode.add(new Graph(0, 0, width, height));
         Graph graph = ((Graph) JNode.getDisplayables().get(0));
-        graph.add(new GraphFunction(Expression.interpret("x")));
+        graph.add(new GraphFunction(Compiler.compile("x")));
 
     }
 

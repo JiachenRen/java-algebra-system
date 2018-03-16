@@ -9,18 +9,10 @@ import static jmc.cas.Assets.*;
 
 /**
  * Created by Jiachen on 19/05/2017.
- * Expression class that programmatically interprets mathematical expressions like "ln(x)^2/e*pi" into binary code.
+ * Compiler class that programmatically interprets mathematical expressions like "ln(x)^2/e*pi" into binary code.
  * An expression must be a function, but a function might not be able to be represented using an expression.
  */
-public class Expression extends Function {
-
-
-    private Operable operable;
-
-    Expression(String exp) {
-        super();
-        this.operable = interpret(exp);
-    }
+public class Compiler {
 
     /**
      * @param expression the string representation of an expression to be incorporated into JMC.
@@ -28,9 +20,9 @@ public class Expression extends Function {
      * @since May 19th. This method is the core of JMC. Took Jiachen tremendous effort. This system of
      * method represents his life's work
      */
-    public static Operable interpret(String expression) {
+    public static Operable compile(String expression) {
         if (expression.toLowerCase().contains("undef")) return RawValue.UNDEF;
-        if (expression.equals("")) throw new JMCException("cannot interpret an empty string");
+        if (expression.equals("")) throw new JMCException("cannot compile an empty string");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
@@ -339,16 +331,4 @@ public class Expression extends Function {
         if (Mode.DEBUG) System.out.println(o);
     }
 
-    public Operable getOperable() {
-        return operable;
-    }
-
-    public void setOperable(Operable operable) {
-        this.operable = operable;
-    }
-
-    @Override
-    public double eval(double val) {
-        return this.operable.eval(val);
-    }
 }

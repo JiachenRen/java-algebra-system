@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.*;
+import jmc.cas.Compiler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,18 +54,18 @@ public class CasSimplificationTest {
 
     public static void main(String args[]) {
         BinaryOperation.define("%", 2, (a, b) -> a % b);
-        l(Expression.interpret("x % 3").eval(5));
+        l(Compiler.compile("x % 3").eval(5));
 
         UnaryOperation.define("digits", x -> Integer.toString((int) x).length());
-        l(Expression.interpret("digits(x)^2").eval(1234));
+        l(Compiler.compile("digits(x)^2").eval(1234));
 
         Constants.define("seed", Math::random);
-        System.out.println(Expression.interpret("seed*2-1").val());
+        System.out.println(Compiler.compile("seed*2-1").val());
 
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
+        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
         operables.forEach(operable -> l(operable
                 + boldBlack("\t->\t")
                 + lightGreen(operable.copy().simplify().toString())

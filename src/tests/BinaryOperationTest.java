@@ -1,7 +1,7 @@
 package tests;
 
 import jmc.cas.BinaryOperation;
-import jmc.cas.Expression;
+import jmc.cas.Compiler;
 import jmc.cas.Operation;
 import jmc.cas.RawValue;
 
@@ -23,8 +23,8 @@ public class BinaryOperationTest {
         l(Operation.mult(3, 5));
         l(Operation.exp(Math.random(), new RawValue(3)));
         l(Operation.exp(new RawValue(3), Math.random()));
-        l(Expression.interpret("x+x*a").simplify());
-        ((BinaryOperation) Expression.interpret("x^b")).flattened().forEach(TestPrint::l);
+        l(Compiler.compile("x+x*a").simplify());
+        ((BinaryOperation) Compiler.compile("x^b")).flattened().forEach(TestPrint::l);
         Operation.div(17,4);
         l(Operation.div(3,4).setLeft(new RawValue(5)));
     }

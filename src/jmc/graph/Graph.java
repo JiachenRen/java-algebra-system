@@ -1,6 +1,6 @@
 package jmc.graph;
 
-import jmc.cas.Expression;
+import jmc.cas.Compiler;
 import jui.*;
 import processing.core.PApplet;
 import processing.core.PConstants;
@@ -488,7 +488,7 @@ public class Graph extends Contextual {
         try {
             String k1 = new BigDecimal(k).toPlainString();
             String b1 = new BigDecimal(b).toPlainString();
-            return new GraphFunction(Expression.interpret(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
+            return new GraphFunction(Compiler.compile(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
         } catch (NumberFormatException e) {
             return null;
         }

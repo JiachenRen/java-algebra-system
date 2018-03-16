@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.*;
+import jmc.cas.Compiler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,19 +18,19 @@ import static tests.TestPrint.l;
 public class CasComprehensiveTest {
     public static void main(String args[]) {
         //to exponential form test
-        Operation operation = (Operation) Expression.interpret("x/(x-1)/(x+1/(x-1))");
+        Operation operation = (Operation) Compiler.compile("x/(x-1)/(x+1/(x-1))");
         operation.toExponentialForm();
         operation.toAdditionOnly();
-        l(Expression.colorMathSymbols(operation.toString()));
+        l(Compiler.colorMathSymbols(operation.toString()));
 
         //to addition only test
-        operation = (Operation) Expression.interpret("x-3x^2+4x-5");
+        operation = (Operation) Compiler.compile("x-3x^2+4x-5");
         operation.toAdditionOnly();
-        l(Expression.colorMathSymbols(operation.toString()));
+        l(Compiler.colorMathSymbols(operation.toString()));
 
         //plug in test
-        operation = (Operation) Expression.interpret("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
-        operation.plugIn(new Variable("x"), Expression.interpret("h"));
+        operation = (Operation) Compiler.compile("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
+        operation.plugIn(new Variable("x"), Compiler.compile("h"));
         l(operation);
 
         //fraction test
@@ -57,9 +58,9 @@ public class CasComprehensiveTest {
         l(f8 + " / " + raw1 + " = " + f8.copy().div(raw1));
         l(f8 + " / " + f7 + " = " + f8.copy().div(f7));
 
-        Operation op1 = (Operation) Expression.interpret("(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3");
+        Operation op1 = (Operation) Compiler.compile("(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3");
         l(((BinaryOperation) op1).flattened());
-        Operation op2 = (Operation) Expression.interpret("3 - 2x + 4x - 4 + 7pi");
+        Operation op2 = (Operation) Compiler.compile("3 - 2x + 4x - 4 + 7pi");
         l(((BinaryOperation) op2).flattened());
 
         l(op1.numNodes(), op2.numNodes());
@@ -76,9 +77,9 @@ public class CasComprehensiveTest {
                 "(ln(x)+3)*5"
         );
         List<Operable> operables;
-        operables = ops.stream().map(Expression::interpret).collect(Collectors.toList());
+        operables = ops.stream().map(Compiler::compile).collect(Collectors.toList());
         operables.forEach(op -> {
-            l(boldBlack("original: ") + Expression.colorMathSymbols(op.toString()));
+            l(boldBlack("original: ") + Compiler.colorMathSymbols(op.toString()));
             l(boldBlack("plug in 5 for x: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)));
             l(boldBlack("evaluated at 5: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)).val());
             l(lightCyan("arbitrary value: ") + op.val());
@@ -86,7 +87,7 @@ public class CasComprehensiveTest {
             l(lightRed("undefined: ") + op.isUndefined());
             l(lightBlue("level of x: ") + op.levelOf(new Variable("x")));
             if (op instanceof Operation) {
-                l(lightGreen("simplified: ") + Expression.colorMathSymbols(op.copy().simplify().toString()));
+                l(lightGreen("simplified: ") + Compiler.colorMathSymbols(op.copy().simplify().toString()));
             }
             l("");
         });
@@ -99,24 +100,24 @@ public class CasComprehensiveTest {
         l(new Fraction(3, 0).isUndefined());
         l(Math.log(11));
 
-        Operable operable = Expression.interpret("0^0");
+        Operable operable = Compiler.compile("0^0");
         l(operable.eval(3));
 
-        l(Operable.numVars(Expression.interpret("a+b*x+a+b/ln(c+e+pi)")));
-        l(Operable.isMultiVar(Expression.interpret("x*3+e")));
-        l(Expression.interpret("x*3+e").replace(new BinaryOperation(new Variable("x"), "*", new RawValue(3)), new Variable("a")));
-        l(Expression.interpret("x*3").equals(Expression.interpret("3*x")));
+        l(Operable.numVars(Compiler.compile("a+b*x+a+b/ln(c+e+pi)")));
+        l(Operable.isMultiVar(Compiler.compile("x*3+e")));
+        l(Compiler.compile("x*3+e").replace(new BinaryOperation(new Variable("x"), "*", new RawValue(3)), new Variable("a")));
+        l(Compiler.compile("x*3").equals(Compiler.compile("3*x")));
 
-        l(Expression.interpret("-6*x*-7").simplify().explicitNegativeForm());
-        l(Expression.interpret("-1*x").simplify().explicitNegativeForm());
+        l(Compiler.compile("-6*x*-7").simplify().explicitNegativeForm());
+        l(Compiler.compile("-1*x").simplify().explicitNegativeForm());
 
-        Operable operable1 = Expression.interpret("(x+a)*-3*(x+a)").simplify();
+        Operable operable1 = Compiler.compile("(x+a)*-3*(x+a)").simplify();
         l(operable1, operable1.explicitNegativeForm(), operable1);
         l(RawValue.ONE);
 
-        l(BinaryOperation.expFormIdx(Expression.interpret("x^(-3/4)").simplify()));
-        l(BinaryOperation.expFormIdx(Expression.interpret("x^(-4)").simplify()));
-        l(BinaryOperation.expFormIdx(Expression.interpret("x^((-4)*x/3)").simplify()));
+        l(BinaryOperation.expFormIdx(Compiler.compile("x^(-3/4)").simplify()));
+        l(BinaryOperation.expFormIdx(Compiler.compile("x^(-4)").simplify()));
+        l(BinaryOperation.expFormIdx(Compiler.compile("x^((-4)*x/3)").simplify()));
 
         l(Constants.E, Constants.PI, Constants.π);
         l(Constants.E.equals(Constants.E), Constants.π.equals(Constants.PI));
@@ -124,6 +125,7 @@ public class CasComprehensiveTest {
         l(RawValue.UNDEF.isInteger(), RawValue.INFINITY.negate().isInteger());
         l(Constants.getConstant("e").val());
         l(Constants.valueOf(Constants.E.getName()));
+
     }
 
 }

@@ -1,7 +1,7 @@
 package tests;
 
 import jmc.MathContext;
-import jmc.cas.Expression;
+import jmc.cas.Compiler;
 import jmc.cas.Fraction;
 import jmc.cas.Operable;
 
@@ -46,13 +46,13 @@ public class FractionTest {
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
         ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Expression::interpret).collect(Collectors.toList());
+        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
         operables.forEach(operable -> l(operable + " -> " + operable.copy().simplify() + ", "
                 + boldBlack("status: ")
                 + ((operable.val() - operable.copy().simplify().val()) < 1E-10 ? lightGreen("PASSED") : lightRed("FAILED"))));
 
 //        l(Fraction.extractRoot(-2,3));
-        l(((Fraction) Expression.interpret("3/4").simplify()).exp(-3));
+        l(((Fraction) Compiler.compile("3/4").simplify()).exp(-3));
     }
 
 }

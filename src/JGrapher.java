@@ -1,4 +1,5 @@
 import jmc.cas.*;
+import jmc.cas.Compiler;
 import jmc.extras.Element;
 import jmc.graph.Graph;
 import jmc.graph.GraphFunction;
@@ -196,7 +197,7 @@ public class JGrapher extends PApplet {
         //Dynamic function interpretation
         funcTextInput.onSubmit(() -> {
             try {
-                Operable original = Expression.interpret(funcTextInput.getStaticContent());
+                Operable original = Compiler.compile(funcTextInput.getStaticContent());
                 if (casEnabled) {
                     original = original.simplify().beautify();
                 }
@@ -207,7 +208,7 @@ public class JGrapher extends PApplet {
         }).setDefaultContent(" type in your function  here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
             try {
-                Operable interpreted = Expression.interpret(funcTextInput.getContent());
+                Operable interpreted = Compiler.compile(funcTextInput.getContent());
                 GraphFunction func = new GraphFunction(interpreted);
                 boolean shouldOverride = !graph.override(funcNameTextInput.getContent(), func);
                 updateSuppliedVarValueSelectors(shouldOverride);
@@ -590,7 +591,7 @@ public class JGrapher extends PApplet {
 
         JNode.add(parent);
 
-        UnaryOperation.define("~", Expression.interpret("x*x"));
+        UnaryOperation.define("~", Compiler.compile("x*x"));
         BinaryOperation.define("%", 2, (a, b) -> a % b);
         Constants.define("$C", () -> 1);
 
