@@ -159,7 +159,21 @@ public interface Operable extends Evaluable {
 
     Operable toExponentialForm();
 
+    /**
+     * Expand the expression; its behavior is exactly what you would expect.
+     * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
+     *
+     * @return expanded expression of type Operable
+     */
     Operable expand();
+
+    /**
+     * If this method is successfully implemented, it would be marked as a milestone.
+     *
+     * @param v the variable in which the first derivative is taken with respect to.
+     * @return first derivative of the expression
+     */
+//    Operable firstDerivative(Variable v);
 
     /**
      * @param o the operable to be replaced

@@ -73,7 +73,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     @Override
     public Operable toExponentialForm() {
         if (getLeftHand() instanceof Operation) {
-            this.setLeftHand(((Operation) getLeftHand()).toExponentialForm());
+            this.setLeftHand(getLeftHand().toExponentialForm());
             return this;
         } else return this;
     }
@@ -191,7 +191,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return new UnaryOperation(getLeftHand(), operation);
     }
 
-    private static class RegisteredUnaryOperation implements Evaluable {
+    private static class RegisteredUnaryOperation implements Evaluable, Nameable {
         private static ArrayList<Function> reservedFunctions;
         private Function unaryOperation;
 
@@ -222,6 +222,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 if (function.getName().equals(name))
                     unaryOperation = function;
             }
+        }
+
+        public String getName() {
+            return unaryOperation.getName();
         }
 
         @Override

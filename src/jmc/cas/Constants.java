@@ -61,7 +61,7 @@ public class Constants {
         return 0.0;
     }
 
-    public static class Constant extends Variable {
+    public static class Constant extends Variable implements Nameable{
         private ComputedConst computedConst;
 
         public Constant(String name, ComputedConst computedConst) {

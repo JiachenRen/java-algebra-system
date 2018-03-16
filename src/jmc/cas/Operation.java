@@ -4,7 +4,7 @@ package jmc.cas;
  * Created by Jiachen on 16/05/2017.
  * Abstract parent of BinaryOperation and Unary Operation
  */
-public abstract class Operation implements Operable {
+public abstract class Operation implements Operable, Nameable {
     private Operable leftHand;
 
     public Operation(Operable leftHand) {

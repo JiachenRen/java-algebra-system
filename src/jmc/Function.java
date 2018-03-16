@@ -1,6 +1,7 @@
 package jmc;
 
 import jmc.cas.Evaluable;
+import jmc.cas.Nameable;
 
 import java.util.ArrayList;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  * Created by Jiachen on 3/2/18.
  * Function class
  */
-public abstract class Function implements Evaluable {
+public abstract class Function implements Evaluable, Nameable {
 
     private String name;
 

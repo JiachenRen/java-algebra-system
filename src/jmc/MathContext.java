@@ -1,7 +1,6 @@
 package jmc;
 
 import jmc.cas.JMCException;
-import tests.TestPrint;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

@@ -4,7 +4,7 @@ package jmc.cas;
  * Created by Jiachen on 16/05/2017.
  * Variable class
  */
-public class Variable extends LeafNode {
+public class Variable extends LeafNode implements Nameable {
     private String name;
 
     public Variable(String name) {

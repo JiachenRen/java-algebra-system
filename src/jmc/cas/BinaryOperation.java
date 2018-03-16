@@ -1009,6 +1009,10 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
+    public String getName() {
+        return operation.name;
+    }
+
     public boolean is(String s) {
         return operation.equals(s);
     }
@@ -1017,7 +1021,7 @@ public class BinaryOperation extends Operation {
         double eval(double a, double b);
     }
 
-    private static class RegisteredBinaryOperation implements BinEvaluable {
+    private static class RegisteredBinaryOperation implements BinEvaluable, Nameable {
         private static ArrayList<RegisteredBinaryOperation> registeredBinOps;
         private BinEvaluable binEvaluable;
         private String name;
@@ -1055,6 +1059,10 @@ public class BinaryOperation extends Operation {
                     registeredBinOps.remove(i);
             }
             registeredBinOps.add(new RegisteredBinaryOperation(name, priority, evaluable));
+        }
+
+        public String getName() {
+            return name;
         }
 
         private static String listAsString(int priority) {

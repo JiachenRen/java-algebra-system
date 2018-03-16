@@ -13,6 +13,8 @@ abstract class LeafNode implements BinLeafNode, Operable {
 
     public abstract Operable explicitNegativeForm();
 
+//    public abstract Operable firstDerivative();
+
     public int levelOf(Operable o) {
         return this.equals(o) ? 0 : -1;
     }
