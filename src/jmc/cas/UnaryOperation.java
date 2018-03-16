@@ -17,8 +17,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     private Function operation;
 
-    public UnaryOperation(Operable leftHand, String operation) {
-        this(leftHand, RegisteredUnaryOperation.extract(operation));
+    public UnaryOperation(Operable operand, String operation) {
+        this(operand, RegisteredUnaryOperation.extract(operation));
     }
 
     /**
@@ -26,11 +26,11 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * This constructor accepts non-JMC standard functions; This means that as long as the function
      * of concern returns a value, it would be valid.
      *
-     * @param leftHand  e.g. "x" in "log(x)"
+     * @param operand  e.g. "x" in "log(x)"
      * @param operation "log" in "log(x)"
      */
-    public UnaryOperation(Operable leftHand, Function operation) {
-        super(leftHand);
+    public UnaryOperation(Operable operand, Function operation) {
+        super(operand);
         this.operation = operation;
     }
 
@@ -57,7 +57,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return the computed value by plugging in the value of x into the designated unary operation
      */
     public double eval(double x) {
-        return operation.eval(getLeftHand().eval(x));
+        return operation.eval(getOperand().eval(x));
     }
 
     /**
@@ -67,14 +67,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      */
     @Override
     public Operable toExponentialForm() {
-        if (getLeftHand() instanceof Operation) {
-            this.setLeftHand(getLeftHand().toExponentialForm());
+        if (getOperand() instanceof Operation) {
+            this.setOperand(getOperand().toExponentialForm());
             return this;
         } else return this;
     }
 
     public int complexity() {
-        return getLeftHand().complexity() + 1;
+        return getOperand().complexity() + 1;
     }
 
     /**
@@ -85,8 +85,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return a new Operable instance that is the simplified version of self.
      */
     public Operable simplify() {
-        if (getLeftHand() instanceof Operation) {
-            this.setLeftHand((this.getLeftHand()).simplify());
+        if (getOperand() instanceof Operation) {
+            this.setOperand((this.getOperand()).simplify());
         }
 
         if (this.isUndefined()) return RawValue.UNDEF;
@@ -95,28 +95,28 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         if (RawValue.isInteger(val))
             return new RawValue(val);
 
-        if (getLeftHand() instanceof UnaryOperation) {
-            UnaryOperation op = (UnaryOperation) getLeftHand();
+        if (getOperand() instanceof UnaryOperation) {
+            UnaryOperation op = (UnaryOperation) getOperand();
             switch (this.operation.getName()) { // TODO: domain!!!
                 case "cos":
                     switch (op.operation.getName()) {
                         case "acos":
-                            return op.getLeftHand();
+                            return op.getOperand();
                     }
                     break;
                 case "sin":
                     switch (op.operation.getName()) {
                         case "asin":
-                            return op.getLeftHand();
+                            return op.getOperand();
                     }
                 case "tan":
                     switch (op.operation.getName()) {
                         case "atan":
-                            return op.getLeftHand(); // what about tan(pi/2)?
+                            return op.getOperand(); // what about tan(pi/2)?
                     }
             }
-        } else if (getLeftHand() instanceof Constants.Constant) {
-            Constants.Constant c = (Constants.Constant) getLeftHand();
+        } else if (getOperand() instanceof Constants.Constant) {
+            Constants.Constant c = (Constants.Constant) getOperand();
             switch (c.getName()) {
                 case "e":
                     switch (operation.getName()) {
@@ -134,8 +134,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                             return RawValue.ZERO;
                     }
             }
-        } else if (getLeftHand() instanceof RawValue) {
-            RawValue r = (RawValue) getLeftHand();
+        } else if (getOperand() instanceof RawValue) {
+            RawValue r = (RawValue) getOperand();
             if (r.isInteger()) {
                 switch (operation.getName()) {
                     case "ln": // ln(a^3) = 3ln(a), where a is a^3 is an integer
@@ -152,12 +152,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 }
             }
 
-        } else if (getLeftHand() instanceof BinaryOperation) {
-            BinaryOperation binOp = (BinaryOperation) getLeftHand();
+        } else if (getOperand() instanceof BinaryOperation) {
+            BinaryOperation binOp = (BinaryOperation) getOperand();
             switch (operation.getName()) {
                 case "ln":
-                    if (binOp.is("^") && binOp.getLeftHand().equals(Constants.getConstant("e"))) {
-                        return binOp.getRightHand();
+                    if (binOp.is("^") && binOp.getOperand().equals(Constants.getConstant("e"))) {
+                        return binOp.getRight();
                     }
             }
         }
@@ -168,7 +168,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     @Override
     public UnaryOperation copy() {
-        return new UnaryOperation(getLeftHand(), operation);
+        return new UnaryOperation(getOperand(), operation);
     }
 
     /**
@@ -178,15 +178,15 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return a new Operable instance that is the addition only form of self.
      */
     public UnaryOperation toAdditionOnly() {
-        if (getLeftHand() instanceof Operation) {
-            this.setLeftHand(((Operation) this.getLeftHand()).toAdditionOnly());
+        if (getOperand() instanceof Operation) {
+            this.setOperand(((Operation) this.getOperand()).toAdditionOnly());
             return this;
         }
         return this;
     }
 
     public String toString() {
-        return operation.getName() + "(" + getLeftHand().toString() + ")";
+        return operation.getName() + "(" + getOperand().toString() + ")";
     }
 
     public String getName() {
@@ -273,7 +273,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     public boolean equals(Operable other) {
         return other instanceof UnaryOperation
                 && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
-                && this.getLeftHand().equals(((UnaryOperation) other).getLeftHand()); //delegate down
+                && this.getOperand().equals(((UnaryOperation) other).getOperand()); //delegate down
     }
 
     /**
@@ -284,24 +284,24 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return a new instance with its original variable replaced with {nested}
      */
     public Operable plugIn(Variable var, Operable replacement) {
-        if (this.getLeftHand().equals(var))
-            this.setLeftHand(replacement);
-        else this.getLeftHand().plugIn(var, replacement);
+        if (this.getOperand().equals(var))
+            this.setOperand(replacement);
+        else this.getOperand().plugIn(var, replacement);
         return this;
     }
 
     public int numNodes() {
-        return 1 + getLeftHand().numNodes();
+        return 1 + getOperand().numNodes();
     }
 
     public double val() {
-        return operation.eval(getLeftHand().val());
+        return operation.eval(getOperand().val());
     }
 
     public boolean isUndefined() {
-        if (getLeftHand().isUndefined()) return true;
-        if (getLeftHand().val() != Double.NaN) {
-            double n = getLeftHand().val();
+        if (getOperand().isUndefined()) return true;
+        if (getOperand().val() != Double.NaN) {
+            double n = getOperand().val();
             switch (operation.getName()) {
                 case "ln":
                     return n <= 0;
@@ -322,14 +322,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         switch (operation.getName()) {
             case "tan": // domain: x != pi/2 + n*pi
             case "sec":
-                o = Operation.div(this.getLeftHand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
+                o = Operation.div(this.getOperand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger()) {
                     return Math.abs(((RawValue) o).intValue() % 2) == 1;
                 }
                 break;
             case "cot": // domain: x != n*pi
             case "csc":
-                o = Operation.div(this.getLeftHand(), Constants.getConstant("pi")).simplify();
+                o = Operation.div(this.getOperand(), Constants.getConstant("pi")).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger())
                     return true;
 
@@ -340,28 +340,28 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     public int levelOf(Operable o) {
         if (this.equals(o)) return 0;
-        int i = getLeftHand().levelOf(o);
+        int i = getOperand().levelOf(o);
         if (i == -1) return -1;
         return i + 1;
     }
 
 
     public Operable beautify() {
-        return setLeftHand(getLeftHand().beautify());
+        return setOperand(getOperand().beautify());
     }
 
     public Operable explicitNegativeForm() {
-        return copy().setLeftHand(getLeftHand().explicitNegativeForm());
+        return copy().setOperand(getOperand().explicitNegativeForm());
     }
 
     public Operable expand() {
-        return setLeftHand(getLeftHand().expand());
+        return setOperand(getOperand().expand());
     }
 
     public Operable replace(Operable o, Operable r) {
         if (this.equals(o)) return r;
         UnaryOperation clone = this.copy();
-        return clone.setLeftHand(clone.getLeftHand().replace(o, r));
+        return clone.setOperand(clone.getOperand().replace(o, r));
     }
 
 

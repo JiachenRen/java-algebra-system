@@ -171,12 +171,12 @@ public class Fraction extends RawValue {
             if (o1 == null || o1.isUndefined() || o2 == null || o2.isUndefined()) return RawValue.UNDEF;
             BinaryOperation nu = (BinaryOperation) o1;
             BinaryOperation de = (BinaryOperation) o2;
-            BinaryOperation irr = (BinaryOperation) de.getRightHand();
-            Operable a = new BinaryOperation(de.getLeftHand(), "*", irr.getLeftHand());
-            Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRightHand());
-            BinaryOperation conjugate = new BinaryOperation(irr.getLeftHand(), "^", c);
-            Operable d = new BinaryOperation(nu.getLeftHand(), "/", a);
-            BinaryOperation e = new BinaryOperation(nu.getRightHand(), "*", conjugate);
+            BinaryOperation irr = (BinaryOperation) de.getRight();
+            Operable a = new BinaryOperation(de.getOperand(), "*", irr.getOperand());
+            Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRight());
+            BinaryOperation conjugate = new BinaryOperation(irr.getOperand(), "^", c);
+            Operable d = new BinaryOperation(nu.getOperand(), "/", a);
+            BinaryOperation e = new BinaryOperation(nu.getRight(), "*", conjugate);
             return new BinaryOperation(d, "*", e).simplify();
         } else if (o.isInteger()) {
             this.exp(o.intValue());

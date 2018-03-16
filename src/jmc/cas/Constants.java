@@ -8,9 +8,6 @@ import java.util.ArrayList;
  */
 public class Constants {
     private static ArrayList<Constant> constants;
-    public static final Constant E = getConstant("e");
-    public static final Constant PI = getConstant("pi");
-    public static final Constant π = getConstant("π");
 
     static {
         constants = new ArrayList<>();
@@ -20,6 +17,10 @@ public class Constants {
         define("rand", Math::random);
         define("π", () -> Math.PI);
     }
+
+    public static final Constant E = getConstant("e");
+    public static final Constant PI = getConstant("pi");
+    public static final Constant π = getConstant("π");
 
     public static boolean contains(String symbol) {
         for (Constant constant : constants) {

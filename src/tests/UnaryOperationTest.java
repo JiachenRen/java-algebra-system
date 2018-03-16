@@ -1,9 +1,6 @@
 package tests;
 
-import jmc.cas.Expression;
-import jmc.cas.Operable;
-import jmc.cas.RawValue;
-import jmc.cas.UnaryOperation;
+import jmc.cas.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,6 +66,10 @@ public class UnaryOperationTest {
         UnaryOperation.registeredOperations().forEach(o -> l(o.getName()));
 
         UnaryOperation.define("$", "x*1000");
+        UnaryOperation uOp = new UnaryOperation(new Variable("x"), "log");
+        l(uOp.getOperand());
+        uOp.setOperand(new Variable("a"));
+        l(uOp.getOperand());
         l(Expression.interpret("$(x)").eval(3));
     }
 
