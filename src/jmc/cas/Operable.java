@@ -8,11 +8,90 @@ import java.util.ArrayList;
  * Operable
  */
 public interface Operable extends Evaluable {
-    String toString();
+    /**
+     * invocation of commonTerms(o1 = "a*b*(c+d)*m", o2 = "f*(c+d)*m")
+     * returns [(c+d), m]
+     *
+     * @param o1 Operable #1
+     * @param o2 Operable #2
+     * @return an ArrayList containing common terms of o1 and o2
+     */
+    static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
+        ArrayList<Operable> terms = new ArrayList<>();
+        if (o1 instanceof BinLeafNode && o2 instanceof BinLeafNode) {
+            if (o1.equals(o2)) {
+                terms.add(o1.copy());
+            }
+        } else if (((o1 instanceof BinaryOperation) && (o2 instanceof BinLeafNode)) || ((o1 instanceof BinLeafNode) && (o2 instanceof BinaryOperation))) {
+            BinaryOperation binOp = (BinaryOperation) (o1 instanceof BinaryOperation ? o1 : o2);
+            Operable op = o1 instanceof BinaryOperation ? o2 : o1;
+            ArrayList<Operable> pool = binOp.flattened();
+            if (Operable.contains(pool, op))
+                terms.add(op.copy());
+        } else if (o1 instanceof BinaryOperation && o2 instanceof BinaryOperation) {
+            BinaryOperation binOp1 = (BinaryOperation) o1;
+            BinaryOperation binOp2 = (BinaryOperation) o2;
+            ArrayList<Operable> pool1 = binOp1.flattened();
+            ArrayList<Operable> pool2 = binOp2.flattened();
+            for (int i = pool1.size() - 1; i >= 0; i--) {
+                Operable op1 = pool1.get(i);
+                for (int k = pool2.size() - 1; k >= 0; k--) {
+                    Operable op2 = pool2.get(k);
+                    if (op1.equals(op2)) {
+                        pool1.remove(i);
+                        pool2.remove(k);
+                        terms.add(op1.copy());
+                        break;
+                    }
+                }
+            }
+        }
+        return terms;
+    }
+
+    boolean equals(Operable other);
 
     Operable copy();
 
-    boolean equals(Operable other);
+    static boolean contains(ArrayList<Operable> operables, Operable target) {
+        for (Operable operable : operables) {
+            if (operable.equals(target))
+                return true;
+        }
+        return false;
+    }
+
+    static boolean isMultiVar(Operable o) {
+        return numVars(o) > 1;
+    }
+
+    /**
+     * @param o the Operable instance to be inspected.
+     * @return number of variables in the expression represented by o.
+     */
+    static int numVars(Operable o) {
+        return extractVariables(o).size();
+    }
+
+    static ArrayList<Variable> extractVariables(Operable o) {
+        ArrayList<Variable> vars = new ArrayList<>();
+        for (Character c : Assets.VARS.toCharArray()) {
+            Variable var = new Variable(c.toString());
+            if (o.levelOf(var) != -1)
+                vars.add(var);
+        }
+        return vars;
+    }
+
+    /**
+     * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
+     *
+     * @param o the Operable instance that you are looking for.
+     * @return the level at which operable is found.
+     */
+    int levelOf(Operable o);
+
+    String toString();
 
     /**
      * numNodes() of expression "(3 + 4.5) * 5.3 / 2.7" returns 7
@@ -29,14 +108,6 @@ public interface Operable extends Evaluable {
      * @return new instance that is the negated version of the original
      */
     Operable negate();
-
-    /**
-     * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
-     *
-     * @param o the Operable instance that you are looking for.
-     * @return the level at which operable is found.
-     */
-    int levelOf(Operable o);
 
     /**
      * @return level of complexity of the expression represented by an integer with 1 being
@@ -88,84 +159,9 @@ public interface Operable extends Evaluable {
      */
     Operable explicitNegativeForm();
 
-    /**
-     * @param o the Operable instance to be inspected.
-     * @return number of variables in the expression represented by o.
-     */
-    static int numVars(Operable o) {
-        return extractVariables(o).size();
-    }
-
-    static ArrayList<Variable> extractVariables(Operable o) {
-        ArrayList<Variable> vars = new ArrayList<>();
-        for (Character c : Assets.VARS.toCharArray()) {
-            Variable var = new Variable(c.toString());
-            if (o.levelOf(var) != -1)
-                vars.add(var);
-        }
-        return vars;
-    }
-
-    static boolean contains(ArrayList<Operable> operables, Operable target) {
-        for (Operable operable : operables) {
-            if (operable.equals(target))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * invocation of commonTerms(o1 = "a*b*(c+d)*m", o2 = "f*(c+d)*m")
-     * returns [(c+d), m]
-     *
-     * @param o1 Operable #1
-     * @param o2 Operable #2
-     * @return an ArrayList containing common terms of o1 and o2
-     */
-    static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
-        ArrayList<Operable> terms = new ArrayList<>();
-        if (o1 instanceof BinLeafNode && o2 instanceof BinLeafNode) {
-            if (o1.equals(o2)) {
-                terms.add(o1.copy());
-            }
-        } else if (((o1 instanceof BinaryOperation) && (o2 instanceof BinLeafNode)) || ((o1 instanceof BinLeafNode) && (o2 instanceof BinaryOperation))) {
-            BinaryOperation binOp = (BinaryOperation) (o1 instanceof BinaryOperation ? o1 : o2);
-            Operable op = o1 instanceof BinaryOperation ? o2 : o1;
-            ArrayList<Operable> pool = binOp.flattened();
-            if (Operable.contains(pool, op))
-                terms.add(op.copy());
-        } else if (o1 instanceof BinaryOperation && o2 instanceof BinaryOperation) {
-            BinaryOperation binOp1 = (BinaryOperation) o1;
-            BinaryOperation binOp2 = (BinaryOperation) o2;
-            ArrayList<Operable> pool1 = binOp1.flattened();
-            ArrayList<Operable> pool2 = binOp2.flattened();
-            for (int i = pool1.size() - 1; i >= 0; i--) {
-                Operable op1 = pool1.get(i);
-                for (int k = pool2.size() - 1; k >= 0; k--) {
-                    Operable op2 = pool2.get(k);
-                    if (op1.equals(op2)) {
-                        pool1.remove(i);
-                        pool2.remove(k);
-                        terms.add(op1.copy());
-                        break;
-                    }
-                }
-            }
-        }
-        return terms;
-    }
-
     Operable toAdditionOnly();
 
     Operable toExponentialForm();
-
-    /**
-     * Expand the expression; its behavior is exactly what you would expect.
-     * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
-     *
-     * @return expanded expression of type Operable
-     */
-    Operable expand();
 
     /**
      * If this method is successfully implemented, it would be marked as a milestone.
@@ -176,15 +172,19 @@ public interface Operable extends Evaluable {
 //    Operable firstDerivative(Variable v);
 
     /**
+     * Expand the expression; its behavior is exactly what you would expect.
+     * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
+     *
+     * @return expanded expression of type Operable
+     */
+    Operable expand();
+
+    /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place
      * @return the original operable with o replaced by r.
      */
     Operable replace(Operable o, Operable r);
-
-    static boolean isMultiVar(Operable o) {
-        return numVars(o) > 1;
-    }
 
     boolean isUndefined();
 }

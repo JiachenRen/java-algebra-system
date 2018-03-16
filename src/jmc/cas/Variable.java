@@ -12,14 +12,6 @@ public class Variable extends LeafNode implements Nameable {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public double eval(double x) {
         return x;
     }
@@ -28,12 +20,8 @@ public class Variable extends LeafNode implements Nameable {
         return name;
     }
 
-    public int complexity() {
-        return 3;
-    }
-
-    public Operable simplify() {
-        return this;
+    public boolean isUndefined() {
+        return false;
     }
 
     /**
@@ -45,21 +33,24 @@ public class Variable extends LeafNode implements Nameable {
         return new Variable(name);
     }
 
+    public Operable explicitNegativeForm() {
+        return this.copy();
+    }
+
+    public int complexity() {
+        return 3;
+    }
+
     public boolean equals(Operable other) {
         return other instanceof Variable && ((Variable) other).getName().equals(this.name);
     }
 
-    public boolean isUndefined() {
-        return false;
+    public String getName() {
+        return name;
     }
 
-    /**
-     * Since a variable is not an arbitrary number, val() should return NaN.
-     *
-     * @return NaN
-     */
-    public double val() {
-        return Double.NaN;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -72,8 +63,17 @@ public class Variable extends LeafNode implements Nameable {
         return other;
     }
 
-    public Operable explicitNegativeForm() {
-        return this.copy();
+    public Operable simplify() {
+        return this;
+    }
+
+    /**
+     * Since a variable is not an arbitrary number, val() should return NaN.
+     *
+     * @return NaN
+     */
+    public double val() {
+        return Double.NaN;
     }
 
 }

@@ -16,19 +16,30 @@ public class RawValue extends LeafNode {
 
     private Number number;
 
-    public RawValue(Number number) {
-        this.number = number;
-    }
-
     public RawValue(RawValue rawValue) {
         this(rawValue.number);
     }
 
-    public double eval(double x) {
-        return doubleValue();
+    public RawValue(Number number) {
+        this.number = number;
     }
 
-    public double val() {
+    public static boolean isInteger(double n) {
+        return new RawValue(n).isInteger();
+    }
+
+    public boolean isInteger() {
+        double val = doubleValue();
+        if (Double.isNaN(val) || Double.isInfinite(val)) return false;
+        String s = number.toString();
+        return s.endsWith(".0") || !s.contains(".");
+    }
+
+    public double doubleValue() {
+        return number.doubleValue();
+    }
+
+    public double eval(double x) {
         return doubleValue();
     }
 
@@ -52,45 +63,21 @@ public class RawValue extends LeafNode {
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
-    public Operable simplify() {
-        return this;
-    }
-
-    public RawValue copy() {
-        return new RawValue(number);
-    }
-
-    @Override
-    public RawValue negate() {
-        return new RawValue(this.doubleValue() * -1);
-    }
-
-    public double doubleValue() {
-        return number.doubleValue();
-    }
-
     public int intValue() {
         return number.intValue();
-    }
-
-    public boolean isInteger() {
-        double val = doubleValue();
-        if (Double.isNaN(val) || Double.isInfinite(val)) return false;
-        String s = number.toString();
-        return s.endsWith(".0") || !s.contains(".");
-    }
-
-    public static boolean isInteger(double n) {
-        return new RawValue(n).isInteger();
     }
 
     public boolean isUndefined() {
         return new Double(number.doubleValue()).isNaN();
     }
 
-    public RawValue inverse() {
-        if (isInteger()) return new Fraction(1, intValue());
-        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
+    public RawValue copy() {
+        return new RawValue(number);
+    }
+
+    public Operable explicitNegativeForm() {
+        if (this.equals(RawValue.ONE.negate())) return this;
+        return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate()) : this.copy();
     }
 
     public boolean equals(Operable other) {
@@ -100,22 +87,6 @@ public class RawValue extends LeafNode {
                 || other instanceof RawValue
                 && ((RawValue) other).doubleValue()
                 == this.doubleValue();
-    }
-
-    public boolean isZero() {
-        return doubleValue() == 0;
-    }
-
-    public boolean isInfinite() {
-        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
-    }
-
-    public boolean isPositive() {
-        return doubleValue() > 0;
-    }
-
-    public int complexity() {
-        return 1;
     }
 
     /**
@@ -128,8 +99,37 @@ public class RawValue extends LeafNode {
         return this;
     }
 
-    public Operable explicitNegativeForm() {
-        if (this.equals(RawValue.ONE.negate())) return this;
-        return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate()) : this.copy();
+    public Operable simplify() {
+        return this;
+    }
+
+    public double val() {
+        return doubleValue();
+    }
+
+    public int complexity() {
+        return 1;
+    }
+
+    @Override
+    public RawValue negate() {
+        return new RawValue(this.doubleValue() * -1);
+    }
+
+    public RawValue inverse() {
+        if (isInteger()) return new Fraction(1, intValue());
+        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
+    }
+
+    public boolean isZero() {
+        return doubleValue() == 0;
+    }
+
+    public boolean isInfinite() {
+        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
+    }
+
+    public boolean isPositive() {
+        return doubleValue() > 0;
     }
 }

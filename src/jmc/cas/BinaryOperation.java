@@ -29,6 +29,12 @@ public class BinaryOperation extends Operation {
         simplifyParenthesis();
     }
 
+    private BinaryOperation simplifyParenthesis() {
+        processParentheticalNotation(getLeftHand(), false);
+        processParentheticalNotation(this.rightHand, true);
+        return this;
+    }
+
     /**
      * Remove unnecessary parenthesis
      *
@@ -49,10 +55,12 @@ public class BinaryOperation extends Operation {
         }
     }
 
-    private BinaryOperation simplifyParenthesis() {
-        processParentheticalNotation(getLeftHand(), false);
-        processParentheticalNotation(this.rightHand, true);
-        return this;
+    public int getPriority() {
+        return operation.priority;
+    }
+
+    void setOmitParenthesis(boolean temp) {
+        omitParenthesis = temp;
     }
 
     /**
@@ -64,35 +72,12 @@ public class BinaryOperation extends Operation {
         RegisteredBinaryOperation.define(name, priority, evaluable);
     }
 
-    public double eval(double x) {
-        double leftVal = getLeftHand().eval(x);
-        double rightVal = rightHand.eval(x);
-        return operation.eval(leftVal, rightVal);
-    }
-
-    public double val() {
-        return operation.eval(getLeftHand().val(), getRightHand().val());
-    }
-
-    public String toString() {
-        boolean k = getLeftHand() instanceof RawValue && getLeftHand().val() < 0;
-        boolean q = getRightHand() instanceof RawValue && getRightHand().val() < 0;
-        String left = k ? "(" + getLeftHand().toString() + ")" : getLeftHand().toString();
-        String right = q ? "(" + getRightHand().toString() + ")" : getRightHand().toString();
-        String temp = left + operation.name + right;
-        return omitParenthesis ? temp : "(" + temp + ")";
-    }
-
-    void setOmitParenthesis(boolean temp) {
-        omitParenthesis = temp;
-    }
-
-    public int getPriority() {
-        return operation.priority;
-    }
-
     public static int getPriority(String operation) {
         return RegisteredBinaryOperation.extract(operation).priority;
+    }
+
+    public static String binaryOperations() {
+        return binaryOperations(1) + binaryOperations(2) + binaryOperations(3);
     }
 
     /**
@@ -102,8 +87,73 @@ public class BinaryOperation extends Operation {
         return RegisteredBinaryOperation.listAsString(priority);
     }
 
-    public static String binaryOperations() {
-        return binaryOperations(1) + binaryOperations(2) + binaryOperations(3);
+    /**
+     * HELPER METHOD
+     * this's operation should be "*" to invoke this method
+     * (a+b)*(a+ln(c)+d) -> a*a + a*ln(c) + a*d + b*a + b*ln(c) + b*d
+     *
+     * @param o1 binary operation "+"
+     * @param o2 binary operation "+"
+     * @return o1*o2 expanded
+     */
+    private static Operable crossExpand(BinaryOperation o1, BinaryOperation o2) {
+        ArrayList<Operable> f1 = o1.flattened(), f2 = o2.flattened();
+        final Operable[] result = new Operable[1];
+        f1.stream().map(o -> f2.stream()
+                .map(p -> Operation.mult(p, o))
+                .reduce(Operation::add).get())
+                .reduce(Operation::add)
+                .ifPresent(o -> result[0] = o);
+        return result[0];
+    }
+
+    private static boolean isAddition(Operable op) {
+        return op instanceof BinaryOperation && ((BinaryOperation) op).operation.equals("+");
+    }
+
+    /**
+     * HELPER METHOD
+     * detects form a^(-[...])
+     * <p>
+     * 0 -> not exponential form
+     * 1 -> form x^(-a/b)
+     * 2 -> form x^-a
+     * 3 -> form x^([...]*-a)
+     *
+     * @return idx that represents the kind of exponential form
+     */
+    public static int expFormIdx(Operable o) {
+        if (!(o instanceof BinaryOperation)) return 0;
+        BinaryOperation binOp = (BinaryOperation) o;
+        if (!binOp.operation.equals("^")) return 0;
+        if (binOp.rightHand instanceof RawValue && binOp.rightHand.val() < 0)
+            return binOp.rightHand instanceof Fraction ? 1 : 2;
+        if (binOp.rightHand instanceof BinaryOperation) {
+            BinaryOperation binOp1 = ((BinaryOperation) binOp.rightHand);
+            if (binOp1.operation.equals("*")) {
+                ArrayList<Operable> pool = ((BinaryOperation) binOp1.explicitNegativeForm()).flattened();
+                if (Operable.contains(pool, RawValue.ONE.negate()))
+                    return 3;
+            }
+        }
+        return 0;
+    }
+
+    public double val() {
+        return operation.eval(getLeftHand().val(), getRightHand().val());
+    }
+
+    public double eval(double x) {
+        double leftVal = getLeftHand().eval(x);
+        double rightVal = rightHand.eval(x);
+        return operation.eval(leftVal, rightVal);
+    }
+
+    @Override
+    public Operable setLeftHand(Operable o) {
+        super.setLeftHand(o);
+        simplifyParenthesis();
+        return this;
     }
 
     /**
@@ -128,6 +178,119 @@ public class BinaryOperation extends Operation {
         processParentheticalNotation(getLeftHand(), false);
         processParentheticalNotation(rightHand, true);
         return this;
+    }
+
+    /**
+     * Note: modifies self, but may not
+     *
+     * @return the simplified version of self
+     */
+    public Operable simplify() {
+
+        simplifySubNodes();
+        simplifyParenthesis();
+
+        if (!operation.isStandard())
+            return this; // nothing could be done with non-standard operations
+        if (isUndefined()) return RawValue.UNDEF;
+
+        if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
+            Operable simplified = simplify((RawValue) getLeftHand(), (RawValue) rightHand);
+            if (simplified != null) return simplified;
+        }
+
+        //at this point neither left hand nor right hand is undefined.
+
+        Operable simplified1 = simplifyRightHand(getRightHand());
+        if (simplified1 != null) return simplified1;
+
+
+        if (getLeftHand().equals(getRightHand())) {
+            switch (operation.name) {
+                case "+":
+                    return new BinaryOperation(new RawValue(2), "*", getLeftHand());
+                case "-":
+                    return RawValue.ZERO;
+                case "*":
+                    return new BinaryOperation(getLeftHand(), "^", new RawValue(2));
+                case "/":
+                    return RawValue.ONE;
+            }
+        }
+
+        //converting to exponential form and additional only, allowing further simplification.
+        this.toAdditionOnly().toExponentialForm().simplifySubNodes();
+
+        //handle special cases
+        Operable simplified2 = simplifyZeroOne();
+        if (simplified2 != null) return simplified2;
+
+        if (getLeftHand() instanceof BinaryOperation && getRightHand() instanceof BinaryOperation) {
+            BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
+            BinaryOperation binOp2 = (BinaryOperation) getRightHand();
+            Operable simplified = simplify(binOp1, binOp2);
+            if (simplified != null) return simplified;
+        }
+
+        if (getLeftHand() instanceof BinaryOperation) {
+            Operable simplified = simplify(getRightHand(), (BinaryOperation) getLeftHand());
+            if (simplified != null) return simplified;
+        }
+        if (getRightHand() instanceof BinaryOperation) {
+            Operable simplified = simplify(getLeftHand(), (BinaryOperation) getRightHand());
+            if (simplified != null) return simplified;
+        }
+
+
+        if (getPriority() == 1) return this.beautify(); //up to this point the ^ operator cannot be simplified.
+
+        //up to this point all simplifications should have been tried, except the recursive cross-simplification
+        if (getLeftHand() instanceof BinLeafNode //e.g. ln(x) * x is not simplifiable
+                && rightHand instanceof BinLeafNode) {
+            return this; //no more could be done.
+        } else if (getLeftHand() instanceof BinLeafNode //e.g. x * (3.5x + 4) is not simplifiable
+                && rightHand instanceof BinaryOperation
+                && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
+            return this;
+        } else if (getRightHand() instanceof BinLeafNode //e.g. (3.5x + 4) * x  is not simplifiable
+                && getLeftHand() instanceof BinaryOperation
+                && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()) {
+            return this;
+        } else if (getLeftHand() instanceof BinaryOperation //e.g. (3.5x + 4) * (4x + 3) is not simplifiable
+                && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()
+                && rightHand instanceof BinaryOperation
+                && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
+            return this;
+        } else { //perform cross-simplification
+            ArrayList<Operable> flattened = this.flattened(); //make operations of the same priority throughout the binary tree visible at the same level.
+            crossSimplify(flattened);
+            if (flattened.size() < 2) return flattened.get(0);
+            else return reconstructBinTree(flattened);
+        }
+    }
+
+    @Override
+    public BinaryOperation copy() {
+        return new BinaryOperation(getLeftHand().copy(), operation, rightHand.copy());
+    }
+
+    public BinaryOperation toAdditionOnly() {
+        if (getLeftHand() instanceof Operation) this.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
+        this.rightHand = rightHand instanceof Operation ? ((Operation) rightHand).toAdditionOnly() : rightHand;
+        if (operation.name.equals("-")) {
+            operation = RegisteredBinaryOperation.extract("+");
+            rightHand = UnaryOperation.negate(rightHand);
+        }
+        return this;
+    }
+
+    public String toString() {
+        boolean k = getLeftHand() instanceof RawValue && getLeftHand().val() < 0;
+        boolean q = getRightHand() instanceof RawValue && getRightHand().val() < 0;
+        String left = k ? "(" + getLeftHand().toString() + ")" : getLeftHand().toString();
+        String right = q ? "(" + getRightHand().toString() + ")" : getRightHand().toString();
+        String temp = left + operation.name + right;
+        return omitParenthesis ? temp : "(" + temp + ")";
     }
 
     /**
@@ -469,7 +632,6 @@ public class BinaryOperation extends Operation {
         return null;
     }
 
-
     /**
      * perform ambiguous iteration of left-hand and right-hand. The order does not matter.
      *
@@ -483,100 +645,8 @@ public class BinaryOperation extends Operation {
         return null;
     }
 
-    /**
-     * a series of operations in which the order of left, right hands is unimportant.
-     */
-    private interface AmbiguousOperation {
-        Operable operate(Operable o1, Operable o2, RegisteredBinaryOperation operator);
-    }
-
-    /**
-     * Note: modifies self, but may not
-     *
-     * @return the simplified version of self
-     */
-    public Operable simplify() {
-
-        simplifySubNodes();
-        simplifyParenthesis();
-
-        if (!operation.isStandard())
-            return this; // nothing could be done with non-standard operations
-        if (isUndefined()) return RawValue.UNDEF;
-
-        if (getLeftHand() instanceof RawValue && rightHand instanceof RawValue) {
-            Operable simplified = simplify((RawValue) getLeftHand(), (RawValue) rightHand);
-            if (simplified != null) return simplified;
-        }
-
-        //at this point neither left hand nor right hand is undefined.
-
-        Operable simplified1 = simplifyRightHand(getRightHand());
-        if (simplified1 != null) return simplified1;
-
-
-        if (getLeftHand().equals(getRightHand())) {
-            switch (operation.name) {
-                case "+":
-                    return new BinaryOperation(new RawValue(2), "*", getLeftHand());
-                case "-":
-                    return RawValue.ZERO;
-                case "*":
-                    return new BinaryOperation(getLeftHand(), "^", new RawValue(2));
-                case "/":
-                    return RawValue.ONE;
-            }
-        }
-
-        //converting to exponential form and additional only, allowing further simplification.
-        this.toAdditionOnly().toExponentialForm().simplifySubNodes();
-
-        //handle special cases
-        Operable simplified2 = simplifyZeroOne();
-        if (simplified2 != null) return simplified2;
-
-        if (getLeftHand() instanceof BinaryOperation && getRightHand() instanceof BinaryOperation) {
-            BinaryOperation binOp1 = (BinaryOperation) getLeftHand();
-            BinaryOperation binOp2 = (BinaryOperation) getRightHand();
-            Operable simplified = simplify(binOp1, binOp2);
-            if (simplified != null) return simplified;
-        }
-
-        if (getLeftHand() instanceof BinaryOperation) {
-            Operable simplified = simplify(getRightHand(), (BinaryOperation) getLeftHand());
-            if (simplified != null) return simplified;
-        }
-        if (getRightHand() instanceof BinaryOperation) {
-            Operable simplified = simplify(getLeftHand(), (BinaryOperation) getRightHand());
-            if (simplified != null) return simplified;
-        }
-
-
-        if (getPriority() == 1) return this.beautify(); //up to this point the ^ operator cannot be simplified.
-
-        //up to this point all simplifications should have been tried, except the recursive cross-simplification
-        if (getLeftHand() instanceof BinLeafNode //e.g. ln(x) * x is not simplifiable
-                && rightHand instanceof BinLeafNode) {
-            return this; //no more could be done.
-        } else if (getLeftHand() instanceof BinLeafNode //e.g. x * (3.5x + 4) is not simplifiable
-                && rightHand instanceof BinaryOperation
-                && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
-            return this;
-        } else if (getRightHand() instanceof BinLeafNode //e.g. (3.5x + 4) * x  is not simplifiable
-                && getLeftHand() instanceof BinaryOperation
-                && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()) {
-            return this;
-        } else if (getLeftHand() instanceof BinaryOperation //e.g. (3.5x + 4) * (4x + 3) is not simplifiable
-                && ((BinaryOperation) getLeftHand()).getPriority() != getPriority()
-                && rightHand instanceof BinaryOperation
-                && ((BinaryOperation) rightHand).getPriority() != getPriority()) {
-            return this;
-        } else { //perform cross-simplification
-            ArrayList<Operable> flattened = this.flattened(); //make operations of the same priority throughout the binary tree visible at the same level.
-            crossSimplify(flattened);
-            if (flattened.size() < 2) return flattened.get(0);
-            else return reconstructBinTree(flattened);
-        }
+    public int numNodes() {
+        return getLeftHand().numNodes() + getRightHand().numNodes() + 1;
     }
 
     /**
@@ -588,10 +658,6 @@ public class BinaryOperation extends Operation {
         setLeftHand(getLeftHand().simplify());
         setRightHand(rightHand.simplify());
         return this;
-    }
-
-    public int numNodes() {
-        return getLeftHand().numNodes() + getRightHand().numNodes() + 1;
     }
 
     /**
@@ -733,39 +799,18 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-    /**
-     * HELPER METHOD
-     * this's operation should be "*" to invoke this method
-     * (a+b)*(a+ln(c)+d) -> a*a + a*ln(c) + a*d + b*a + b*ln(c) + b*d
-     *
-     * @param o1 binary operation "+"
-     * @param o2 binary operation "+"
-     * @return o1*o2 expanded
-     */
-    private static Operable crossExpand(BinaryOperation o1, BinaryOperation o2) {
-        ArrayList<Operable> f1 = o1.flattened(), f2 = o2.flattened();
-        final Operable[] result = new Operable[1];
-        f1.stream().map(o -> f2.stream()
-                .map(p -> Operation.mult(p, o))
-                .reduce(Operation::add).get())
-                .reduce(Operation::add)
-                .ifPresent(o -> result[0] = o);
-        return result[0];
-    }
-
-    private static boolean isAddition(Operable op) {
-        return op instanceof BinaryOperation && ((BinaryOperation) op).operation.equals("+");
-    }
-
-
     private void expandSubNodes() {
         setLeftHand(getLeftHand().expand());
         setRightHand(getRightHand().expand());
     }
 
-    @Override
-    public BinaryOperation copy() {
-        return new BinaryOperation(getLeftHand().copy(), operation, rightHand.copy());
+    private boolean isVirtuallyNegative(Operable binOp) {
+        return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), RawValue.ONE.negate());
+    }
+
+    private Operable reconstruct(ArrayList<Operable> operables) {
+        if (operables.size() == 0) return null;
+        return operables.size() >= 2 ? reconstructBinTree(operables) : operables.get(0);
     }
 
     public boolean equals(Operable other) {
@@ -777,75 +822,6 @@ public class BinaryOperation extends Operation {
                 || (binOp.getLeftHand().equals(this.getRightHand())
                 && binOp.getRightHand().equals(this.getLeftHand())
                 && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
-    }
-
-    public BinaryOperation toAdditionOnly() {
-        if (getLeftHand() instanceof Operation) this.setLeftHand(((Operation) getLeftHand()).toAdditionOnly());
-        this.rightHand = rightHand instanceof Operation ? ((Operation) rightHand).toAdditionOnly() : rightHand;
-        if (operation.name.equals("-")) {
-            operation = RegisteredBinaryOperation.extract("+");
-            rightHand = UnaryOperation.negate(rightHand);
-        }
-        return this;
-    }
-
-    /**
-     * basically reversing the effects of toAdditionalOnly and toExponentialForm
-     * a*b^(-1) -> a/b,
-     * a*(1/3) -> a/3,
-     * a+(-1)*b -> a-b
-     *
-     * @return beautified version of the original
-     */
-    public Operable beautify() {
-        Operable left = getLeftHand().beautify();
-        Operable right = getRightHand().beautify();
-        switch (operation.name) {
-            case "*":
-                ArrayList<Operable> numerators = new ArrayList<>();
-                ArrayList<Operable> denominators = new ArrayList<>();
-                separate(left, denominators, numerators);
-                separate(right, denominators, numerators);
-                Operable numerator = reconstruct(numerators);
-                Operable denominator = reconstruct(denominators);
-                if (denominator == null || denominator.equals(RawValue.ONE))
-                    return numerator;
-                else return new BinaryOperation(numerator, "/", denominator);
-            case "+":
-                if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
-                    Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
-                    return new BinaryOperation(right, "-", right1).beautify();
-                } else if (isVirtuallyNegative(right) && !isVirtuallyNegative(left)) {
-                    Operable right1 = new BinaryOperation(right, "*", RawValue.ONE.negate()).simplify();
-                    return new BinaryOperation(left, "-", right1).beautify();
-                }
-            case "^":
-                ArrayList<Operable> ns = new ArrayList<>();
-                ArrayList<Operable> ds = new ArrayList<>();
-                this.setLeftHand(left);
-                this.setRightHand(right);
-
-                separate(this, ds, ns);
-                Operable n = reconstruct(ns);
-                Operable d = reconstruct(ds);
-                if (n == null) return this;
-                if (d == null || d.equals(RawValue.ONE))
-                    return n;
-                else return new BinaryOperation(n, "/", d);
-
-        }
-        this.setLeftHand(left);
-        this.setRightHand(right);
-        return this;
-    }
-
-    private boolean isVirtuallyNegative(Operable binOp) {
-        return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), RawValue.ONE.negate());
-    }
-
-    private Operable reconstruct(ArrayList<Operable> operables) {
-        if (operables.size() == 0) return null;
-        return operables.size() >= 2 ? reconstructBinTree(operables) : operables.get(0);
     }
 
     /**
@@ -913,31 +889,144 @@ public class BinaryOperation extends Operation {
     }
 
     /**
-     * HELPER METHOD
-     * detects form a^(-[...])
-     * <p>
-     * 0 -> not exponential form
-     * 1 -> form x^(-a/b)
-     * 2 -> form x^-a
-     * 3 -> form x^([...]*-a)
+     * basically reversing the effects of toAdditionalOnly and toExponentialForm
+     * a*b^(-1) -> a/b,
+     * a*(1/3) -> a/3,
+     * a+(-1)*b -> a-b
      *
-     * @return idx that represents the kind of exponential form
+     * @return beautified version of the original
      */
-    public static int expFormIdx(Operable o) {
-        if (!(o instanceof BinaryOperation)) return 0;
-        BinaryOperation binOp = (BinaryOperation) o;
-        if (!binOp.operation.equals("^")) return 0;
-        if (binOp.rightHand instanceof RawValue && binOp.rightHand.val() < 0)
-            return binOp.rightHand instanceof Fraction ? 1 : 2;
-        if (binOp.rightHand instanceof BinaryOperation) {
-            BinaryOperation binOp1 = ((BinaryOperation) binOp.rightHand);
-            if (binOp1.operation.equals("*")) {
-                ArrayList<Operable> pool = ((BinaryOperation) binOp1.explicitNegativeForm()).flattened();
-                if (Operable.contains(pool, RawValue.ONE.negate()))
-                    return 3;
-            }
+    public Operable beautify() {
+        Operable left = getLeftHand().beautify();
+        Operable right = getRightHand().beautify();
+        switch (operation.name) {
+            case "*":
+                ArrayList<Operable> numerators = new ArrayList<>();
+                ArrayList<Operable> denominators = new ArrayList<>();
+                separate(left, denominators, numerators);
+                separate(right, denominators, numerators);
+                Operable numerator = reconstruct(numerators);
+                Operable denominator = reconstruct(denominators);
+                if (denominator == null || denominator.equals(RawValue.ONE))
+                    return numerator;
+                else return new BinaryOperation(numerator, "/", denominator);
+            case "+":
+                if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
+                    Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
+                    return new BinaryOperation(right, "-", right1).beautify();
+                } else if (isVirtuallyNegative(right) && !isVirtuallyNegative(left)) {
+                    Operable right1 = new BinaryOperation(right, "*", RawValue.ONE.negate()).simplify();
+                    return new BinaryOperation(left, "-", right1).beautify();
+                }
+            case "^":
+                ArrayList<Operable> ns = new ArrayList<>();
+                ArrayList<Operable> ds = new ArrayList<>();
+                this.setLeftHand(left);
+                this.setRightHand(right);
+
+                separate(this, ds, ns);
+                Operable n = reconstruct(ns);
+                Operable d = reconstruct(ds);
+                if (n == null) return this;
+                if (d == null || d.equals(RawValue.ONE))
+                    return n;
+                else return new BinaryOperation(n, "/", d);
+
         }
-        return 0;
+        this.setLeftHand(left);
+        this.setRightHand(right);
+        return this;
+    }
+
+    public String getName() {
+        return operation.name;
+    }
+
+    public boolean is(String s) {
+        return operation.equals(s);
+    }
+
+    /**
+     * a series of operations in which the order of left, right hands is unimportant.
+     */
+    private interface AmbiguousOperation {
+        Operable operate(Operable o1, Operable o2, RegisteredBinaryOperation operator);
+    }
+
+    public interface BinEvaluable {
+        double eval(double a, double b);
+    }
+
+    private static class RegisteredBinaryOperation implements BinEvaluable, Nameable {
+        private static ArrayList<RegisteredBinaryOperation> registeredBinOps;
+
+        static {
+            registeredBinOps = new ArrayList<>();
+            define("+", 3, (a, b) -> a + b);
+            define("-", 3, (a, b) -> a - b);
+            define("*", 2, (a, b) -> a * b);
+            define("/", 2, (a, b) -> a / b);
+            define("^", 1, Math::pow);
+            if (Mode.DEBUG) System.out.println("# reserved binary operations declared");
+        }
+
+        private BinEvaluable binEvaluable;
+        private String name;
+        private int priority; //1 is the most prioritized
+        private String standardOperations = "+-*/^";
+
+        private RegisteredBinaryOperation(String name, int priority, BinEvaluable evaluable) {
+            this.name = name;
+            this.binEvaluable = evaluable;
+            this.priority = priority;
+        }
+
+        private static void define(String name, int priority, BinEvaluable evaluable) {
+            for (int i = 0; i < registeredBinOps.size(); i++) {
+                RegisteredBinaryOperation function = registeredBinOps.get(i);
+                if (function.name.equals(name))
+                    registeredBinOps.remove(i);
+            }
+            registeredBinOps.add(new RegisteredBinaryOperation(name, priority, evaluable));
+        }
+
+        private static String listAsString(int priority) {
+            String incrementer = "";
+            for (RegisteredBinaryOperation operation : registeredBinOps) {
+                if (operation.priority == priority)
+                    incrementer += operation.name;
+            }
+            return incrementer;
+        }
+
+        private static RegisteredBinaryOperation extract(String name) {
+            for (RegisteredBinaryOperation binaryOperation : registeredBinOps)
+                if (binaryOperation.name.equals(name))
+                    return binaryOperation;
+            throw new RuntimeException("undefined binary operator \"" + name + "\"");
+        }
+
+        private boolean isStandard() {
+            return standardOperations.contains(name);
+        }
+
+        public double eval(double a, double b) {
+            return binEvaluable.eval(a, b);
+        }
+
+        public boolean equals(RegisteredBinaryOperation other) {
+            return this.name.equals(other.name);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean equals(String s) {
+            return this.name.equals(s);
+        }
+
+
     }
 
     public Operable explicitNegativeForm() {
@@ -1002,91 +1091,5 @@ public class BinaryOperation extends Operation {
         return clone;
     }
 
-    @Override
-    public Operable setLeftHand(Operable o) {
-        super.setLeftHand(o);
-        simplifyParenthesis();
-        return this;
-    }
 
-    public String getName() {
-        return operation.name;
-    }
-
-    public boolean is(String s) {
-        return operation.equals(s);
-    }
-
-    public interface BinEvaluable {
-        double eval(double a, double b);
-    }
-
-    private static class RegisteredBinaryOperation implements BinEvaluable, Nameable {
-        private static ArrayList<RegisteredBinaryOperation> registeredBinOps;
-        private BinEvaluable binEvaluable;
-        private String name;
-        private int priority; //1 is the most prioritized
-        private String standardOperations = "+-*/^";
-
-        static {
-            registeredBinOps = new ArrayList<>();
-            define("+", 3, (a, b) -> a + b);
-            define("-", 3, (a, b) -> a - b);
-            define("*", 2, (a, b) -> a * b);
-            define("/", 2, (a, b) -> a / b);
-            define("^", 1, Math::pow);
-            if (Mode.DEBUG) System.out.println("# reserved binary operations declared");
-        }
-
-        private boolean isStandard() {
-            return standardOperations.contains(name);
-        }
-
-        private RegisteredBinaryOperation(String name, int priority, BinEvaluable evaluable) {
-            this.name = name;
-            this.binEvaluable = evaluable;
-            this.priority = priority;
-        }
-
-        public double eval(double a, double b) {
-            return binEvaluable.eval(a, b);
-        }
-
-        private static void define(String name, int priority, BinEvaluable evaluable) {
-            for (int i = 0; i < registeredBinOps.size(); i++) {
-                RegisteredBinaryOperation function = registeredBinOps.get(i);
-                if (function.name.equals(name))
-                    registeredBinOps.remove(i);
-            }
-            registeredBinOps.add(new RegisteredBinaryOperation(name, priority, evaluable));
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        private static String listAsString(int priority) {
-            String incrementer = "";
-            for (RegisteredBinaryOperation operation : registeredBinOps) {
-                if (operation.priority == priority)
-                    incrementer += operation.name;
-            }
-            return incrementer;
-        }
-
-        private static RegisteredBinaryOperation extract(String name) {
-            for (RegisteredBinaryOperation binaryOperation : registeredBinOps)
-                if (binaryOperation.name.equals(name))
-                    return binaryOperation;
-            throw new RuntimeException("undefined binary operator \"" + name + "\"");
-        }
-
-        public boolean equals(RegisteredBinaryOperation other) {
-            return this.name.equals(other.name);
-        }
-
-        public boolean equals(String s) {
-            return this.name.equals(s);
-        }
-    }
 }

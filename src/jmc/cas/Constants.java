@@ -7,11 +7,10 @@ import java.util.ArrayList;
  * Constants
  */
 public class Constants {
-    public interface ComputedConst {
-        double compute();
-    }
-
     private static ArrayList<Constant> constants;
+    public static final Constant E = getConstant("e");
+    public static final Constant PI = getConstant("pi");
+    public static final Constant π = getConstant("π");
 
     static {
         constants = new ArrayList<>();
@@ -22,10 +21,6 @@ public class Constants {
         define("π", () -> Math.PI);
     }
 
-    public static final Constant E = getConstant("e");
-    public static final Constant PI = getConstant("pi");
-    public static final Constant π = getConstant("π");
-
     public static boolean contains(String symbol) {
         for (Constant constant : constants) {
             if (constant.getName().equals(symbol))
@@ -33,7 +28,6 @@ public class Constants {
         }
         return false;
     }
-
 
     /**
      * add or define a Constant object into the static ArrayList Constants.
@@ -61,7 +55,23 @@ public class Constants {
         return 0.0;
     }
 
-    public static class Constant extends Variable implements Nameable{
+    public static ArrayList<Constant> list() {
+        return constants;
+    }
+
+    public static Constant getConstant(String name) {
+        for (Constant constant : constants) {
+            if (constant.getName().equals(name))
+                return constant;
+        }
+        throw new JMCException("constant + \"" + name + "\" does not exist");
+    }
+
+    public interface ComputedConst {
+        double compute();
+    }
+
+    public static class Constant extends Variable implements Nameable {
         private ComputedConst computedConst;
 
         public Constant(String name, ComputedConst computedConst) {
@@ -75,26 +85,21 @@ public class Constants {
             this.computedConst = other.computedConst;
         }
 
-        public String toString() {
-            return getName();
-        }
-
-        public int complexity() {
-            return 2;
-        }
-
         public double eval(double x) {
             return computedConst.compute();
         }
 
-        @Override
-        public double val() {
-            return computedConst.compute();
+        public String toString() {
+            return getName();
         }
 
         @Override
         public Constant copy() {
             return new Constant(getName(), computedConst);
+        }
+
+        public int complexity() {
+            return 2;
         }
 
         public boolean equals(Operable other) {
@@ -106,21 +111,13 @@ public class Constants {
             return new Constant(this);
         }
 
+        @Override
+        public double val() {
+            return computedConst.compute();
+        }
+
         public int numNodes() {
             return 1;
         }
-    }
-
-    public static ArrayList<Constant> list() {
-        return constants;
-    }
-
-
-    public static Constant getConstant(String name) {
-        for (Constant constant : constants) {
-            if (constant.getName().equals(name))
-                return constant;
-        }
-        throw new JMCException("constant + \"" + name + "\" does not exist");
     }
 }

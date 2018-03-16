@@ -34,19 +34,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         this.operation = operation;
     }
 
-    /**
-     * @param x input, double x
-     * @return the computed value by plugging in the value of x into the designated unary operation
-     */
-    public double eval(double x) {
-        return operation.eval(getLeftHand().eval(x));
-    }
-
-    public int complexity() {
-        return getLeftHand().complexity() + 1;
-    }
-
-
     public static void define(String name, String expression) {
         UnaryOperation.define(name, Expression.interpret(expression));
     }
@@ -66,6 +53,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     /**
+     * @param x input, double x
+     * @return the computed value by plugging in the value of x into the designated unary operation
+     */
+    public double eval(double x) {
+        return operation.eval(getLeftHand().eval(x));
+    }
+
+    /**
      * Note: modifies self
      *
      * @return exponential form of self
@@ -78,23 +73,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         } else return this;
     }
 
-    /**
-     * Note: modifies self.
-     * Only delegates downward if it contains an operation.
-     *
-     * @return a new Operable instance that is the addition only form of self.
-     */
-    public UnaryOperation toAdditionOnly() {
-        if (getLeftHand() instanceof Operation) {
-            this.setLeftHand(((Operation) this.getLeftHand()).toAdditionOnly());
-            return this;
-        }
-        return this;
-    }
-
-
-    public String toString() {
-        return operation.getName() + "(" + getLeftHand().toString() + ")";
+    public int complexity() {
+        return getLeftHand().complexity() + 1;
     }
 
     /**
@@ -191,9 +171,30 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return new UnaryOperation(getLeftHand(), operation);
     }
 
+    /**
+     * Note: modifies self.
+     * Only delegates downward if it contains an operation.
+     *
+     * @return a new Operable instance that is the addition only form of self.
+     */
+    public UnaryOperation toAdditionOnly() {
+        if (getLeftHand() instanceof Operation) {
+            this.setLeftHand(((Operation) this.getLeftHand()).toAdditionOnly());
+            return this;
+        }
+        return this;
+    }
+
+    public String toString() {
+        return operation.getName() + "(" + getLeftHand().toString() + ")";
+    }
+
+    public String getName() {
+        return operation.getName();
+    }
+
     private static class RegisteredUnaryOperation implements Evaluable, Nameable {
         private static ArrayList<Function> reservedFunctions;
-        private Function unaryOperation;
 
         static {
             reservedFunctions = new ArrayList<>();
@@ -217,20 +218,13 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             if (Mode.DEBUG) System.out.println("# reserved unary operations declared");
         }
 
+        private Function unaryOperation;
+
         RegisteredUnaryOperation(String name) {
             for (Function function : reservedFunctions) {
                 if (function.getName().equals(name))
                     unaryOperation = function;
             }
-        }
-
-        public String getName() {
-            return unaryOperation.getName();
-        }
-
-        @Override
-        public double eval(double x) {
-            return unaryOperation.eval(x);
         }
 
         private static Function extract(String name) {
@@ -254,9 +248,20 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             return reservedFunctions;
         }
 
+        @Override
+        public double eval(double x) {
+            return unaryOperation.eval(x);
+        }
+
+        public String getName() {
+            return unaryOperation.getName();
+        }
+
         public boolean equals(RegisteredUnaryOperation other) {
             return other.unaryOperation.getName().equals(this.unaryOperation.getName());
         }
+
+
     }
 
     /**
@@ -340,9 +345,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return i + 1;
     }
 
-    public String getName() {
-        return operation.getName();
-    }
 
     public Operable beautify() {
         return setLeftHand(getLeftHand().beautify());
@@ -361,5 +363,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         UnaryOperation clone = this.copy();
         return clone.setLeftHand(clone.getLeftHand().replace(o, r));
     }
+
 
 }

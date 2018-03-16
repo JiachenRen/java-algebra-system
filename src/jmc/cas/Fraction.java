@@ -13,16 +13,45 @@ import static jmc.MathContext.getUniqueFactors;
  * Fraction
  */
 public class Fraction extends RawValue {
-    private long numerator;
-    private long denominator;
     public static double TOLERANCE = 5E-7;
     public static Fraction UNDEF = new Fraction(0, 0);
+    private long numerator;
+    private long denominator;
 
     public Fraction(long numerator, long denominator) {
         super(denominator == 0 ? Double.NaN : numerator / denominator);
         this.numerator = numerator;
         this.denominator = denominator;
         this.reduce();
+    }
+
+    public RawValue reduce() {
+        if (isUndefined()) return RawValue.UNDEF;
+        long gcd = gcd();
+        this.numerator /= gcd;
+        this.denominator /= gcd;
+        if (denominator == 1) {
+            return new RawValue(numerator);
+        } else if (numerator == 0) {
+            return new RawValue(0);
+        } else if (numerator < 0 && denominator < 0) {
+            this.numerator *= -1;
+            this.denominator *= -1;
+        }
+        return this;
+    }
+
+    private long gcd() {
+        return gcd(numerator, denominator);
+    }
+
+    /**
+     * @param a first number
+     * @param b second number
+     * @return greatest common divisor
+     */
+    private static long gcd(long a, long b) {
+        return MathContext.gcd(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
     }
 
     public static RawValue convertToFraction(double val) {
@@ -39,8 +68,81 @@ public class Fraction extends RawValue {
         return new Fraction(numerator, denominator).reduce();
     }
 
-    private long gcd() {
-        return gcd(numerator, denominator);
+    /**
+     * extract root, n^(1/r) to a*b^(1/r)
+     *
+     * @param r root (square, cube, quad, etc)
+     * @param n number within the root, n^(1/r)
+     * @return irrational form Fraction or BinaryOperation
+     */
+    public static Operable extractRoot(int n, int r) {
+        if (n == 0) return null;
+        else if (n == 1 || n == -1) {
+            BinaryOperation in = new BinaryOperation(RawValue.ONE, "^", RawValue.ZERO);
+            return new BinaryOperation(new RawValue(n), "*", in);
+        } else if (r == 0) throw new IllegalArgumentException("root cannot be negative");
+        boolean isNegative = false;
+        if (n < 0) {
+            if (r % 2 == 0) return RawValue.UNDEF;
+            isNegative = true;
+            n *= -1;
+        }
+        ArrayList<Long> factors = getFactors(n);
+        ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
+        int[] num = new int[uniqueFactors.size()];
+        int max = uniqueFactors.get(uniqueFactors.size() - 1).intValue();
+        int[] map = new int[max + 1];
+        for (int i = 0; i < uniqueFactors.size(); i++) {
+            map[uniqueFactors.get(i).intValue()] = i;
+        }
+        factors.forEach(f -> num[map[f.intValue()]] += 1);
+        int ext = isNegative ? -1 : 1, n1 = 1;
+        for (int i = 0; i < num.length; i++) {
+            int k = num[i] / r;
+            long u = uniqueFactors.get(i);
+            ext *= Math.pow(u, k);
+            int q = num[i] - r * k;
+            n1 *= Math.pow(u, q);
+        }
+
+        BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r));
+        BinaryOperation irr = new BinaryOperation(new RawValue(n1), "^", exp);
+        return new BinaryOperation(new RawValue(ext), "*", irr);
+    }
+
+    private static long lcm(long a, long b) {
+        return MathContext.lcm(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
+    }
+
+    /**
+     * Works like a charm -- outputs the exact fraction as my TI-nspire CAS.
+     *
+     * @param val       the double to be converted to fraction
+     * @param tolerance desired difference between fraction and the actual double value
+     * @return Fraction derived from the provided double value
+     */
+    public static RawValue convertToFraction(double val, double tolerance) {
+        if (val < 0) {
+            RawValue raw = convertToFraction(-val);
+            if (raw instanceof Fraction)
+                ((Fraction) raw).numerator *= -1;
+            return raw;
+        }
+        //TODO: there should be a maximum TOLERANCE for inputs like 0.1403508772
+        long numerator = 1, h2 = 0, denominator = 0, k2 = 1;
+        double b = val;
+        do {
+            long a = (long) Math.floor(b);
+            long aux = numerator;
+            numerator = a * numerator + h2;
+            h2 = aux;
+            aux = denominator;
+            denominator = a * denominator + k2;
+            k2 = aux;
+            b = 1 / (b - a);
+        } while (Math.abs(val - numerator / (double) denominator) > val * tolerance);
+
+        return new Fraction(numerator, denominator).reduce();
     }
 
     public RawValue add(RawValue o) {
@@ -96,48 +198,6 @@ public class Fraction extends RawValue {
         return this.reduce();
     }
 
-    /**
-     * extract root, n^(1/r) to a*b^(1/r)
-     *
-     * @param r root (square, cube, quad, etc)
-     * @param n number within the root, n^(1/r)
-     * @return irrational form Fraction or BinaryOperation
-     */
-    public static Operable extractRoot(int n, int r) {
-        if (n == 0) return null;
-        else if (n == 1 || n == -1) {
-            BinaryOperation in = new BinaryOperation(RawValue.ONE, "^", RawValue.ZERO);
-            return new BinaryOperation(new RawValue(n), "*", in);
-        } else if (r == 0) throw new IllegalArgumentException("root cannot be negative");
-        boolean isNegative = false;
-        if (n < 0) {
-            if (r % 2 == 0) return RawValue.UNDEF;
-            isNegative = true;
-            n *= -1;
-        }
-        ArrayList<Long> factors = getFactors(n);
-        ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
-        int[] num = new int[uniqueFactors.size()];
-        int max = uniqueFactors.get(uniqueFactors.size() - 1).intValue();
-        int[] map = new int[max + 1];
-        for (int i = 0; i < uniqueFactors.size(); i++) {
-            map[uniqueFactors.get(i).intValue()] = i;
-        }
-        factors.forEach(f -> num[map[f.intValue()]] += 1);
-        int ext = isNegative ? -1 : 1, n1 = 1;
-        for (int i = 0; i < num.length; i++) {
-            int k = num[i] / r;
-            long u = uniqueFactors.get(i);
-            ext *= Math.pow(u, k);
-            int q = num[i] - r * k;
-            n1 *= Math.pow(u, q);
-        }
-
-        BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r));
-        BinaryOperation irr = new BinaryOperation(new RawValue(n1), "^", exp);
-        return new BinaryOperation(new RawValue(ext), "*", irr);
-    }
-
     public RawValue sub(RawValue o) {
         return this.add(o.copy().negate());
     }
@@ -157,122 +217,13 @@ public class Fraction extends RawValue {
         }
     }
 
-    @Override
-    public Fraction inverse() {
-        if (isUndefined()) return Fraction.UNDEF;
-        long tmp = denominator;
-        denominator = numerator;
-        numerator = tmp;
-        return this;
-    }
-
-    @Override
-    public boolean isUndefined() {
-        return super.isUndefined() || denominator == 0;
-    }
-
     public RawValue div(RawValue o) {
         return mult(o.inverse());
-    }
-
-    public Fraction negate() {
-        Fraction clone = this.copy();
-        clone.numerator *= -1;
-        clone.reduce();
-        return clone;
     }
 
     private void simult(long n) {
         denominator *= n;
         numerator *= n;
-    }
-
-    public RawValue reduce() {
-        if (isUndefined()) return RawValue.UNDEF;
-        long gcd = gcd();
-        this.numerator /= gcd;
-        this.denominator /= gcd;
-        if (denominator == 1) {
-            return new RawValue(numerator);
-        } else if (numerator == 0) {
-            return new RawValue(0);
-        } else if (numerator < 0 && denominator < 0) {
-            this.numerator *= -1;
-            this.denominator *= -1;
-        }
-        return this;
-    }
-
-    /**
-     * @param a first number
-     * @param b second number
-     * @return greatest common divisor
-     */
-    private static long gcd(long a, long b) {
-        return MathContext.gcd(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
-    }
-
-    private static long lcm(long a, long b) {
-        return MathContext.lcm(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
-    }
-
-    /**
-     * Works like a charm -- outputs the exact fraction as my TI-nspire CAS.
-     *
-     * @param val       the double to be converted to fraction
-     * @param tolerance desired difference between fraction and the actual double value
-     * @return Fraction derived from the provided double value
-     */
-    public static RawValue convertToFraction(double val, double tolerance) {
-        if (val < 0) {
-            RawValue raw = convertToFraction(-val);
-            if (raw instanceof Fraction)
-                ((Fraction) raw).numerator *= -1;
-            return raw;
-        }
-        //TODO: there should be a maximum TOLERANCE for inputs like 0.1403508772
-        long numerator = 1, h2 = 0, denominator = 0, k2 = 1;
-        double b = val;
-        do {
-            long a = (long) Math.floor(b);
-            long aux = numerator;
-            numerator = a * numerator + h2;
-            h2 = aux;
-            aux = denominator;
-            denominator = a * denominator + k2;
-            k2 = aux;
-            b = 1 / (b - a);
-        } while (Math.abs(val - numerator / (double) denominator) > val * tolerance);
-
-        return new Fraction(numerator, denominator).reduce();
-    }
-
-    public String toString() {
-        return "(" + numerator + "/" + denominator + ")";
-    }
-
-    public Fraction setNumerator(long n) {
-        this.numerator = n;
-        return this;
-    }
-
-    public Fraction setDenominator(long n) {
-        this.denominator = n;
-        return this;
-    }
-
-    public Fraction copy() {
-        return new Fraction(numerator, denominator);
-    }
-
-    @Override
-    public boolean isZero() {
-        return !isUndefined() && denominator == 0;
-    }
-
-    @Override
-    public boolean isPositive() {
-        return !isUndefined() && numerator / denominator > 0;
     }
 
     @Override
@@ -286,8 +237,17 @@ public class Fraction extends RawValue {
         return (double) numerator / (double) denominator;
     }
 
-    public Operable beautify() {
-        return this;
+    public String toString() {
+        return "(" + numerator + "/" + denominator + ")";
+    }
+
+    @Override
+    public boolean isUndefined() {
+        return super.isUndefined() || denominator == 0;
+    }
+
+    public Fraction copy() {
+        return new Fraction(numerator, denominator);
     }
 
     public Operable explicitNegativeForm() {
@@ -295,11 +255,51 @@ public class Fraction extends RawValue {
         else return new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate());
     }
 
+    public Fraction negate() {
+        Fraction clone = this.copy();
+        clone.numerator *= -1;
+        clone.reduce();
+        return clone;
+    }
+
+    @Override
+    public Fraction inverse() {
+        if (isUndefined()) return Fraction.UNDEF;
+        long tmp = denominator;
+        denominator = numerator;
+        numerator = tmp;
+        return this;
+    }
+
+    @Override
+    public boolean isZero() {
+        return !isUndefined() && denominator == 0;
+    }
+
+    @Override
+    public boolean isPositive() {
+        return !isUndefined() && numerator / denominator > 0;
+    }
+
+    public Operable beautify() {
+        return this;
+    }
+
     public long getNumerator() {
         return numerator;
     }
 
+    public Fraction setNumerator(long n) {
+        this.numerator = n;
+        return this;
+    }
+
     public long getDenominator() {
         return denominator;
+    }
+
+    public Fraction setDenominator(long n) {
+        this.denominator = n;
+        return this;
     }
 }
