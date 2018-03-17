@@ -3,6 +3,9 @@ package jmc.cas.operations;
 
 import jmc.MathContext;
 import jmc.cas.*;
+import jmc.cas.components.Fraction;
+import jmc.cas.Operable;
+import jmc.cas.components.RawValue;
 
 import java.util.ArrayList;
 import java.util.Optional;

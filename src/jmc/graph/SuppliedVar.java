@@ -2,7 +2,7 @@ package jmc.graph;
 
 import jmc.cas.Mode;
 import jmc.cas.Operable;
-import jmc.cas.Variable;
+import jmc.cas.components.Variable;
 
 /**
  * Created by Jiachen on 3/4/18.

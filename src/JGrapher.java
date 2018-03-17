@@ -1,5 +1,7 @@
-import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.components.Constants;
+import jmc.cas.Operable;
+import jmc.cas.components.Variable;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.UnaryOperation;
 import jmc.extras.Element;

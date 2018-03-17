@@ -1,4 +1,4 @@
-package tests;
+package tests.specific;
 
 import jmc.cas.Compiler;
 import jmc.graph.GraphFunction;

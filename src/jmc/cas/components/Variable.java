@@ -1,4 +1,9 @@
-package jmc.cas;
+package jmc.cas.components;
+
+import jmc.cas.JMCException;
+import jmc.cas.LeafNode;
+import jmc.cas.Nameable;
+import jmc.cas.Operable;
 
 /**
  * Created by Jiachen on 16/05/2017.

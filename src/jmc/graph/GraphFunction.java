@@ -2,7 +2,7 @@ package jmc.graph;
 
 import jmc.Function;
 import jmc.cas.Operable;
-import jmc.cas.Variable;
+import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
 

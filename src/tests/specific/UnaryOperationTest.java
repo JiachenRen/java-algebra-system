@@ -1,7 +1,9 @@
-package tests;
+package tests.specific;
 
-import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.Operable;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;

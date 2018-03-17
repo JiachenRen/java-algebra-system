@@ -1,4 +1,4 @@
-package tests;
+package tests.specific;
 
 import jmc.cas.operations.Argument;
 import jmc.cas.Compiler;

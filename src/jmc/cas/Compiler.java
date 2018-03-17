@@ -1,5 +1,8 @@
 package jmc.cas;
 
+import jmc.cas.components.Constants;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.CompositeOperation;
 import jmc.cas.operations.UnaryOperation;

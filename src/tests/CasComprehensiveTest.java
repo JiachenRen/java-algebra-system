@@ -1,8 +1,9 @@
 package tests;
 
 import jmc.Function;
-import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.Operable;
+import jmc.cas.components.*;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.Operation;
 

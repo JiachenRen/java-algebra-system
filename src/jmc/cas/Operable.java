@@ -1,6 +1,8 @@
 package jmc.cas;
 
 
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.Operation;
 

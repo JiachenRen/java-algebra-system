@@ -1,6 +1,8 @@
 package jmc.cas.operations;
 
 import jmc.cas.*;
+import jmc.cas.Operable;
+import jmc.cas.components.RawValue;
 
 import java.util.ArrayList;
 import java.util.Optional;

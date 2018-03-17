@@ -2,8 +2,8 @@ package jmc.cas.operations;
 
 import jmc.cas.JMCException;
 import jmc.cas.Operable;
-import jmc.cas.RawValue;
-import jmc.cas.Variable;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 
 /**
  * Created by Jiachen on 3/17/18.

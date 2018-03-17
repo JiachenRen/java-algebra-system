@@ -1,9 +1,10 @@
-package tests;
+package tests.specific;
 
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.Compiler;
 import jmc.cas.operations.Operation;
-import jmc.cas.RawValue;
+import jmc.cas.components.RawValue;
+import tests.TestPrint;
 
 /**
  * Created by Jiachen on 3/7/18.

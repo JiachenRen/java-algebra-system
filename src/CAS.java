@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.Operable;
 import jmc.cas.operations.Operation;
 
 import java.util.NoSuchElementException;

@@ -1,5 +1,7 @@
-package jmc.cas;
+package jmc.cas.components;
 
+import jmc.cas.LeafNode;
+import jmc.cas.Operable;
 import jmc.cas.operations.BinaryOperation;
 import jmc.graph.Graph;
 

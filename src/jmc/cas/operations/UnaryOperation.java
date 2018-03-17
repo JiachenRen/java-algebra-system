@@ -4,6 +4,9 @@ import jmc.Function;
 import jmc.MathContext;
 import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.components.Constants;
+import jmc.cas.Operable;
+import jmc.cas.components.RawValue;
 
 import java.util.ArrayList;
 

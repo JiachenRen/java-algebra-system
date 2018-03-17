@@ -1,4 +1,7 @@
-package jmc.cas;
+package jmc.cas.components;
+
+import jmc.cas.JMCException;
+import jmc.cas.Operable;
 
 import java.util.ArrayList;
 
