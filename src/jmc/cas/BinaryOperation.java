@@ -1061,10 +1061,7 @@ public class BinaryOperation extends Operation {
                 && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
     }
 
-    public int complexity() {
-        return getLeft().complexity() + getRight().complexity() + 1;
-    }
-
+    @Override
     public Operable replace(Operable o, Operable r) {
         Operable clone = super.replace(o, r);
         if (clone instanceof BinaryOperation) ((BinaryOperation) clone).simplifyParenthesis();

@@ -273,11 +273,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     }
 
-    public int complexity() {
-        return getOperand().complexity() + 1;
-    }
-
-
     public Operable setOperand(Operable operable) {
         return super.setOperand(operable, 0);
     }

@@ -48,6 +48,10 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "+", new RawValue(n));
     }
 
+    public static BinaryOperation add(Number a, Number b) {
+        return new BinaryOperation(new RawValue(a), "+", new RawValue(b));
+    }
+
     public static BinaryOperation sub(Operable o1, Operable o2) {
         return new BinaryOperation(o1.copy(), "-", o2.copy());
     }
@@ -207,8 +211,15 @@ public abstract class Operation extends Operable implements Nameable {
     public Operable replace(Operable o, Operable r) {
         Operation clone = this.copy();
         clone.setOperands(operands.stream()
-                .map(op -> op.replace(o,r))
+                .map(op -> op.replace(o, r))
                 .collect(Collectors.toCollection(ArrayList::new)));
         return clone;
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public int complexity() {
+        return operands.stream()
+                .map(Operable::complexity)
+                .reduce((a, b) -> a + b).get() + 1;
     }
 }
