@@ -1048,6 +1048,7 @@ public class BinaryOperation extends Operation {
     }
 
 
+    @Override
     public Operable expand() {
         this.toAdditionOnly().toExponentialForm();
         this.expandSubNodes();

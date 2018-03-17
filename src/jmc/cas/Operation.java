@@ -189,6 +189,11 @@ public abstract class Operation extends Operable implements Nameable {
         return minDepth + 1;
     }
 
+    public Operable expand() {
+        operands.forEach(Operable::expand);
+        return this;
+    }
+
     public boolean isUndefined() {
         for (Operable operand : operands) {
             if (operand.isUndefined())

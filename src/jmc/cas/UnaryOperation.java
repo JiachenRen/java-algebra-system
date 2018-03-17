@@ -318,10 +318,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.eval(getOperand().val());
     }
 
-    public Operable expand() {
-        return setOperand(getOperand().expand());
-    }
-
     public Operable replace(Operable o, Operable r) {
         if (this.equals(o)) return r;
         UnaryOperation clone = this.copy();
