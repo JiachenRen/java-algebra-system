@@ -178,6 +178,17 @@ public abstract class Operation extends Operable implements Nameable {
         return 1 + nodes.get();
     }
 
+    public int levelOf(Operable o) {
+        if (this.equals(o)) return 0;
+        int minDepth = -1;
+        for (Operable operand : operands) {
+            int lev = operand.levelOf(o);
+            minDepth = lev > minDepth ? lev : minDepth;
+        }
+        if (minDepth == -1) return -1;
+        return minDepth + 1;
+    }
+
     public boolean isUndefined() {
         for (Operable operand : operands) {
             if (operand.isUndefined())

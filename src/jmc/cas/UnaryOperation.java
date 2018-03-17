@@ -318,14 +318,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.eval(getOperand().val());
     }
 
-
-    public int levelOf(Operable o) {
-        if (this.equals(o)) return 0;
-        int i = getOperand().levelOf(o);
-        if (i == -1) return -1;
-        return i + 1;
-    }
-
     public Operable expand() {
         return setOperand(getOperand().expand());
     }

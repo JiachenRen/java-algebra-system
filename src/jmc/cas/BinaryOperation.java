@@ -1077,16 +1077,6 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-
-    public int levelOf(Operable o) {
-        if (this.equals(o)) return 0;
-        int left = getLeft().levelOf(o);
-        int right = getRight().levelOf(o);
-        if (left == -1 && right == -1) return -1;
-        if (left == -1 || right == -1) return left == -1 ? right + 1 : left + 1;
-        return left > right ? right + 1 : left + 1;
-    }
-
     public int complexity() {
         return getLeft().complexity() + getRight().complexity() + 1;
     }
