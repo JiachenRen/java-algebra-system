@@ -21,7 +21,7 @@ public class BinaryOperation extends Operation {
     }
 
     private BinaryOperation(Operable leftHand, RegisteredBinaryOperation operation, Operable rightHand) {
-        super(wrap(leftHand,rightHand));
+        super(wrap(leftHand, rightHand));
         this.operation = operation;
         omitParenthesis = true;
         simplifyParenthesis();
@@ -182,7 +182,7 @@ public class BinaryOperation extends Operation {
      */
     public Operable simplify() {
 
-        simplifySubNodes();
+        super.simplify();
         simplifyParenthesis();
 
         if (!operation.isStandard())
@@ -214,7 +214,8 @@ public class BinaryOperation extends Operation {
         }
 
         //converting to exponential form and additional only, allowing further simplification.
-        this.toAdditionOnly().toExponentialForm().simplifySubNodes();
+        this.toAdditionOnly().toExponentialForm();
+        super.simplify();
 
         //handle special cases
         Operable simplified2 = simplifyZeroOne();
@@ -640,17 +641,6 @@ public class BinaryOperation extends Operation {
         return null;
     }
 
-    /**
-     * HELPER METHOD
-     *
-     * @return self
-     */
-    private Operable simplifySubNodes() {
-        setLeft(getLeft().simplify());
-        setRight(getRight().simplify());
-        return this;
-    }
-
     public int numNodes() {
         return getLeft().numNodes() + getRight().numNodes() + 1;
     }
@@ -892,7 +882,7 @@ public class BinaryOperation extends Operation {
     }
 
     public Operable setLeft(Operable operable) {
-        super.setOperand(operable,0);
+        super.setOperand(operable, 0);
         this.simplifyParenthesis();
         return this;
     }
@@ -1054,7 +1044,7 @@ public class BinaryOperation extends Operation {
     }
 
     public void setRight(Operable operable) {
-        setOperand(operable,1);
+        setOperand(operable, 1);
         simplifyParenthesis();
     }
 

@@ -2,6 +2,7 @@ package jmc.cas;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -124,7 +125,12 @@ public abstract class Operation implements Operable, Nameable {
      *
      * @return modified self.
      */
-    public abstract Operable simplify();
+    public Operable simplify() {
+        operands = operands.stream()
+                .map(Operable::simplify)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return this;
+    }
 
 
     public BinaryOperation negate() {

@@ -35,8 +35,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
 
-
-
     public static void define(String name, String expression) {
         UnaryOperation.define(name, Compiler.compile(expression));
     }
@@ -76,21 +74,16 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         } else return this;
     }
 
-    public int complexity() {
-        return getOperand().complexity() + 1;
-    }
-
     /**
      * Note: modifies self.
      * TODO: ln(a) - ln(b) should be ln(a/b)
-     * TODO: log(225) should be 2log(15)
+     * log(225) should be 2log(15) -> implemented
      *
      * @return a new Operable instance that is the simplified version of self.
      */
+    @Override
     public Operable simplify() {
-        if (getOperand() instanceof Operation) {
-            this.setOperand((this.getOperand()).simplify());
-        }
+        super.simplify();
 
         if (this.isUndefined()) return RawValue.UNDEF;
 
@@ -167,6 +160,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
 
         return this;
+    }    public int complexity() {
+        return getOperand().complexity() + 1;
     }
 
     @Override
@@ -186,6 +181,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             return this;
         }
         return this;
+    }
+
+    public Operable setOperand(Operable operable) {
+        return super.setOperand(operable, 0);
+    }
+
+    public Operable getOperand() {
+        return getOperand(0);
     }
 
     public String toString() {
@@ -256,18 +259,16 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             return unaryOperation.eval(x);
         }
 
-        public String getName() {
+        public boolean equals(RegisteredUnaryOperation other) {
+            return other.unaryOperation.getName().equals(this.unaryOperation.getName());
+        }        public String getName() {
             return unaryOperation.getName();
         }
 
-        public boolean equals(RegisteredUnaryOperation other) {
-            return other.unaryOperation.getName().equals(this.unaryOperation.getName());
-        }
 
 
-    }
 
-    /**
+    }    /**
      * Returns true if the operations (Function) e.g. "sin", "cos" are the same
      *
      * @param other the other operable, possibly UnaryOperation or BinaryOperation
@@ -348,13 +349,9 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return i + 1;
     }
 
-    public Operable getOperand() {
-        return getOperand(0);
-    }
 
-    public Operable setOperand(Operable operable) {
-        return super.setOperand(operable, 0);
-    }
+
+
 
 
     public Operable beautify() {
