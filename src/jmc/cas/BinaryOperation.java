@@ -156,31 +156,9 @@ public class BinaryOperation extends Operation {
         return operation.eval(leftVal, rightVal);
     }
 
-    public double val() {
-        return operation.eval(getLeft().val(), getRight().val());
-    }
-
-    /**
-     * for example, "(x-4)(x-5)/(x-3/(x-6))" would first transformed into
-     * "(x-4)(x-5)(x-3/(x-6))^-1", and then recursively reduced to
-     * "(x-4)(x-5)(x-3*(x-6)^-1)^-1"
-     * basic CAS capabilities. Implementation began: May 19th.
-     * NOTE: modifies self.
-     */
     @Override
-    public BinaryOperation toExponentialForm() {
-        super.toExponentialForm();
-        if (!this.operation.equals("/")) return this;
-        if (getRight().equals(new RawValue(0))) return this;
-        if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).operation.equals("*")) {
-            BinaryOperation enclosed = ((BinaryOperation) getRight());
-            enclosed.setLeft(new BinaryOperation(enclosed.getLeft(), "^", new RawValue(-1)));
-            enclosed.setRight(new BinaryOperation(enclosed.getRight(), "^", new RawValue(-1)));
-        } else this.setRight(new BinaryOperation(getRight(), "^", new RawValue(-1)));
-        operation = RegisteredBinaryOperation.extract("*");
-        processParentheticalNotation(getLeft(), false);
-        processParentheticalNotation(getRight(), true);
-        return this;
+    public BinaryOperation copy() {
+        return new BinaryOperation(getLeft().copy(), operation, getRight().copy());
     }
 
     /**
@@ -278,9 +256,55 @@ public class BinaryOperation extends Operation {
         }
     }
 
+    /**
+     * basically reversing the effects of toAdditionalOnly and toExponentialForm
+     * a*b^(-1) -> a/b,
+     * a*(1/3) -> a/3,
+     * a+(-1)*b -> a-b
+     *
+     * @return beautified version of the original
+     */
     @Override
-    public BinaryOperation copy() {
-        return new BinaryOperation(getLeft().copy(), operation, getRight().copy());
+    public Operable beautify() {
+        Operable left = getLeft().beautify();
+        Operable right = getRight().beautify();
+        switch (operation.name) {
+            case "*":
+                ArrayList<Operable> numerators = new ArrayList<>();
+                ArrayList<Operable> denominators = new ArrayList<>();
+                separate(left, denominators, numerators);
+                separate(right, denominators, numerators);
+                Operable numerator = reconstruct(numerators);
+                Operable denominator = reconstruct(denominators);
+                if (denominator == null || denominator.equals(RawValue.ONE))
+                    return numerator;
+                else return new BinaryOperation(numerator, "/", denominator);
+            case "+":
+                if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
+                    Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
+                    return new BinaryOperation(right, "-", right1).beautify();
+                } else if (isVirtuallyNegative(right) && !isVirtuallyNegative(left)) {
+                    Operable right1 = new BinaryOperation(right, "*", RawValue.ONE.negate()).simplify();
+                    return new BinaryOperation(left, "-", right1).beautify();
+                }
+            case "^":
+                ArrayList<Operable> ns = new ArrayList<>();
+                ArrayList<Operable> ds = new ArrayList<>();
+                this.setLeft(left);
+                this.setRight(right);
+
+                separate(this, ds, ns);
+                Operable n = reconstruct(ns);
+                Operable d = reconstruct(ds);
+                if (n == null) return this;
+                if (d == null || d.equals(RawValue.ONE))
+                    return n;
+                else return new BinaryOperation(n, "/", d);
+
+        }
+        this.setLeft(left);
+        this.setRight(right);
+        return this;
     }
 
     public BinaryOperation toAdditionOnly() {
@@ -292,13 +316,45 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-    public String toString() {
-        boolean k = getLeft() instanceof RawValue && getLeft().val() < 0;
-        boolean q = getRight() instanceof RawValue && getRight().val() < 0;
-        String left = k ? "(" + getLeft().toString() + ")" : getLeft().toString();
-        String right = q ? "(" + getRight().toString() + ")" : getRight().toString();
-        String temp = left + operation.name + right;
-        return omitParenthesis ? temp : "(" + temp + ")";
+    public double val() {
+        return operation.eval(getLeft().val(), getRight().val());
+    }
+
+    /**
+     * for example, "(x-4)(x-5)/(x-3/(x-6))" would first transformed into
+     * "(x-4)(x-5)(x-3/(x-6))^-1", and then recursively reduced to
+     * "(x-4)(x-5)(x-3*(x-6)^-1)^-1"
+     * basic CAS capabilities. Implementation began: May 19th.
+     * NOTE: modifies self.
+     */
+    @Override
+    public BinaryOperation toExponentialForm() {
+        super.toExponentialForm();
+        if (!this.operation.equals("/")) return this;
+        if (getRight().equals(new RawValue(0))) return this;
+        if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).operation.equals("*")) {
+            BinaryOperation enclosed = ((BinaryOperation) getRight());
+            enclosed.setLeft(new BinaryOperation(enclosed.getLeft(), "^", new RawValue(-1)));
+            enclosed.setRight(new BinaryOperation(enclosed.getRight(), "^", new RawValue(-1)));
+        } else this.setRight(new BinaryOperation(getRight(), "^", new RawValue(-1)));
+        operation = RegisteredBinaryOperation.extract("*");
+        processParentheticalNotation(getLeft(), false);
+        processParentheticalNotation(getRight(), true);
+        return this;
+    }
+
+    public boolean isUndefined() {
+        if (super.isUndefined()) return true;
+        if (getRight() instanceof RawValue) {
+            RawValue r = ((RawValue) getRight());
+            switch (operation.name) {
+                case "/":
+                    return r.isZero();
+                case "^":
+                    return getLeft() instanceof RawValue && ((RawValue) getLeft()).isZero() && !r.isPositive();
+            }
+        }
+        return false;
     }
 
     /**
@@ -487,6 +543,15 @@ public class BinaryOperation extends Operation {
             }
         }
         return null;
+    }
+
+    public String toString() {
+        boolean k = getLeft() instanceof RawValue && getLeft().val() < 0;
+        boolean q = getRight() instanceof RawValue && getRight().val() < 0;
+        String left = k ? "(" + getLeft().toString() + ")" : getLeft().toString();
+        String right = q ? "(" + getRight().toString() + ")" : getRight().toString();
+        String temp = left + operation.name + right;
+        return omitParenthesis ? temp : "(" + temp + ")";
     }
 
     /**
@@ -753,10 +818,6 @@ public class BinaryOperation extends Operation {
         }
     }
 
-    public int numNodes() {
-        return getLeft().numNodes() + getRight().numNodes() + 1;
-    }
-
     private boolean 是加减乘除() {
         return "+-*/".contains(operation.name);
     }
@@ -903,12 +964,6 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-    public Operable expand() {
-        this.toAdditionOnly().toExponentialForm();
-        this.expandSubNodes();
-        return expandBase();
-    }
-
     /**
      * a series of operations in which the order of left, right hands is unimportant.
      */
@@ -992,6 +1047,14 @@ public class BinaryOperation extends Operation {
 
     }
 
+
+    public Operable expand() {
+        this.toAdditionOnly().toExponentialForm();
+        this.expandSubNodes();
+        return expandBase();
+    }
+
+
     public boolean equals(Operable other) {
         if (!(other instanceof BinaryOperation)) return false;
         BinaryOperation binOp = (BinaryOperation) other;
@@ -1003,56 +1066,6 @@ public class BinaryOperation extends Operation {
                 && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
     }
 
-    /**
-     * basically reversing the effects of toAdditionalOnly and toExponentialForm
-     * a*b^(-1) -> a/b,
-     * a*(1/3) -> a/3,
-     * a+(-1)*b -> a-b
-     *
-     * @return beautified version of the original
-     */
-    @Override
-    public Operable beautify() {
-        Operable left = getLeft().beautify();
-        Operable right = getRight().beautify();
-        switch (operation.name) {
-            case "*":
-                ArrayList<Operable> numerators = new ArrayList<>();
-                ArrayList<Operable> denominators = new ArrayList<>();
-                separate(left, denominators, numerators);
-                separate(right, denominators, numerators);
-                Operable numerator = reconstruct(numerators);
-                Operable denominator = reconstruct(denominators);
-                if (denominator == null || denominator.equals(RawValue.ONE))
-                    return numerator;
-                else return new BinaryOperation(numerator, "/", denominator);
-            case "+":
-                if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
-                    Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
-                    return new BinaryOperation(right, "-", right1).beautify();
-                } else if (isVirtuallyNegative(right) && !isVirtuallyNegative(left)) {
-                    Operable right1 = new BinaryOperation(right, "*", RawValue.ONE.negate()).simplify();
-                    return new BinaryOperation(left, "-", right1).beautify();
-                }
-            case "^":
-                ArrayList<Operable> ns = new ArrayList<>();
-                ArrayList<Operable> ds = new ArrayList<>();
-                this.setLeft(left);
-                this.setRight(right);
-
-                separate(this, ds, ns);
-                Operable n = reconstruct(ns);
-                Operable d = reconstruct(ds);
-                if (n == null) return this;
-                if (d == null || d.equals(RawValue.ONE))
-                    return n;
-                else return new BinaryOperation(n, "/", d);
-
-        }
-        this.setLeft(left);
-        this.setRight(right);
-        return this;
-    }
 
     public Operable plugIn(Variable var, Operable replacement) {
         if (this.getLeft().equals(var))
@@ -1064,19 +1077,6 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-    public boolean isUndefined() {
-        if (super.isUndefined()) return true;
-        if (getRight() instanceof RawValue) {
-            RawValue r = ((RawValue) getRight());
-            switch (operation.name) {
-                case "/":
-                    return r.isZero();
-                case "^":
-                    return getLeft() instanceof RawValue && ((RawValue) getLeft()).isZero() && !r.isPositive();
-            }
-        }
-        return false;
-    }
 
     public int levelOf(Operable o) {
         if (this.equals(o)) return 0;

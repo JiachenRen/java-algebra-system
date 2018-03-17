@@ -83,6 +83,153 @@ public class Graph extends Contextual {
         setAxesVisible(true);
     }
 
+    public Graph(float relativeW, float relativeH) {
+        super(relativeW, relativeH);
+        init();
+    }
+
+    private void init() {
+        updateStepValue();
+        if (!isRelative) {
+            this.resize(w, h);
+        }
+    }
+
+    /**
+     * Updates the actual incremental value per plot point according to the designated step pixel length on screen
+     *
+     * @since April 7th
+     */
+    private void updateStepValue() {
+        if (rangeX == null) rangeX = new Range(-10, 10);
+        rangeX.setStep(rangeX.getSpan() / w * stepLength);
+    }
+
+    @Override
+    public void resize(float x, float y) {
+        super.resize(x, y);
+        this.updateNumMarkings();
+        this.updateFunctions();
+    }
+
+    private void updateNumMarkings() {
+        if (w == 0 || h == 0 || minMarkingLength == 0 || maxMarkingLength == 0) return;
+        stepValueX = this.calculateStepValue(rangeX, (int) w / minMarkingLength, (int) w / maxMarkingLength);
+        stepValueY = this.calculateStepValue(rangeY, (int) h / minMarkingLength, (int) h / maxMarkingLength);
+    }
+
+    /**
+     * Comprehensive update
+     */
+    private void updateFunctions() {
+        this.updatePlots();
+        this.updatePlotCoordinates();
+    }
+
+    /**
+     * updates the step number of markings and step length for the graph's grid.
+     *
+     * @since May 18th, alternative dividend scaling to keep a decimal scale.
+     */
+    private double calculateStepValue(Range range, int minNumMarkings, int maxNumMarkings) {
+        double valRange = range.getSpan();
+        double temp = 1.0d;
+        int markings = (int) (valRange / temp);
+        int flag = 0;
+        while (markings < minNumMarkings) {
+            temp /= flag % 3 == 1 ? 2.5d : 2.0d;
+            markings = (int) (valRange / temp);
+            flag++;
+        }
+        flag = 0;
+        while (markings > maxNumMarkings) {
+            temp *= flag % 3 == 1 ? 2.5d : 2.0d;
+            markings = (int) (valRange / temp);
+            flag++;
+        }
+        return temp;
+    }
+
+    /**
+     * This method re-plots each of the function according to the updated window dimension.
+     * This method should be called each time when the domain or range of the graphing window is altered.
+     */
+    private void updatePlots() {
+        this.updateStepValue();
+        for (GraphFunction function : functions) {
+            if (!function.isDynamic())
+                function.updatePlot(rangeX, rangeY, h);
+        }
+    }
+
+    /**
+     * The method calls the updates the coordinates on screen for each of the function.
+     * This method should be called whenever the displayable is updated or plot points are altered.
+     */
+    private void updatePlotCoordinates() {
+        for (GraphFunction function : functions) {
+            if (!function.isDynamic())
+                function.getPlot().updateCoordinates(rangeY, w, h);
+        }
+    }
+
+
+    public Graph() {
+        super();
+        init();
+    }
+
+    //TODO debug constructor, it would not work!!!
+    public Graph(float x, float y, float w, float h) {
+        super(x, y, w, h);
+        init();
+    }
+
+    /**
+     * @param val the double value to be formatted for display on screen.
+     * @return formatted string from the double value
+     */
+    public static String formatForDisplay(double val) {
+        if (Double.toString(val).length() <= 4) return Double.toString(val);
+        NumberFormat formatter = new DecimalFormat("0.###E0");
+        return formatter.format(val);
+    }
+
+    /**
+     * calculates a tangent line to a function on a certain point and returns
+     * the acquired function.
+     *
+     * @param x        the point on the graph in which a tangent line is going to be derived
+     * @param function the function that the first derivative is going to be based on.
+     * @since 9:37 PM, May 17th, breakthrough, succeeded!!!
+     * May 21st: debugged floating point accuracy is now considered.
+     */
+    public static GraphFunction tangentLineToPoint(double x, GraphFunction function, double accuracy) {
+        Point init = new Point(x - accuracy, function.eval(x - accuracy));
+        Point end = new Point(x + accuracy, function.eval(x + accuracy));
+        return Graph.createLinearFunction(init, end);
+    }
+
+    /**
+     * #consider returning a interpreted function. (takes more time)
+     * this method generates a compiled function from 2 points. (for now)
+     *
+     * @param first  the first point
+     * @param second the second point
+     * @return a linear implemented function from 2 points.
+     */
+    public static GraphFunction createLinearFunction(Point first, Point second) {
+        double k = (first.getY() - second.getY()) / (first.getX() - second.getX());
+        double b = first.getY() - k * first.getX();
+        try {
+            String k1 = new BigDecimal(k).toPlainString();
+            String b1 = new BigDecimal(b).toPlainString();
+            return new GraphFunction(Compiler.compile(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private void initEventListeners() {
         this.addEventListener(new EventListener("DRAG", Event.MOUSE_DRAGGED).attachMethod(() -> {
             if (!isMouseOver()) return;
@@ -123,54 +270,6 @@ public class Graph extends Contextual {
         }).setDisabled(true));
     }
 
-    public Graph(float relativeW, float relativeH) {
-        super(relativeW, relativeH);
-        init();
-    }
-
-    public Graph() {
-        super();
-        init();
-    }
-
-    //TODO debug constructor, it would not work!!!
-    public Graph(float x, float y, float w, float h) {
-        super(x, y, w, h);
-        init();
-    }
-
-    private void init() {
-        updateStepValue();
-        if (!isRelative) {
-            this.resize(w, h);
-        }
-    }
-
-    public void display() {
-        super.display();
-
-        if (axesVisible)
-            this.drawAxes();
-
-        for (GraphFunction function : functions) {
-            if (function.isDynamic()) {
-                function.updatePlot(rangeX, rangeY, h);
-                function.getPlot().updateCoordinates(rangeY, w, h);
-            }
-            if (function.isVisible())
-                this.drawFunction(function);
-        }
-
-        if (tracingIsOn() && isMouseOver()) {
-            double xPosOnGraph = this.convertToPointOnGraph(getParent().mouseX, getParent().mouseY)[0];
-            TextInput xVal = JNode.getTextInputById("#XVAL");
-            assert xVal != null;
-            xVal.setIsFocusedOn(false);
-            xVal.setContent("x = " + Double.toString(xPosOnGraph));
-            this.trace(xPosOnGraph);
-        }
-    }
-
     private void drawAxesText(double val, float cx, float cy, boolean isYAxis) {
         String text = formatForDisplay(val);
         float textWidth = getParent().textWidth(text);
@@ -191,13 +290,11 @@ public class Graph extends Contextual {
         getParent().line(right > x + w ? x + w - 1 : right, cy, left < x + 1 ? x + 1 : left, cy);
     }
 
-
     private void drawAxisMarksX(float cx, float cy) {
         float up = cy - markLengthBig;
         float down = cy + markLengthBig;
         getParent().line(cx, up < y + 1 ? y + 1 : up, cx, down > y + h - 1 ? y + h - 1 : down);
     }
-
 
     /**
      * Draws the grids of the graph.
@@ -267,30 +364,6 @@ public class Graph extends Contextual {
     }
 
     /**
-     * updates the step number of markings and step length for the graph's grid.
-     *
-     * @since May 18th, alternative dividend scaling to keep a decimal scale.
-     */
-    private double calculateStepValue(Range range, int minNumMarkings, int maxNumMarkings) {
-        double valRange = range.getSpan();
-        double temp = 1.0d;
-        int markings = (int) (valRange / temp);
-        int flag = 0;
-        while (markings < minNumMarkings) {
-            temp /= flag % 3 == 1 ? 2.5d : 2.0d;
-            markings = (int) (valRange / temp);
-            flag++;
-        }
-        flag = 0;
-        while (markings > maxNumMarkings) {
-            temp *= flag % 3 == 1 ? 2.5d : 2.0d;
-            markings = (int) (valRange / temp);
-            flag++;
-        }
-        return temp;
-    }
-
-    /**
      * zooms in according to a scale given and a point that is the center-to-be
      *
      * @param scale   how many times larger than original. 1.5 would be zoom out while 0.5 would be zoom in.
@@ -320,6 +393,13 @@ public class Graph extends Contextual {
         this.setWindow(graphX - gw, graphX + gw, graphY - gh, graphY + gh);
     }
 
+    public void setWindow(double minX, double maxX, double minY, double maxY) {
+        rangeX = new Range(minX, maxX, rangeX.getStep());
+        rangeY = new Range(minY, maxY);
+        this.updateNumMarkings();
+        new Thread(this::updateFunctions).start(); //performance enhancement May 20th
+    }
+
     /**
      * equalized the axes of the graph so they look equal on the screen
      * note: the y axis is resized according to the x axis
@@ -333,14 +413,8 @@ public class Graph extends Contextual {
         setWindowY(newRangeY.getLow(), newRangeY.getHigh());
     }
 
-    /**
-     * @param val the double value to be formatted for display on screen.
-     * @return formatted string from the double value
-     */
-    public static String formatForDisplay(double val) {
-        if (Double.toString(val).length() <= 4) return Double.toString(val);
-        NumberFormat formatter = new DecimalFormat("0.###E0");
-        return formatter.format(val);
+    public void setWindowY(double minY, double maxY) {
+        this.setWindow(rangeX.getLow(), rangeX.getHigh(), minY, maxY);
     }
 
     /**
@@ -460,41 +534,6 @@ public class Graph extends Contextual {
     }
 
     /**
-     * calculates a tangent line to a function on a certain point and returns
-     * the acquired function.
-     *
-     * @param x        the point on the graph in which a tangent line is going to be derived
-     * @param function the function that the first derivative is going to be based on.
-     * @since 9:37 PM, May 17th, breakthrough, succeeded!!!
-     * May 21st: debugged floating point accuracy is now considered.
-     */
-    public static GraphFunction tangentLineToPoint(double x, GraphFunction function, double accuracy) {
-        Point init = new Point(x - accuracy, function.eval(x - accuracy));
-        Point end = new Point(x + accuracy, function.eval(x + accuracy));
-        return Graph.createLinearFunction(init, end);
-    }
-
-    /**
-     * #consider returning a interpreted function. (takes more time)
-     * this method generates a compiled function from 2 points. (for now)
-     *
-     * @param first  the first point
-     * @param second the second point
-     * @return a linear implemented function from 2 points.
-     */
-    public static GraphFunction createLinearFunction(Point first, Point second) {
-        double k = (first.getY() - second.getY()) / (first.getX() - second.getX());
-        double b = first.getY() - k * first.getX();
-        try {
-            String k1 = new BigDecimal(k).toPlainString();
-            String b1 = new BigDecimal(b).toPlainString();
-            return new GraphFunction(Compiler.compile(k1 + "*x+(" + b1 + ")")).setName(k + "," + b);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    /**
      * @param function the function to be added into this graph.
      * @return this Graph instance for chained access.
      */
@@ -515,70 +554,17 @@ public class Graph extends Contextual {
         return null;
     }
 
-    @Override
-    public void resize(float x, float y) {
-        super.resize(x, y);
-        this.updateNumMarkings();
-        this.updateFunctions();
-    }
-
-    private void updateNumMarkings() {
-        if (w == 0 || h == 0 || minMarkingLength == 0 || maxMarkingLength == 0) return;
-        stepValueX = this.calculateStepValue(rangeX, (int) w / minMarkingLength, (int) w / maxMarkingLength);
-        stepValueY = this.calculateStepValue(rangeY, (int) h / minMarkingLength, (int) h / maxMarkingLength);
-    }
-
-    /**
-     * The method calls the updates the coordinates on screen for each of the function.
-     * This method should be called whenever the displayable is updated or plot points are altered.
-     */
-    private void updatePlotCoordinates() {
-        for (GraphFunction function : functions) {
-            if (!function.isDynamic())
-                function.getPlot().updateCoordinates(rangeY, w, h);
-        }
-    }
-
-    /**
-     * This method re-plots each of the function according to the updated window dimension.
-     * This method should be called each time when the domain or range of the graphing window is altered.
-     */
-    private void updatePlots() {
-        this.updateStepValue();
-        for (GraphFunction function : functions) {
-            if (!function.isDynamic())
-                function.updatePlot(rangeX, rangeY, h);
-        }
-    }
-
-    public void setWindow(double minX, double maxX, double minY, double maxY) {
-        rangeX = new Range(minX, maxX, rangeX.getStep());
-        rangeY = new Range(minY, maxY);
-        this.updateNumMarkings();
-        new Thread(this::updateFunctions).start(); //performance enhancement May 20th
-    }
-
     public void setWindowX(double minX, double maxX) {
         this.setWindow(minX, maxX, rangeY.getLow(), rangeY.getHigh());
     }
 
-    public void setWindowY(double minY, double maxY) {
-        this.setWindow(rangeX.getLow(), rangeX.getHigh(), minY, maxY);
+    public GraphFunction getLastFunction() {
+        if (functions.size() == 0) return null;
+        return functions.get(functions.size() - 1);
     }
 
-    /**
-     * Updates the actual incremental value per plot point according to the designated step pixel length on screen
-     *
-     * @since April 7th
-     */
-    private void updateStepValue() {
-        if (rangeX == null) rangeX = new Range(-10, 10);
-        rangeX.setStep(rangeX.getSpan() / w * stepLength);
-    }
-
-    public void setStepLength(double pixels) {
-        this.stepLength = pixels;
-        this.updateFunctions();
+    public boolean override(String name, GraphFunction function) {
+        return this.override(name, function, true);
     }
 
     /**
@@ -603,79 +589,10 @@ public class Graph extends Contextual {
         return overridden;
     }
 
-    public GraphFunction getLastFunction() {
-        if (functions.size() == 0) return null;
-        return functions.get(functions.size() - 1);
-    }
-
     public void updateFunction(GraphFunction func) {
         func.updatePlot(rangeX, rangeY, h);
         func.getPlot().updateCoordinates(rangeY, w, h);
     }
-
-    public boolean override(String name, GraphFunction function) {
-        return this.override(name, function, true);
-    }
-
-    /**
-     * Comprehensive update
-     */
-    private void updateFunctions() {
-        this.updatePlots();
-        this.updatePlotCoordinates();
-    }
-
-    public GraphFunction getFunction(String name) {
-        for (GraphFunction function : functions) {
-            if (function.getName().equals(name))
-                return function;
-        }
-        return null;
-    }
-
-    public double getMinX() {
-        return rangeX.getLow();
-    }
-
-    public double getMaxX() {
-        return rangeX.getHigh();
-    }
-
-    public double getMaxY() {
-        return rangeY.getHigh();
-    }
-
-    public double getMinY() {
-        return rangeY.getLow();
-    }
-
-    /**
-     * converts an abs coordinate on screen to xy coordinate on graph.
-     *
-     * @param screenX x-coordinate on screen
-     * @param screenY y-coordinate on screen
-     * @return x-y coordinate on graph window
-     */
-    public double[] convertToPointOnGraph(float screenX, float screenY) {
-        double cx = PApplet.map(screenX, x, x + w, (float) getMinX(), (float) getMaxX());
-        double cy = PApplet.map(screenY, y, y + h, (float) getMaxY(), (float) getMinY());
-        return new double[]{cx, cy};
-    }
-
-
-    /**
-     * converts x-y coordinate graph to absolute coordinate on screen
-     *
-     * @param x x coordinate in the graph window
-     * @param y y coordinate in the graph window
-     * @return coordinate on screen
-     */
-    public float[] convertToCoordinateOnScreen(double x, double y) {
-        float cx = Plot.map(x, rangeX.getLow(), rangeX.getHigh(), 0, w);
-        float cy = Plot.map(y, rangeY.getLow(), rangeY.getHigh(), 0, h);
-        return new float[]{this.x + cx, this.y + h - cy};
-    }
-
 
     public void setMaxMarkingLength(int temp) {
         this.maxMarkingLength = temp;
@@ -685,6 +602,10 @@ public class Graph extends Contextual {
     public void setMinMarkingLength(int temp) {
         this.minMarkingLength = temp;
         updateNumMarkings();
+    }
+
+    public Mode getMode() {
+        return mode;
     }
 
     /**
@@ -699,10 +620,6 @@ public class Graph extends Contextual {
                 eventListener.setDisabled(!mode.equals(eventListener.getId()));
             }
         });
-    }
-
-    public Mode getMode() {
-        return mode;
     }
 
     public ArrayList<GraphFunction> getFunctions() {
@@ -724,12 +641,41 @@ public class Graph extends Contextual {
         return function.containsPoint(graph_pos[0], graph_pos[1], allowed_diff / h * rangeX.getSpan(), 2);
     }
 
-    public boolean isEvaluationOn() {
-        return evaluationOn;
+    public GraphFunction getFunction(String name) {
+        for (GraphFunction function : functions) {
+            if (function.getName().equals(name))
+                return function;
+        }
+        return null;
     }
 
-    public void setEvaluationOn(boolean evaluationOn) {
-        this.evaluationOn = evaluationOn;
+    /**
+     * converts an abs coordinate on screen to xy coordinate on graph.
+     *
+     * @param screenX x-coordinate on screen
+     * @param screenY y-coordinate on screen
+     * @return x-y coordinate on graph window
+     */
+    public double[] convertToPointOnGraph(float screenX, float screenY) {
+        double cx = PApplet.map(screenX, x, x + w, (float) getMinX(), (float) getMaxX());
+        double cy = PApplet.map(screenY, y, y + h, (float) getMaxY(), (float) getMinY());
+        return new double[]{cx, cy};
+    }
+
+    public double getMinX() {
+        return rangeX.getLow();
+    }
+
+    public double getMaxX() {
+        return rangeX.getHigh();
+    }
+
+    public double getMaxY() {
+        return rangeY.getHigh();
+    }
+
+    public double getMinY() {
+        return rangeY.getLow();
     }
 
     public boolean isAxesVisible() {
@@ -740,41 +686,77 @@ public class Graph extends Contextual {
         this.axesVisible = axesVisible;
     }
 
-    public enum Mode {
-        DRAG("DRAG"),
-        ZOOM_OUT("ZOOM_OUT"),
-        ZOOM_RECT("ZOOM_RECT"),
-        ZOOM_IN("ZOOM_IN");
-
-        private String name;
-        private static String[] list;
-
-        static {
-            list = new String[]{"DRAG", "ZOOM_IN", "ZOOM_OUT", "ZOOM_RECT"};
-        }
-
-        Mode(String name) {
-            this.name = name;
-        }
-
-        public boolean equals(Mode other) {
-            return other.name.equals(name);
-        }
-
-        public boolean equals(String other) {
-            return this.name.equals(other);
-        }
-
-        public static boolean contains(String name) {
-            for (String s : list) if (s.equals(name)) return true;
-            return false;
-        }
-    }
-
     @Override
     public Graph setId(String id) {
         super.setId(id);
         return this;
+    }
+
+    public void display() {
+        super.display();
+
+        if (axesVisible)
+            this.drawAxes();
+
+        for (GraphFunction function : functions) {
+            if (function.isDynamic()) {
+                function.updatePlot(rangeX, rangeY, h);
+                function.getPlot().updateCoordinates(rangeY, w, h);
+            }
+            if (function.isVisible())
+                this.drawFunction(function);
+        }
+
+        if (tracingIsOn() && isMouseOver()) {
+            double xPosOnGraph = this.convertToPointOnGraph(getParent().mouseX, getParent().mouseY)[0];
+            TextInput xVal = JNode.getTextInputById("#XVAL");
+            assert xVal != null;
+            xVal.setIsFocusedOn(false);
+            xVal.setContent("x = " + Double.toString(xPosOnGraph));
+            this.trace(xPosOnGraph);
+        }
+    }
+
+    public boolean tracingIsOn() {
+        return tracingOn;
+    }
+
+    public double getStepLength() {
+        return stepLength;
+    }
+
+    public void setStepLength(double pixels) {
+        this.stepLength = pixels;
+        this.updateFunctions();
+    }
+
+    public void setTracingOn(boolean tracingOn) {
+        this.tracingOn = tracingOn;
+        @SuppressWarnings("unchecked") ArrayList<Displayable> matching = (ArrayList<Displayable>) JNode.get("#functionInputWrapper");
+        if (matching.size() == 0) return;
+        HBox wrapper = (HBox) matching.get(0);
+        if (tracingOn) {
+            if (!wrapper.contains("#XVAL")) {
+                TextInput input = (TextInput) new TextInput().setContent("x = ").setId("#XVAL");
+                input.onFocus(() -> input.setContent("x = "));
+                input.onKeyTyped(() -> input.setContent(input.getContent().contains("x = ") ? input.getContent() : "x = "));
+                input.onEditing(() -> {
+                    String temp = input.getContent().substring(4);
+                    try {
+                        this.trace(Double.valueOf(temp));
+                    } catch (NumberFormatException ignore) {
+                    }
+                });
+                wrapper.add(input);
+                wrapper.setCollapseInvisible(true);
+            } else {
+                wrapper.get("#XVAL").setVisible(true);
+            }
+        } else {
+            if (wrapper.contains("#XVAL")) {
+                wrapper.get("#XVAL").setVisible(false);
+            }
+        }
     }
 
     private void trace(double xPosOnGraph) {
@@ -875,6 +857,27 @@ public class Graph extends Contextual {
         }
     }
 
+    /**
+     * converts x-y coordinate graph to absolute coordinate on screen
+     *
+     * @param x x coordinate in the graph window
+     * @param y y coordinate in the graph window
+     * @return coordinate on screen
+     */
+    public float[] convertToCoordinateOnScreen(double x, double y) {
+        float cx = Plot.map(x, rangeX.getLow(), rangeX.getHigh(), 0, w);
+        float cy = Plot.map(y, rangeY.getLow(), rangeY.getHigh(), 0, h);
+        return new float[]{this.x + cx, this.y + h - cy};
+    }
+
+    public boolean isEvaluationOn() {
+        return evaluationOn;
+    }
+
+    public void setEvaluationOn(boolean evaluationOn) {
+        this.evaluationOn = evaluationOn;
+    }
+
     private int overlapped(ArrayList<Float> occupied, float currentPos, float height) {
         for (int i = 0; i < occupied.size(); i++) {
             Float f = occupied.get(i);
@@ -885,37 +888,35 @@ public class Graph extends Contextual {
         return -1;
     }
 
-    public boolean tracingIsOn() {
-        return tracingOn;
-    }
-    public double getStepLength() {return stepLength;}
+    public enum Mode {
+        DRAG("DRAG"),
+        ZOOM_OUT("ZOOM_OUT"),
+        ZOOM_RECT("ZOOM_RECT"),
+        ZOOM_IN("ZOOM_IN");
 
-    public void setTracingOn(boolean tracingOn) {
-        this.tracingOn = tracingOn;
-        @SuppressWarnings("unchecked") ArrayList<Displayable> matching = (ArrayList<Displayable>) JNode.get("#functionInputWrapper");
-        if (matching.size() == 0) return;
-        HBox wrapper = (HBox) matching.get(0);
-        if (tracingOn) {
-            if (!wrapper.contains("#XVAL")) {
-                TextInput input = (TextInput) new TextInput().setContent("x = ").setId("#XVAL");
-                input.onFocus(() -> input.setContent("x = "));
-                input.onKeyTyped(() -> input.setContent(input.getContent().contains("x = ") ? input.getContent() : "x = "));
-                input.onEditing(() -> {
-                    String temp = input.getContent().substring(4);
-                    try {
-                        this.trace(Double.valueOf(temp));
-                    } catch (NumberFormatException ignore) {
-                    }
-                });
-                wrapper.add(input);
-                wrapper.setCollapseInvisible(true);
-            } else {
-                wrapper.get("#XVAL").setVisible(true);
-            }
-        } else {
-            if (wrapper.contains("#XVAL")) {
-                wrapper.get("#XVAL").setVisible(false);
-            }
+        private static String[] list;
+
+        static {
+            list = new String[]{"DRAG", "ZOOM_IN", "ZOOM_OUT", "ZOOM_RECT"};
+        }
+
+        private String name;
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+        public static boolean contains(String name) {
+            for (String s : list) if (s.equals(name)) return true;
+            return false;
+        }
+
+        public boolean equals(Mode other) {
+            return other.name.equals(name);
+        }
+
+        public boolean equals(String other) {
+            return this.name.equals(other);
         }
     }
 }

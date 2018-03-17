@@ -15,30 +15,9 @@ public class SuppliedVar extends Variable {
         super(name);
     }
 
-    public SuppliedVar setVal(double val) {
-        this.val = val;
-        return this;
-    }
-
     @Override
     public double eval(double x) {
         return val;
-    }
-
-    @Override
-    public double val() {
-        return val;
-    }
-
-    @Override
-    public SuppliedVar copy() {
-        super.copy();
-        return new SuppliedVar(this.getName()).setVal(this.val);
-    }
-
-    @Override
-    public Operable replace(Operable o, Operable r) {
-        return o.equals(this) ? r : this;
     }
 
     @Override
@@ -48,5 +27,26 @@ public class SuppliedVar extends Variable {
 
     public String toString() {
         return Mode.DEBUG ? "&" + getName() + "&" : getName();
+    }
+
+    @Override
+    public SuppliedVar copy() {
+        super.copy();
+        return new SuppliedVar(this.getName()).setVal(this.val);
+    }
+
+    public SuppliedVar setVal(double val) {
+        this.val = val;
+        return this;
+    }
+
+    @Override
+    public double val() {
+        return val;
+    }
+
+    @Override
+    public Operable replace(Operable o, Operable r) {
+        return o.equals(this) ? r : this;
     }
 }

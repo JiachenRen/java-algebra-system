@@ -3,11 +3,6 @@ package jmc.utils;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
-
-import static jmc.utils.ColorFormatter.*;
-import static tests.TestPrint.l;
 
 /**
  * Created by Jiachen on 3/10/18.

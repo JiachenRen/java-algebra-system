@@ -118,6 +118,16 @@ public abstract class Operable implements Evaluable {
     }
 
     /**
+     * traverses the composite tree and evaluates every single node that represents a raw value.
+     * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
+     * however, if variables exists in the expression, NaN is returned.
+     * e.g. if the Operable represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
+     *
+     * @return arbitrary value of the node.
+     */
+    public abstract double val();
+
+    /**
      * @return level of complexity of the expression represented by an integer with 1 being
      * the most simplistic
      */
@@ -135,16 +145,6 @@ public abstract class Operable implements Evaluable {
     public abstract Operable plugIn(Variable var, Operable replacement);
 
     public abstract Operable simplify();
-
-    /**
-     * traverses the composite tree and evaluates every single node that represents a raw value.
-     * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
-     * however, if variables exists in the expression, NaN is returned.
-     * e.g. if the Operable represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
-     *
-     * @return arbitrary value of the node.
-     */
-    public abstract double val();
 
     /**
      * basically reversing the effects of toAdditionalOnly and toExponentialForm

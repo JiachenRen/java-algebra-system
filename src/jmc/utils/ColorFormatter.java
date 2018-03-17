@@ -11,6 +11,11 @@ public class ColorFormatter {
         return color(o.toString(), "[1m");
     }
 
+    public static String color(String s, String modifier) {
+        if (JNode.OS.toLowerCase().contains("windows")) return s;
+        return (char) 27 + modifier + s + (char) 27 + "[0m";
+    }
+
     public static String lightRed(Object o) {
         return color(o.toString(), AnsiColor.LIGHT_RED.toString());
     }
@@ -55,10 +60,5 @@ public class ColorFormatter {
             line = line.replace(symbol, (char) 27 + modifier + symbol + (char) 27 + "[0m");
         }
         return line;
-    }
-
-    public static String color(String s, String modifier) {
-        if (JNode.OS.toLowerCase().contains("windows")) return s;
-        return (char) 27 + modifier + s + (char) 27 + "[0m";
     }
 }

@@ -5,29 +5,27 @@ package jmc.cas;
  * Leaf Node: super class of Variable and RawValue
  */
 abstract class LeafNode extends Operable implements BinLeafNode {
-    public abstract String toString();
-
-    public abstract boolean isUndefined();
-
     public abstract Operable copy();
-
-    public abstract Operable explicitNegativeForm();
-
-//    public abstract Operable firstDerivative();
 
     public int levelOf(Operable o) {
         return this.equals(o) ? 0 : -1;
     }
 
+    public abstract String toString();
+
     public int numNodes() {
         return 1;
     }
+
+//    public abstract Operable firstDerivative();
 
     public abstract int complexity();
 
     public Operable beautify() {
         return this;
     }
+
+    public abstract Operable explicitNegativeForm();
 
     public Operable toAdditionOnly() {
         return this;
@@ -44,5 +42,7 @@ abstract class LeafNode extends Operable implements BinLeafNode {
     public Operable replace(Operable o, Operable r) {
         return this.equals(o) ? r : this;
     }
+
+    public abstract boolean isUndefined();
 
 }

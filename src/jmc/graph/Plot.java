@@ -11,11 +11,11 @@ import java.util.Arrays;
  * May 17th
  */
 public class Plot {
+    private static final int APL = 5; //Asymptote computation pixel length
     private ArrayList<Point> data;
     private ArrayList<Point> coordinates;
     private double lowerBondX;
     private double upperBondX;
-    private static final int APL = 5; //Asymptote computation pixel length
 
     {
         data = new ArrayList<>();
@@ -26,6 +26,50 @@ public class Plot {
     public Plot(Range range) {
         lowerBondX = range.getLow();
         upperBondX = range.getHigh();
+    }
+
+    private static Point[] mergeSort(Point[] array) {
+        return recursiveMergeSort(0, array.length - 1, array);
+    }
+
+    //designed by Jiachen Ren on March 19th
+    private static Point[] recursiveMergeSort(int startIndex, int endIndex, Point[] array) {
+        // base case
+        if (endIndex - startIndex <= 1) {
+            if (endIndex == startIndex) return new Point[]{array[endIndex]};
+            return array[startIndex].getX() > array[endIndex].getX() ? new Point[]{array[endIndex], array[startIndex]}
+                    : new Point[]{array[startIndex], array[endIndex]};
+        } else {
+            int mid = (startIndex + endIndex) / 2;
+            Point[] array_left = recursiveMergeSort(startIndex, mid, array);
+            Point[] array_right = recursiveMergeSort(mid + 1, endIndex, array);
+
+            //perform merging
+            Point[] merged = new Point[array_left.length + array_right.length];
+            int left_index = 0, right_index = 0, curIndex = 0;
+            while (left_index < array_left.length && right_index < array_right.length) {
+                if (array_left[left_index].getX() > array_right[right_index].getX()) {
+                    merged[curIndex] = array_right[right_index];
+                    right_index++;
+                } else {
+                    merged[curIndex] = array_left[left_index];
+                    left_index++;
+                }
+                curIndex++;
+            }
+
+            //add the rest of the sorted half list to the merged
+            //System.out.println(merged.length);
+            for (int i = left_index; i < array_left.length; i++) {
+                merged[curIndex] = array_left[i];
+                curIndex++;
+            }
+            for (int i = right_index; i < array_right.length; i++) {
+                merged[curIndex] = array_right[i];
+                curIndex++;
+            }
+            return merged;
+        }
     }
 
     /**
@@ -67,6 +111,10 @@ public class Plot {
         }
     }
 
+    public static float map(double d, double l, double u, double l1, double l2) {
+        return PApplet.map((float) d, (float) l, (float) u, (float) l1, (float) l2);
+    }
+
     public Plot add(Point point) {
         this.data.add(point);
         return this;
@@ -86,17 +134,12 @@ public class Plot {
         return lowerBondX;
     }
 
-
     public double getUpperBondX() {
         return upperBondX;
     }
 
     ArrayList<Point> getCoordinates() {
         return coordinates;
-    }
-
-    public static float map(double d, double l, double u, double l1, double l2) {
-        return PApplet.map((float) d, (float) l, (float) u, (float) l1, (float) l2);
     }
 
     /**
@@ -157,7 +200,6 @@ public class Plot {
         return true;
     }
 
-
     public String toString() {
         String s = "";
         for (Point point : data) {
@@ -170,56 +212,10 @@ public class Plot {
         return data;
     }
 
-
     public void sort() {
         Point sorted[] = mergeSort(data.toArray(new Point[data.size()]));
         data = new ArrayList<>();
         data.addAll(Arrays.asList(sorted));
-    }
-
-    private static Point[] mergeSort(Point[] array) {
-        return recursiveMergeSort(0, array.length - 1, array);
-    }
-
-
-    //designed by Jiachen Ren on March 19th
-    private static Point[] recursiveMergeSort(int startIndex, int endIndex, Point[] array) {
-        // base case
-        if (endIndex - startIndex <= 1) {
-            if (endIndex == startIndex) return new Point[]{array[endIndex]};
-            return array[startIndex].getX() > array[endIndex].getX() ? new Point[]{array[endIndex], array[startIndex]}
-                    : new Point[]{array[startIndex], array[endIndex]};
-        } else {
-            int mid = (startIndex + endIndex) / 2;
-            Point[] array_left = recursiveMergeSort(startIndex, mid, array);
-            Point[] array_right = recursiveMergeSort(mid + 1, endIndex, array);
-
-            //perform merging
-            Point[] merged = new Point[array_left.length + array_right.length];
-            int left_index = 0, right_index = 0, curIndex = 0;
-            while (left_index < array_left.length && right_index < array_right.length) {
-                if (array_left[left_index].getX() > array_right[right_index].getX()) {
-                    merged[curIndex] = array_right[right_index];
-                    right_index++;
-                } else {
-                    merged[curIndex] = array_left[left_index];
-                    left_index++;
-                }
-                curIndex++;
-            }
-
-            //add the rest of the sorted half list to the merged
-            //System.out.println(merged.length);
-            for (int i = left_index; i < array_left.length; i++) {
-                merged[curIndex] = array_left[i];
-                curIndex++;
-            }
-            for (int i = right_index; i < array_right.length; i++) {
-                merged[curIndex] = array_right[i];
-                curIndex++;
-            }
-            return merged;
-        }
     }
 
     double lookUp(double x, double accuracy) {

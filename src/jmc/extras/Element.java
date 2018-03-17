@@ -18,14 +18,9 @@ public enum Element {
     // ... 90+ others
     ;
 
-    private static class Holder {
-        static Map<Integer, Element> map = new HashMap<>();
-    }
-
     private final int atomicNumber;
     private final String fullName;
     private final double atomicMass;
-
     Element(int atomicNumber, String fullName, double atomicMass) {
         this.atomicNumber = atomicNumber;
         this.fullName = fullName;
@@ -53,5 +48,9 @@ public enum Element {
 
     public double getAtomicMass() {
         return atomicMass;
+    }
+
+    private static class Holder {
+        static Map<Integer, Element> map = new HashMap<>();
     }
 }

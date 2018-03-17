@@ -16,31 +16,6 @@ public class Variable extends LeafNode implements Nameable {
         return x;
     }
 
-    public String toString() {
-        return name;
-    }
-
-    public boolean isUndefined() {
-        return false;
-    }
-
-    /**
-     * Ensures that if "x" is defined as "x = 3", the value gets replicated as well.
-     *
-     * @return new Variable instance that is identical to self.
-     */
-    public Variable copy() {
-        return new Variable(name);
-    }
-
-    public Operable explicitNegativeForm() {
-        return this.copy();
-    }
-
-    public int complexity() {
-        return 3;
-    }
-
     public boolean equals(Operable other) {
         return other instanceof Variable && ((Variable) other).getName().equals(this.name);
     }
@@ -49,8 +24,25 @@ public class Variable extends LeafNode implements Nameable {
         return name;
     }
 
+    public String toString() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * Since a variable is not an arbitrary number, val() should return NaN.
+     *
+     * @return NaN
+     */
+    public double val() {
+        return Double.NaN;
+    }
+
+    public boolean isUndefined() {
+        return false;
     }
 
     /**
@@ -68,12 +60,23 @@ public class Variable extends LeafNode implements Nameable {
     }
 
     /**
-     * Since a variable is not an arbitrary number, val() should return NaN.
+     * Ensures that if "x" is defined as "x = 3", the value gets replicated as well.
      *
-     * @return NaN
+     * @return new Variable instance that is identical to self.
      */
-    public double val() {
-        return Double.NaN;
+    public Variable copy() {
+        return new Variable(name);
     }
+
+
+    public Operable explicitNegativeForm() {
+        return this.copy();
+    }
+
+
+    public int complexity() {
+        return 3;
+    }
+
 
 }

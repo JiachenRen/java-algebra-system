@@ -7,8 +7,6 @@ import java.util.ArrayList;
  * Constants
  */
 public class Constants {
-    private static ArrayList<Constant> constants;
-
     static {
         constants = new ArrayList<>();
         define("e", () -> Math.E);
@@ -18,6 +16,7 @@ public class Constants {
         define("π", () -> Math.PI);
     }
 
+    private static ArrayList<Constant> constants;
     public static final Constant E = getConstant("e");
     public static final Constant PI = getConstant("pi");
     public static final Constant π = getConstant("π");
@@ -89,18 +88,14 @@ public class Constants {
             return computedConst.compute();
         }
 
-        @Override
-        public Constant copy() {
-            return new Constant(getName(), computedConst);
-        }
-
-        public int complexity() {
-            return 2;
-        }
-
         public boolean equals(Operable other) {
             return other instanceof Constant && (((Constant) other).getName().equals(getName())
                     || other.val() == this.val());
+        }
+
+        @Override
+        public double val() {
+            return computedConst.compute();
         }
 
         public Operable plugIn(Variable var, Operable nested) {
@@ -108,8 +103,12 @@ public class Constants {
         }
 
         @Override
-        public double val() {
-            return computedConst.compute();
+        public Constant copy() {
+            return new Constant(getName(), computedConst);
+        }
+
+        public int complexity() {
+            return 2;
         }
 
         public int numNodes() {

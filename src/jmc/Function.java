@@ -14,13 +14,13 @@ public class Function implements Evaluable, Nameable {
     private String name;
     private Evaluable evaluable;
 
+    public Function(Evaluable evaluable) {
+        this("", evaluable);
+    }
+
     public Function(String name, Evaluable evaluable) {
         setName(name);
         this.evaluable = evaluable;
-    }
-
-    public Function(Evaluable evaluable) {
-        this("", evaluable);
     }
 
     /**
@@ -37,6 +37,15 @@ public class Function implements Evaluable, Nameable {
 
     public boolean equals(Function other) {
         return this.getName().equals(other.getName());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Function setName(String name) {
+        this.name = name;
+        return this;
     }
 
     public ArrayList<Double> numericalSolve(double y, double lowerBound, double upperBound, double accuracy) {
@@ -63,11 +72,6 @@ public class Function implements Evaluable, Nameable {
         return solutions;
     }
 
-    public Function setName(String name) {
-        this.name = name;
-        return this;
-    }
-
     public Evaluable getEvaluable() {
         return evaluable;
     }
@@ -75,9 +79,5 @@ public class Function implements Evaluable, Nameable {
     public Function setEvaluable(Evaluable evaluable) {
         this.evaluable = evaluable;
         return this;
-    }
-
-    public String getName() {
-        return name;
     }
 }

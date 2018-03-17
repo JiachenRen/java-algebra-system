@@ -2,6 +2,7 @@ package jmc.cas;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -167,6 +168,14 @@ public abstract class Operation extends Operable implements Nameable {
     public Operable toExponentialForm() {
         operands.forEach(Operable::toExponentialForm);
         return this;
+    }
+
+    public int numNodes() {
+        Optional<Integer> nodes = operands.stream()
+                .map(Operable::numNodes)
+                .reduce((a, b) -> a + b);
+        if (!nodes.isPresent()) throw new JMCException("empty nodes");
+        return 1 + nodes.get();
     }
 
     public boolean isUndefined() {

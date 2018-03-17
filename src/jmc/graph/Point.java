@@ -30,6 +30,14 @@ public class Point {
         this.isOutOfScope = clone.isOutOfScope;
     }
 
+    public static double dist(Point a, Point b) {
+        return Point.dist(a.getX(), a.getY(), b.getX(), b.getY());
+    }
+
+    private static double dist(double x1, double y1, double x2, double y2) {
+        return Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 0.5);
+    }
+
     public double getX() {
         return x;
     }
@@ -40,6 +48,14 @@ public class Point {
             isValidPoint = false;
     }
 
+    boolean isValid() {
+        return isValidPoint;
+    }
+
+    public double dist(Point other) {
+        return Math.abs(this.getY() - other.getY());
+    }
+
     public double getY() {
         return y;
     }
@@ -48,14 +64,6 @@ public class Point {
         this.y = y;
         if (Double.isNaN(y) || Double.isInfinite(y) || y > 1E37)
             isValidPoint = false;
-    }
-
-    boolean isValid() {
-        return isValidPoint;
-    }
-
-    public double dist(Point other) {
-        return Math.abs(this.getY() - other.getY());
     }
 
     public String toString() {
@@ -86,13 +94,5 @@ public class Point {
 
     void setOutOfScope(boolean temp) {
         this.isOutOfScope = temp;
-    }
-
-    public static double dist(Point a, Point b) {
-        return Point.dist(a.getX(), a.getY(), b.getX(), b.getY());
-    }
-
-    private static double dist(double x1, double y1, double x2, double y2) {
-        return Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2), 0.5);
     }
 }

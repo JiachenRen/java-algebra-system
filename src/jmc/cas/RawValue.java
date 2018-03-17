@@ -43,6 +43,19 @@ public class RawValue extends LeafNode {
         return doubleValue();
     }
 
+    public RawValue inverse() {
+        if (isInteger()) return new Fraction(1, intValue());
+        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
+    }
+
+    public boolean isZero() {
+        return doubleValue() == 0;
+    }
+
+    public boolean isInfinite() {
+        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
+    }
+
     /**
      * Removes the extra ".0" at the end of the number
      *
@@ -63,13 +76,20 @@ public class RawValue extends LeafNode {
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
+    public boolean isPositive() {
+        return doubleValue() > 0;
+    }
+
+
     public int intValue() {
         return number.intValue();
     }
 
+
     public boolean isUndefined() {
         return new Double(number.doubleValue()).isNaN();
     }
+
 
     public RawValue copy() {
         return new RawValue(number);
@@ -116,20 +136,5 @@ public class RawValue extends LeafNode {
         return new RawValue(this.doubleValue() * -1);
     }
 
-    public RawValue inverse() {
-        if (isInteger()) return new Fraction(1, intValue());
-        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
-    }
 
-    public boolean isZero() {
-        return doubleValue() == 0;
-    }
-
-    public boolean isInfinite() {
-        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
-    }
-
-    public boolean isPositive() {
-        return doubleValue() > 0;
-    }
 }

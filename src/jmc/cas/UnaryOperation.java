@@ -192,14 +192,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         }
 
         return false;
-    }    public int complexity() {
-        return getOperand().complexity() + 1;
     }
 
     public Operable getOperand() {
         return getOperand(0);
-    }    public Operable setOperand(Operable operable) {
-        return super.setOperand(operable, 0);
     }
 
     public String getName() {
@@ -277,6 +273,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     }
 
+    public int complexity() {
+        return getOperand().complexity() + 1;
+    }
+
+
+    public Operable setOperand(Operable operable) {
+        return super.setOperand(operable, 0);
+    }
 
 
     public String toString() {
@@ -310,14 +314,9 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return this;
     }
 
-    public int numNodes() {
-        return 1 + getOperand().numNodes();
-    }
-
     public double val() {
         return operation.eval(getOperand().val());
     }
-
 
 
     public int levelOf(Operable o) {

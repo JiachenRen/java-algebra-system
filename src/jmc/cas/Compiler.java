@@ -4,8 +4,8 @@ import jmc.Function;
 
 import java.util.ArrayList;
 
-import static jmc.utils.ColorFormatter.*;
 import static jmc.cas.Assets.*;
+import static jmc.utils.ColorFormatter.*;
 
 /**
  * Created by Jiachen on 19/05/2017.
@@ -195,7 +195,6 @@ public class Compiler {
 
 
     /**
-     *
      * @param segment the segment of expression
      * @param index   index of the binary operation
      * @return the indices of the beginning and the end of the binary operation, both inclusive
