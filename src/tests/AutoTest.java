@@ -48,62 +48,62 @@ public class AutoTest {
     }
 
     private static void testSimplify() throws Exception {
-        l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        l(lightPurple("\n---------> Simplification \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
         test("/tests/files/simplification/bin_ops.txt", true, "simplify");
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        l(boldBlack("\n---------> Unary Operations Test \n"));
         test("/tests/files/simplification/u_ops.txt", true, "simplify");
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/simplification/irr_num.txt", true, "simplify");
     }
 
     private static void testBeautify() throws Exception {
-        l(lightPurple("\n---------------------------> Beautification <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        l(lightPurple("\n---------> Beautification \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
         test("/tests/files/beautify/bin_ops.txt", true, "simplify", "beautify");
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        l(boldBlack("\n---------> Unary Operations Test \n"));
         test("/tests/files/beautify/u_ops.txt", true, "simplify", "beautify");
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/beautify/irr_num.txt", true, "simplify", "beautify");
     }
 
     private static void testNumNodes() throws Exception {
-        l(lightPurple("\n---------------------------> Number of Nodes <-------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        l(lightPurple("\n---------> Number of Nodes \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
         test("/tests/files/nodes/bin_ops.txt", false, "numNodes");
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        l(boldBlack("\n---------> Unary Operations Test \n"));
         test("/tests/files/nodes/u_ops.txt", false, "numNodes");
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/nodes/irr_num.txt", false, "numNodes");
     }
 
     private static void testExpand() throws Exception {
-        l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        l(lightPurple("\n---------> Expansion \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
         test("/tests/files/expansion/bin_ops.txt", true, "expand", "simplify");
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        l(boldBlack("\n---------> Unary Operations Test \n"));
         test("/tests/files/expansion/u_ops.txt", true, "expand", "simplify");
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/expansion/irr_num.txt", true, "expand", "simplify");
     }
 
     private static void testToExponentialForm() throws Exception {
-        l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        l(lightPurple("\n---------> Exponential Form \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
         test("/tests/files/exponential/bin_ops.txt", true, "toExponentialForm");
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        l(boldBlack("\n---------> Unary Operations Test \n"));
         test("/tests/files/exponential/u_ops.txt", true, "toExponentialForm");
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/exponential/irr_num.txt", true, "toExponentialForm");
     }
 
     private static void testToAdditionOnly() throws Exception {
-        l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
-        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        l(lightPurple("\n---------> Addition Only Form \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
         test("/tests/files/additional/bin_ops.txt", true, "toAdditionOnly");
-        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        l(boldBlack("\n---------> Unary Operations Test \n"));
         test("/tests/files/additional/u_ops.txt", true, "toAdditionOnly");
-        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/additional/irr_num.txt", true, "toAdditionOnly");
     }
 
