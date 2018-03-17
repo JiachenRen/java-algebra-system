@@ -31,7 +31,7 @@ public class CasComprehensiveTest {
 
         //plug in test
         operation = (Operation) Compiler.compile("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
-        operation.plugIn(new Variable("x"), Compiler.compile("h"));
+        operation.replace(new Variable("x"), Compiler.compile("h"));
         l(operation);
 
         //fraction test
@@ -81,8 +81,8 @@ public class CasComprehensiveTest {
         operables = ops.stream().map(Compiler::compile).collect(Collectors.toList());
         operables.forEach(op -> {
             l(boldBlack("original: ") + Compiler.colorMathSymbols(op.toString()));
-            l(boldBlack("plug in 5 for x: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)));
-            l(boldBlack("evaluated at 5: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)).val());
+            l(boldBlack("plug in 5 for x: ") + op.copy().replace(new Variable("x"), new RawValue(5)));
+            l(boldBlack("evaluated at 5: ") + op.copy().replace(new Variable("x"), new RawValue(5)).val());
             l(lightCyan("arbitrary value: ") + op.val());
             l(boldBlack("# vars: ") + op.numVars());
             l(lightRed("undefined: ") + op.isUndefined());

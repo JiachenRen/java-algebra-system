@@ -45,16 +45,6 @@ public class Variable extends LeafNode implements Nameable {
         return false;
     }
 
-    /**
-     * Ensures that {other} does not get modified.
-     *
-     * @param other the replacing variable
-     * @return new instance of the replacing variable
-     */
-    public Operable plugIn(Variable var, Operable other) {
-        return other;
-    }
-
     public Operable simplify() {
         return this;
     }

@@ -1,0 +1,37 @@
+tan(3*pi/2)        -> undef
+tan(3*pi/2*x)      -> tan(pi*(3/2)*x)
+atan(tan(x))       -> atan(tan(x))
+asin(sin(x))       -> asin(sin(x))
+acos(cos(2*ln(x))) -> acos(cos(2*ln(x)))
+atan(tan(5*pi/2))  -> undef
+tan(0-3*pi/2)      -> undef
+sec(0-3*pi/2)      -> undef
+cot(pi)            -> undef
+cot(0)             -> undef
+csc(0)             -> undef
+csc(100*pi)        -> undef
+csc(pi/2)          -> 1
+log(10)            -> 1
+log(100)           -> 2
+ln(225)            -> 2*ln(15)
+ln(e)              -> 1
+int(3.5)           -> 3
+ln(e^3)            -> 3
+ln(e^3+x)          -> ln(e^3+x)
+ln(e^3*x)          -> ln(e^3*x)
+ln(x)              -> ln(x)
+ln(e^(3*x))        -> (3*x)
+cos(pi)            -> -1
+sin(pi)            -> 0
+tan(pi)            -> 0
+100^log(5)         -> 25
+1000^log(5)        -> 125
+(e^3)^ln(3)        -> 27
+e^ln(5)            -> 5
+ln((2/3)^(3/2))    -> ln((2/9)*2^(1/2)*3^(1/2))
+ln(2^(3/2))        -> ln(2*2^(1/2))
+log(13)            -> log(13)
+ln(37)             -> ln(37)
+ln(1/4)            -> ln((1/4))
+ln(-1)
+ln(-1*x)

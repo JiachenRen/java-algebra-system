@@ -300,20 +300,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 && this.getOperand().equals(((UnaryOperation) other).getOperand()); //delegate down
     }
 
-    /**
-     * Creates a new Operable with its variable replaced with {nested}
-     * Note: modifies
-     *
-     * @param replacement the operable to be plugged in
-     * @return a new instance with its original variable replaced with {nested}
-     */
-    public Operable plugIn(Variable var, Operable replacement) {
-        if (getOperand().equals(var))
-            setOperand(replacement);
-        else getOperand().plugIn(var, replacement);
-        return this;
-    }
-
     public double val() {
         return operation.eval(getOperand().val());
     }

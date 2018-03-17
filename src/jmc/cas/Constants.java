@@ -98,10 +98,6 @@ public class Constants {
             return computedConst.compute();
         }
 
-        public Operable plugIn(Variable var, Operable nested) {
-            return new Constant(this);
-        }
-
         @Override
         public Constant copy() {
             return new Constant(getName(), computedConst);

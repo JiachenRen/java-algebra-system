@@ -133,17 +133,6 @@ public abstract class Operable implements Evaluable {
      */
     public abstract int complexity();
 
-    /**
-     * plugs in the operable nested for all variables in the expression
-     * NOTE: the method returns the operable with the desired nested operable plugged in, but
-     * the operable itself is not altered.
-     *
-     * @param var         the variable to be replaced
-     * @param replacement the operable to be plugged in
-     * @return the resulting operable with nested plugged in
-     */
-    public abstract Operable plugIn(Variable var, Operable replacement);
-
     public abstract Operable simplify();
 
     /**

@@ -1039,7 +1039,6 @@ public class BinaryOperation extends Operation {
             return name;
         }
 
-
     }
 
 
@@ -1062,19 +1061,14 @@ public class BinaryOperation extends Operation {
                 && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
     }
 
-
-    public Operable plugIn(Variable var, Operable replacement) {
-        if (this.getLeft().equals(var))
-            this.setLeft(replacement);
-        else this.getLeft().plugIn(var, replacement);
-        if (this.getRight().equals(var))
-            this.setRight(replacement);
-        else this.getRight().plugIn(var, replacement);
-        return this;
-    }
-
     public int complexity() {
         return getLeft().complexity() + getRight().complexity() + 1;
+    }
+
+    public Operable replace(Operable o, Operable r) {
+        Operable clone = super.replace(o, r);
+        if (clone instanceof BinaryOperation) ((BinaryOperation) clone).simplifyParenthesis();
+        return clone;
     }
 
 }

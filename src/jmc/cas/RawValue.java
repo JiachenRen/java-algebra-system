@@ -109,16 +109,6 @@ public class RawValue extends LeafNode {
                 == this.doubleValue();
     }
 
-    /**
-     * Since plugIn only applies to variable, a RawValue type should only return itself.
-     *
-     * @param nested the operable to be plugged in
-     * @return new instance of self
-     */
-    public Operable plugIn(Variable var, Operable nested) {
-        return this;
-    }
-
     public Operable simplify() {
         return this;
     }
