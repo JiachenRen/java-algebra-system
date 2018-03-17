@@ -1,7 +1,5 @@
 package jmc.cas;
 
-import jmc.Function;
-
 import java.util.ArrayList;
 
 import static jmc.cas.Assets.*;
@@ -27,7 +25,7 @@ public class Compiler {
             throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
         if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
             throw new JMCException("'<>' mismatch in " + "\"" + expression + "\"");
-        expression = formatUnaryOperations(expression.replace(" ", "").replace("(-", "(0-"));
+        expression = formatOperations(expression.replace(" ", "").replace("(-", "(0-"));
         String exp = formatCoefficients(expression);
         exp = handleParentheticalNotation(handleCalcPriority(exp));
         log(boldBlack("formatted input: ") + exp);
@@ -51,11 +49,11 @@ public class Compiler {
     }
 
 
-    private static String formatUnaryOperations(String exp) {
-        while (containsUnformattedUnaryOperations(exp)) {
+    private static String formatOperations(String exp) {
+        while (isUnformatted(exp)) {
             int idx1 = -1;
-            for (Function function : UnaryOperation.registeredOperations()) {
-                String candidate = function.getName() + "(";
+            for (String s : Assets.reservedNames()) {
+                String candidate = s + "(";
                 if (exp.contains(candidate)) {
                     idx1 = exp.indexOf(candidate) + candidate.length() - 1;
                     break;
@@ -71,9 +69,9 @@ public class Compiler {
         return s.substring(0, idx) + c + s.substring(idx + 1);
     }
 
-    private static boolean containsUnformattedUnaryOperations(String exp) {
-        for (Function function : UnaryOperation.registeredOperations()) {
-            if (exp.contains(function.getName() + "("))
+    private static boolean isUnformatted(String exp) {
+        for (String s : Assets.reservedNames()) {
+            if (exp.contains(s + "("))
                 return true;
         }
         return false;
@@ -116,6 +114,13 @@ public class Compiler {
         return new int[]{openIndex, closeIndex};
     }
 
+    private static void flat(Operable tree, ArrayList<Operable> flattened) {
+        if (tree instanceof BinaryOperation && ((BinaryOperation) tree).is(",")) {
+            BinaryOperation binOp = ((BinaryOperation) tree);
+            flat(binOp.getLeft(), flattened);
+            flat(binOp.getRight(), flattened);
+        } else flattened.add(tree);
+    }
 
     private static Operable generateOperations(String segment, ArrayList<Operable> operables) {
         log(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
@@ -125,23 +130,28 @@ public class Compiler {
             int indices[] = extractInnerParenthesis(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
             Operable operand = generateOperations(extracted, operables);
-            String unaryOperation = segment.substring(0, indices[0]);
+            String operationName = segment.substring(0, indices[0]);
             int startIndex = 0;
             for (int i = indices[0] - 1; i >= 0; i--) {
                 char c = segment.charAt(i);
                 if (SYMBOLS.contains(Character.toString(c))) {
-                    unaryOperation = segment.substring(i + 1, indices[0]);
+                    operationName = segment.substring(i + 1, indices[0]);
                     startIndex = i;
                     break;
                 }
             }
-            pendingOperations.add(new UnaryOperation(operand, unaryOperation));
+            if (operand instanceof BinaryOperation && ((BinaryOperation) operand).is(",")) {
+                BinaryOperation tree = ((BinaryOperation) operand);
+                ArrayList<Operable> operands = new ArrayList<>();
+                flat(tree, operands);
+                pendingOperations.add(new CompositeOperation(operationName, operands));
+            } else pendingOperations.add(new UnaryOperation(operand, operationName));
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
             log(lightBlue("unary:\t") + colorMathSymbols(segment));
             segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
             operableHashId++;
         }
-        for (int p = 1; p <= 3; p++) { //prioritize ^ over */ over +-. This way it is flexible for adding more operations.
+        for (int p = 0; p <= 3; p++) { //prioritize ^ over */ over +-. This way it is flexible for adding more operations.
             for (int i = 0; i < segment.length(); i++) {
                 CharSequence op = segment.subSequence(i, i + 1);
                 if (BinaryOperation.binaryOperations(p).contains(op)) {

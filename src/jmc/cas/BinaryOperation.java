@@ -88,7 +88,7 @@ public class BinaryOperation extends Operation {
     }
 
     public static String binaryOperations() {
-        return binaryOperations(1) + binaryOperations(2) + binaryOperations(3);
+        return binaryOperations(0) + binaryOperations(1) + binaryOperations(2) + binaryOperations(3);
     }
 
     /**
@@ -980,6 +980,7 @@ public class BinaryOperation extends Operation {
             define("*", 2, (a, b) -> a * b);
             define("/", 2, (a, b) -> a / b);
             define("^", 1, Math::pow);
+            define(",", 0, (a, b) -> Double.NaN);
             if (Mode.DEBUG) System.out.println("# reserved binary operations declared");
         }
 

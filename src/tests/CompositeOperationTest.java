@@ -10,7 +10,9 @@ import static tests.TestPrint.l;
  */
 public class CompositeOperationTest {
     public static void main(String args[]) {
-        l(Compiler.compile("comp(a,b,comp(a,c))+x/c"));
+        l(Compiler.compile("a+log(3+a)+4"));
+        l(Compiler.compile("comp(a,log(3+a),comp(4,5))"));
+//        l(Compiler.compile("a+log(3+a)+4"));
 
     }
 }
