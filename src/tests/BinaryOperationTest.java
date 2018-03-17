@@ -1,8 +1,8 @@
 package tests;
 
-import jmc.cas.BinaryOperation;
+import jmc.cas.operations.BinaryOperation;
 import jmc.cas.Compiler;
-import jmc.cas.Operation;
+import jmc.cas.operations.Operation;
 import jmc.cas.RawValue;
 
 /**

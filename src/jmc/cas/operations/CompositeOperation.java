@@ -1,4 +1,6 @@
-package jmc.cas;
+package jmc.cas.operations;
+
+import jmc.cas.*;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -13,7 +15,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     private RegisteredManipulation manipulation;
 
     static {
-        define("comp", new Signature(Argument.ANY), (operands -> new RawValue(0)));
+        define("comp", new Signature(Argument.ANY, Argument.ANY, Argument.ANY), (operands -> new RawValue(0)));
     }
 
 
@@ -23,15 +25,16 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
 
     public CompositeOperation(String name, ArrayList<Operable> operands) {
         super(operands);
-        this.manipulation = getRegisteredManipulation(name);
+        this.manipulation = resolveManipulation(name, Signature.resolve(operands));
     }
 
-    public static RegisteredManipulation getRegisteredManipulation(String name) {
+    public static RegisteredManipulation resolveManipulation(String name, Signature signature) {
         for (RegisteredManipulation manipulation : registeredManipulations) {
-            if (manipulation.getName().equals(name))
+            if (manipulation.getName().equals(name) && manipulation.getSignature().equals(signature)) {
                 return manipulation;
+            }
         }
-        return null;
+        throw new JMCException("cannot resolve operation \""+name+"\" with signature "+signature);
     }
 
     public static ArrayList<RegisteredManipulation> registeredManipulations() {
@@ -57,7 +60,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     }
 
     public String getName() {
-        return manipulation.name;
+        return manipulation.getName();
     }
 
     public double eval(double x) {
@@ -78,32 +81,4 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         }
         return false;
     }
-
-    public interface Manipulation {
-        Operable manipulate(ArrayList<Operable> operands);
-    }
-
-    /**
-     * should this be subclassed?
-     */
-    static class RegisteredManipulation implements Nameable, Manipulation {
-        private String name;
-        private Manipulation manipulation;
-        private Signature signature;
-
-        private RegisteredManipulation(String name, Signature signature, Manipulation manipulation) {
-            this.manipulation = manipulation;
-            this.signature = signature;
-            this.name = name;
-        }
-
-        public Operable manipulate(ArrayList<Operable> operands) {
-            return manipulation.manipulate(operands);
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
-
 }

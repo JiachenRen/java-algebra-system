@@ -1,7 +1,9 @@
-package jmc.cas;
+package jmc.cas.operations;
 
 import jmc.Function;
 import jmc.MathContext;
+import jmc.cas.*;
+import jmc.cas.Compiler;
 
 import java.util.ArrayList;
 

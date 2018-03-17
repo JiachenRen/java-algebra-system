@@ -1,5 +1,6 @@
 package jmc.cas;
 
+import jmc.cas.operations.BinaryOperation;
 import jmc.graph.Graph;
 
 /**

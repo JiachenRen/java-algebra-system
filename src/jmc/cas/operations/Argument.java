@@ -1,4 +1,9 @@
-package jmc.cas;
+package jmc.cas.operations;
+
+import jmc.cas.JMCException;
+import jmc.cas.Operable;
+import jmc.cas.RawValue;
+import jmc.cas.Variable;
 
 /**
  * Created by Jiachen on 3/17/18.
@@ -11,7 +16,7 @@ public enum Argument {
     ANY,
     OPERATION;
 
-    public Argument resolve(Operable o) {
+    public static Argument resolve(Operable o) {
         if (!o.isNaN()) {
             return RawValue.isInteger(o.val()) ? INTEGER : DECIMAL;
         } else if (o instanceof Variable) {
@@ -20,5 +25,9 @@ public enum Argument {
             return OPERATION;
         }
         throw new JMCException("cannot resolve argument type \"" + o + "\"");
+    }
+
+    public boolean equals(Argument other) {
+        return super.equals(ANY) || other == ANY || super.equals(other);
     }
 }

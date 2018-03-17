@@ -1,5 +1,7 @@
 import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.UnaryOperation;
 import jmc.extras.Element;
 import jmc.graph.Graph;
 import jmc.graph.GraphFunction;

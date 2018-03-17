@@ -1,6 +1,9 @@
 package jmc.cas;
 
 
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.Operation;
+
 import java.util.ArrayList;
 
 /**

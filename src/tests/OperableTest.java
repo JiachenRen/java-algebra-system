@@ -2,7 +2,7 @@ package tests;
 
 import jmc.cas.Compiler;
 import jmc.cas.Operable;
-import jmc.cas.Operation;
+import jmc.cas.operations.Operation;
 import jmc.cas.Variable;
 
 import java.util.ArrayList;

@@ -1,4 +1,9 @@
-package jmc.cas;
+package jmc.cas.operations;
+
+import jmc.cas.JMCException;
+import jmc.cas.Nameable;
+import jmc.cas.Operable;
+import jmc.cas.RawValue;
 
 import java.util.ArrayList;
 import java.util.Collections;

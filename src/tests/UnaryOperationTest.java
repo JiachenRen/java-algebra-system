@@ -2,6 +2,7 @@ package tests;
 
 import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,8 @@
 package tests;
 
+import jmc.cas.operations.Argument;
 import jmc.cas.Compiler;
+import jmc.cas.operations.CompositeOperation;
 
 import static tests.TestPrint.l;
 
@@ -11,8 +13,13 @@ import static tests.TestPrint.l;
 public class CompositeOperationTest {
     public static void main(String args[]) {
         l(Compiler.compile("a+log(3+a)+4"));
-        l(Compiler.compile("comp(a,log(3+a),comp(4,5))"));
+        CompositeOperation co = (CompositeOperation) Compiler.compile("comp(4+7+5,5+x,log(7+cos(x)))");
+        l(co.getOperands());
 //        l(Compiler.compile("a+log(3+a)+4"));
-
+        l(Argument.DECIMAL.equals(Argument.ANY));
+        l(Argument.ANY.equals(Argument.DECIMAL));
+        l(Argument.VARIABLE.equals(Argument.DECIMAL));
+        l(Argument.INTEGER.equals(Argument.DECIMAL));
+        l(Argument.OPERATION.equals(Argument.INTEGER));
     }
 }

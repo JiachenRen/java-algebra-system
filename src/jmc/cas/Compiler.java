@@ -1,5 +1,9 @@
 package jmc.cas;
 
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.CompositeOperation;
+import jmc.cas.operations.UnaryOperation;
+
 import java.util.ArrayList;
 
 import static jmc.cas.Assets.*;
@@ -119,7 +123,10 @@ public class Compiler {
             BinaryOperation binOp = ((BinaryOperation) tree);
             flat(binOp.getLeft(), flattened);
             flat(binOp.getRight(), flattened);
-        } else flattened.add(tree);
+        } else {
+            if (tree instanceof BinaryOperation) ((BinaryOperation) tree).setOmitParenthesis(true);
+            flattened.add(tree);
+        }
     }
 
     private static Operable generateOperations(String segment, ArrayList<Operable> operables) {
@@ -145,20 +152,23 @@ public class Compiler {
                 ArrayList<Operable> operands = new ArrayList<>();
                 flat(tree, operands);
                 pendingOperations.add(new CompositeOperation(operationName, operands));
-            } else pendingOperations.add(new UnaryOperation(operand, operationName));
+            } else {
+                if (operand instanceof BinaryOperation) System.out.println(((BinaryOperation) operand).getName());
+                pendingOperations.add(new UnaryOperation(operand, operationName));
+            }
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
             log(lightBlue("unary:\t") + colorMathSymbols(segment));
             segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
             operableHashId++;
         }
-        for (int p = 0; p <= 3; p++) { //prioritize ^ over */ over +-. This way it is flexible for adding more operations.
-            for (int i = 0; i < segment.length(); i++) {
+        for (int p = 1; p <= 4; p++) { //prioritize ^ over */ over +-. This way it is flexible for adding more operations.
+            for (int i = 0; i < segment.length(); i++) { // p == 4 -> ',' for composite operations
                 CharSequence op = segment.subSequence(i, i + 1);
-                if (BinaryOperation.binaryOperations(p).contains(op)) {
+                if (BinaryOperation.binaryOperations(p).contains(op) || p == 4 && op.charAt(0) == ',') {
                     int[] indices = extractOperationIndices(segment, i);
                     String[] operandStrs = new String[]{segment.substring(indices[0], i), segment.substring(i + 1, indices[1] + 1)};
                     ArrayList<Operable> operands = getOperands(pendingOperations, operables, operandStrs);
-                    Operation operation = new BinaryOperation(operands.get(0), op.toString(), operands.get(1));
+                    BinaryOperation operation = new BinaryOperation(operands.get(0), op.toString(), operands.get(1));
                     pendingOperations.add(operation);
                     String left = indices[0] == 0 ? "" : segment.substring(0, indices[0]);
                     segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);

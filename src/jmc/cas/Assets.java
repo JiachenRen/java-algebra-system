@@ -2,6 +2,9 @@ package jmc.cas;
 
 
 import jmc.Function;
+import jmc.cas.operations.CompositeOperation;
+import jmc.cas.operations.RegisteredManipulation;
+import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -12,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public interface Assets {
     String DIGITS = "0123456789.";
-    String SYMBOLS = "()+-*/^,<>";
+    String SYMBOLS = ",()+-*/^<>";
     String VARS = "abcdfghjklmnopqrstuvwxyz";
     String LETTERS = "abcdefghijklmnopqrstuvwxyz";
 
@@ -22,7 +25,7 @@ public interface Assets {
                 .map(Function::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
         names.addAll(CompositeOperation.registeredManipulations().stream()
-                .map(CompositeOperation.RegisteredManipulation::getName)
+                .map(RegisteredManipulation::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
         return names;
     }

@@ -1,6 +1,7 @@
 package jmc.cas;
 
 import jmc.MathContext;
+import jmc.cas.operations.BinaryOperation;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

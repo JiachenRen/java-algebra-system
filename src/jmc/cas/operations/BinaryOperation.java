@@ -1,7 +1,8 @@
-package jmc.cas;
+package jmc.cas.operations;
 
 
 import jmc.MathContext;
+import jmc.cas.*;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -65,7 +66,7 @@ public class BinaryOperation extends Operation {
         return operation.priority;
     }
 
-    void setOmitParenthesis(boolean temp) {
+    public void setOmitParenthesis(boolean temp) {
         omitParenthesis = temp;
     }
 
@@ -980,7 +981,7 @@ public class BinaryOperation extends Operation {
             define("*", 2, (a, b) -> a * b);
             define("/", 2, (a, b) -> a / b);
             define("^", 1, Math::pow);
-            define(",", 0, (a, b) -> Double.NaN);
+            define(",", -1, (a, b) -> Double.NaN);
             if (Mode.DEBUG) System.out.println("# reserved binary operations declared");
         }
 

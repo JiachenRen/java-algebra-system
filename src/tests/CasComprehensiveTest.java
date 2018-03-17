@@ -3,6 +3,8 @@ package tests;
 import jmc.Function;
 import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.Operation;
 
 import java.util.ArrayList;
 import java.util.Collections;
