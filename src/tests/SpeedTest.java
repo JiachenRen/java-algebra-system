@@ -9,10 +9,10 @@ import jmc.cas.Compiler;
  * Test result: interpreted JMC function is approximately 8/9 the speed of Java compiled function
  */
 public class SpeedTest {
-    private final static double start = 0, end = 1000, step = 0.1;
+    private final static double start = 0, end = 10000, step = 0.1;
     private final static String expStr = "sin(cos(x^(x+sec(x)^3))+12x)";
-    private static Function interpretedFunc = Function.implement(Compiler.compile(expStr));
-    private static Function javaCompiledFunction = Function.implement(val -> Math.sin(Math.cos(Math.pow(val, val + Math.pow(1 / Math.cos(val), 3)) + 12 * val)));
+    private static Function jmcCompiledFunction = new Function(Compiler.compile(expStr));
+    private static Function javaCompiledFunction = new Function(val -> Math.sin(Math.cos(Math.pow(val, val + Math.pow(1 / Math.cos(val), 3)) + 12 * val)));
 
     //Java compiled function that is the same as "sin(cos(x^(x+sec(x)^3))+12x)"
 
@@ -28,7 +28,7 @@ public class SpeedTest {
     private static Thread trd2 = new Thread(() -> {
         final long initAbsMillis = System.currentTimeMillis();
         for (double i = start; i <= end; i += step)
-            interpretedFunc.eval(i);
+            jmcCompiledFunction.eval(i);
         System.out.println("JMC interpreted function finished within " + (System.currentTimeMillis() - initAbsMillis) + " ms");
     });
 

@@ -1,5 +1,6 @@
 package tests;
 
+import jmc.Function;
 import jmc.cas.*;
 import jmc.cas.Compiler;
 
@@ -92,39 +93,50 @@ public class CasComprehensiveTest {
             l("");
         });
 
+
+        // RawValue
         l(new RawValue(5).equals(new RawValue(5.0)));
         l(RawValue.UNDEF.isUndefined());
         l(RawValue.UNDEF);
         l(RawValue.UNDEF.equals(RawValue.UNDEF));
-        l(Fraction.UNDEF.isUndefined());
+        l(RawValue.INFINITY.doubleValue());
+        l(RawValue.UNDEF.isInteger(), RawValue.INFINITY.negate().isInteger());
+        l(RawValue.ONE);
+
         l(new Fraction(3, 0).isUndefined());
-        l(Math.log(11));
+        l(Fraction.UNDEF.isUndefined());
 
         Operable operable = Compiler.compile("0^0");
         l(operable.eval(3));
 
         l(Operable.numVars(Compiler.compile("a+b*x+a+b/ln(c+e+pi)")));
         l(Operable.isMultiVar(Compiler.compile("x*3+e")));
+        Operable operable1 = Compiler.compile("(x+a)*-3*(x+a)").simplify();
+        l(operable1, operable1.explicitNegativeForm(), operable1);
+
         l(Compiler.compile("x*3+e").replace(new BinaryOperation(new Variable("x"), "*", new RawValue(3)), new Variable("a")));
         l(Compiler.compile("x*3").equals(Compiler.compile("3*x")));
-
         l(Compiler.compile("-6*x*-7").simplify().explicitNegativeForm());
         l(Compiler.compile("-1*x").simplify().explicitNegativeForm());
 
-        Operable operable1 = Compiler.compile("(x+a)*-3*(x+a)").simplify();
-        l(operable1, operable1.explicitNegativeForm(), operable1);
-        l(RawValue.ONE);
 
         l(BinaryOperation.expFormIdx(Compiler.compile("x^(-3/4)").simplify()));
         l(BinaryOperation.expFormIdx(Compiler.compile("x^(-4)").simplify()));
         l(BinaryOperation.expFormIdx(Compiler.compile("x^((-4)*x/3)").simplify()));
 
+
+        // Constants
         l(Constants.E, Constants.PI, Constants.π);
         l(Constants.E.equals(Constants.E), Constants.π.equals(Constants.PI));
-        l(RawValue.INFINITY.doubleValue());
-        l(RawValue.UNDEF.isInteger(), RawValue.INFINITY.negate().isInteger());
         l(Constants.getConstant("e").val());
         l(Constants.valueOf(Constants.E.getName()));
+
+
+        // Function
+        Function function = new Function(Compiler.compile("x^2"));
+        l(function.eval(3), function.numericalSolve(3, -10, 10, 0.0001));
+        function.setEvaluable((x) -> x * x);
+        l(function.getEvaluable().eval(3));
 
     }
 

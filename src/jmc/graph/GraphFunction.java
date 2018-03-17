@@ -20,7 +20,6 @@ public class GraphFunction extends Function {
     private int color;
     private boolean matchAuxiliaryLinesColor;
     private boolean autoAsymptoteExtension;
-    private Operable operable;
     private Variable independentVar = new Variable("x");
     private ArrayList<SuppliedVar> suppliedVars;
 
@@ -51,29 +50,29 @@ public class GraphFunction extends Function {
     }
 
     public GraphFunction(String name, boolean dynamic, Operable operable) {
-        super(name);
-        this.operable = operable;
+        super(name, operable);
         suppliedVars = new ArrayList<>();
         initSuppliedVars();
         setDynamic(dynamic);
     }
 
     public void initSuppliedVars() {
-        if (Operable.isMultiVar(operable)) {
-            ArrayList<Variable> vars = Operable.extractVariables(operable);
+        if (Operable.isMultiVar(getOperable())) {
+            ArrayList<Variable> vars = Operable.extractVariables(getOperable());
             for (Variable v : vars) {
                 if (!v.equals(independentVar)) {
                     SuppliedVar sv = new SuppliedVar(v.getName());
                     suppliedVars.add(sv);
-                    operable = operable.replace(v, sv); //god this bug took me forever to find
+                    setOperable(getOperable().replace(v, sv)); //god this bug took me forever to find
                 }
             }
         }
     }
 
+
     @Override
     public double eval(double val) { // this might compromise speed
-        return operable.eval(val);
+        return getOperable().eval(val);
     }
 
     /**
@@ -265,11 +264,11 @@ public class GraphFunction extends Function {
     }
 
     public Operable getOperable() {
-        return this.operable;
+        return (Operable) getEvaluable();
     }
 
     public void setOperable(Operable o) {
-        this.operable = o;
+        setEvaluable(o);
     }
 
     public boolean isDiscrete() {

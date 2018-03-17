@@ -104,7 +104,7 @@ public abstract class Operation implements Operable, Nameable {
      * @param idx     the index of the old operand to be replaced
      * @return this
      */
-    public Operable setOperand(Operable operand, int idx) {
+    public Operation setOperand(Operable operand, int idx) {
         operands.set(idx, operand);
         return this;
     }

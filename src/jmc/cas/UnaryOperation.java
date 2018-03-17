@@ -244,7 +244,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 if (function.getName().equals(name))
                     reservedFunctions.remove(i);
             }
-            reservedFunctions.add(Function.implement(name, evaluable));
+            reservedFunctions.add(new Function(name, evaluable));
         }
 
         static ArrayList<Function> list() {

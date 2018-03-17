@@ -9,34 +9,18 @@ import java.util.ArrayList;
  * Created by Jiachen on 3/2/18.
  * Function class
  */
-public abstract class Function implements Evaluable, Nameable {
+public class Function implements Evaluable, Nameable {
 
     private String name;
+    private Evaluable evaluable;
 
-    protected Function(String name) {
+    public Function(String name, Evaluable evaluable) {
         setName(name);
+        this.evaluable = evaluable;
     }
 
-    public Function() {
-        this("");
-    }
-
-    public static Function implement(Evaluable evaluable) {
-        return new Function() {
-            @Override
-            public double eval(double val) {
-                return evaluable.eval(val);
-            }
-        };
-    }
-
-    public static Function implement(String name, Evaluable evaluable) {
-        return new Function(name) {
-            @Override
-            public double eval(double val) {
-                return evaluable.eval(val);
-            }
-        };
+    public Function(Evaluable evaluable) {
+        this("", evaluable);
     }
 
     /**
@@ -47,7 +31,9 @@ public abstract class Function implements Evaluable, Nameable {
      * @param val the value that is going to be plugged into this GraphFunction for evaluation
      * @return the result gained from the evaluation with val and this GraphFunction instance's definition.
      */
-    public abstract double eval(double val);
+    public double eval(double val) {
+        return evaluable.eval(val);
+    }
 
     public boolean equals(Function other) {
         return this.getName().equals(other.getName());
@@ -57,7 +43,7 @@ public abstract class Function implements Evaluable, Nameable {
         return numericalSolve(y, lowerBound, upperBound, accuracy, 1000);
     }
 
-    public ArrayList<Double> numericalSolve(double y, double lowerBound, double upperBound, double accuracy, int steps) {
+    protected ArrayList<Double> numericalSolve(double y, double lowerBound, double upperBound, double accuracy, int steps) {
         if (Math.abs(upperBound - lowerBound) <= accuracy) {
             ArrayList<Double> results = new ArrayList<>();
             double solution = (lowerBound + upperBound) / 2;
@@ -79,6 +65,15 @@ public abstract class Function implements Evaluable, Nameable {
 
     public Function setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Evaluable getEvaluable() {
+        return evaluable;
+    }
+
+    public Function setEvaluable(Evaluable evaluable) {
+        this.evaluable = evaluable;
         return this;
     }
 

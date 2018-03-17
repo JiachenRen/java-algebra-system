@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import static tests.TestPrint.l;
 import static jmc.utils.ColorFormatter.*;
 
-public class JMathContextTest {
+public class MathContextTest {
 
     public static void main(String[] args) {
         ArrayList<BigInteger> factors = MathContext.factor(new BigInteger("100000"));
