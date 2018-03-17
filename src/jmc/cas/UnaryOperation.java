@@ -156,20 +156,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return getOperand().complexity() + 1;
     }
 
-    /**
-     * Note: modifies self.
-     * Only delegates downward if it contains an operation.
-     *
-     * @return a new Operable instance that is the addition only form of self.
-     */
-    public UnaryOperation toAdditionOnly() {
-        if (getOperand() instanceof Operation) {
-            this.setOperand(((Operation) this.getOperand()).toAdditionOnly());
-            return this;
-        }
-        return this;
-    }
-
     public Operable setOperand(Operable operable) {
         return super.setOperand(operable, 0);
     }

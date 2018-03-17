@@ -134,5 +134,22 @@ public abstract class Operation extends Operable implements Nameable {
 
     public abstract Operation copy();
 
-    public abstract Operation toAdditionOnly();
+    public boolean isUndefined() {
+        for (Operable operand : operands) {
+            if (operand.isUndefined())
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Note: modifies self.
+     * Only delegates downward if it contains an operation.
+     *
+     * @return a new Operable instance that is the addition only form of self.
+     */
+    public Operation toAdditionOnly() {
+        operands.forEach(Operable::toAdditionOnly);
+        return this;
+    }
 }

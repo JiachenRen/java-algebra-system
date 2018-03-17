@@ -284,8 +284,7 @@ public class BinaryOperation extends Operation {
     }
 
     public BinaryOperation toAdditionOnly() {
-        if (getLeft() instanceof Operation) this.setLeft(((Operation) getLeft()).toAdditionOnly());
-        this.setRight(getRight() instanceof Operation ? ((Operation) getRight()).toAdditionOnly() : getRight());
+        super.toAdditionOnly();
         if (operation.name.equals("-")) {
             operation = RegisteredBinaryOperation.extract("+");
             setRight(getRight().negate());
@@ -1072,7 +1071,7 @@ public class BinaryOperation extends Operation {
     }
 
     public boolean isUndefined() {
-        if (getLeft().isUndefined() || getRight().isUndefined()) return true;
+        if (super.isUndefined()) return true;
         if (getRight() instanceof RawValue) {
             RawValue r = ((RawValue) getRight());
             switch (operation.name) {
@@ -1082,7 +1081,6 @@ public class BinaryOperation extends Operation {
                     return getLeft() instanceof RawValue && ((RawValue) getLeft()).isZero() && !r.isPositive();
             }
         }
-        //TODO: how about BinaryOperations like 3 - 3 which is essentially 0?
         return false;
     }
 
