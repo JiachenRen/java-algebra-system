@@ -222,4 +222,17 @@ public abstract class Operation extends Operable implements Nameable {
                 .map(Operable::complexity)
                 .reduce((a, b) -> a + b).get() + 1;
     }
+
+    public boolean equals(Operable other) {
+        if (!(other instanceof Operation)) return false;
+        Operation op = ((Operation) other);
+        if (op.getOperands().size() != this.getOperands().size()) return false;
+        ArrayList<Operable> operands1 = op.getOperands();
+        for (int i = 0; i < operands1.size(); i++) {
+            Operable operable = operands1.get(i);
+            if (!operable.equals(getOperand(i)))
+                return false;
+        }
+        return true;
+    }
 }

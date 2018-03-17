@@ -1050,6 +1050,7 @@ public class BinaryOperation extends Operation {
     }
 
 
+    @Override
     public boolean equals(Operable other) {
         if (!(other instanceof BinaryOperation)) return false;
         BinaryOperation binOp = (BinaryOperation) other;

@@ -63,7 +63,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     @Override
     public UnaryOperation copy() {
-        return new UnaryOperation(getOperand(), operation);
+        return new UnaryOperation(getOperand().copy(), operation);
     }
 
     /**
@@ -289,6 +289,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @param other the other operable, possibly UnaryOperation or BinaryOperation
      * @return whether or not the two instances are identical to each other.
      */
+    @Override
     public boolean equals(Operable other) {
         return other instanceof UnaryOperation
                 && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
