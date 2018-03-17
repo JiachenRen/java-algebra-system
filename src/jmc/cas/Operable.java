@@ -195,4 +195,44 @@ public abstract class Operable implements Evaluable {
     public abstract Operable replace(Operable o, Operable r);
 
     public abstract boolean isUndefined();
+
+    public BinaryOperation mult(Operable o) {
+        return new BinaryOperation(this.copy(), "*", o);
+    }
+
+    public BinaryOperation mult(Number n) {
+        return new BinaryOperation(this.copy(), "*", new RawValue(n));
+    }
+
+    public BinaryOperation add(Operable o) {
+        return new BinaryOperation(this.copy(), "+", o.copy());
+    }
+
+    public BinaryOperation add(Number n) {
+        return new BinaryOperation(this.copy(), "+", new RawValue(n));
+    }
+
+    public BinaryOperation sub(Operable o) {
+        return new BinaryOperation(this.copy(), "-", o.copy());
+    }
+
+    public BinaryOperation sub(Number n) {
+        return new BinaryOperation(this.copy(), "-", new RawValue(n));
+    }
+
+    public BinaryOperation div(Operable o) {
+        return new BinaryOperation(this.copy(), "/", o.copy());
+    }
+
+    public BinaryOperation div(Number n) {
+        return new BinaryOperation(this.copy(), "/", new RawValue(n));
+    }
+
+    public BinaryOperation exp(Operable o) {
+        return new BinaryOperation(this.copy(), "^", o.copy());
+    }
+
+    public BinaryOperation exp(Number n) {
+        return new BinaryOperation(this.copy(), "^", new RawValue(n));
+    }
 }

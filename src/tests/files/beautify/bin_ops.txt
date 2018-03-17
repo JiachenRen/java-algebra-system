@@ -66,5 +66,13 @@ x^(a+b)                                          -> x^(a+b)
 (x*b)^3                                          -> x^3*b^3
 (a+b)^3                                          -> (a+b)^3
 x^a*x^b-x^(a+b)                                  -> x^a*x^b-x^(a+b)
-ln(3)-ln(5)                                      -> ln(3)-ln(5)
-log(3)-log(5)                                    -> log(3)-log(5)
+ln(3)-ln(5)                                      -> ln((3/5))
+log(3)-log(5)                                    -> log((3/5))
+x+2+2*x+2                                        -> x*3+4
+log(3)-ln(4)                                     -> log(3)-ln(2)*2
+ln(e^4)+ln(e)                                    -> 5
+ln(e^4)-ln(e)                                    -> 3
+ln(3)+ln(4)                                      -> ln(3)+2*ln(2)
+ln(x^2)                                          -> ln(x^2)
+x^a*x^b+x^(a+b)                                  -> x^a*x^b+x^(a+b)
+x^a*x^b                                          -> x^a*x^b

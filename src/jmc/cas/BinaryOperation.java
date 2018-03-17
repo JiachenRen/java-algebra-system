@@ -112,8 +112,8 @@ public class BinaryOperation extends Operation {
         final Operable[] result = new Operable[1];
         f1.stream().map(o -> f2.stream()
                 .map(p -> Operation.mult(p, o))
-                .reduce(Operation::add).get())
-                .reduce(Operation::add)
+                .reduce(Operable::add).get())
+                .reduce(Operable::add)
                 .ifPresent(o -> result[0] = o);
         return result[0];
     }
@@ -203,6 +203,11 @@ public class BinaryOperation extends Operation {
             if (simplified != null) return simplified;
         }
 
+        if (getLeft() instanceof UnaryOperation && getRight() instanceof UnaryOperation) {
+            Operable simplified = simplify(((UnaryOperation) getLeft()), ((UnaryOperation) getRight()));
+            if (simplified != null) return simplified;
+        }
+
         //at this point neither left hand nor right hand is undefined.
         //simplifyRightHand() -> for subtraction and exponentiation, the position of left and right hand is not interchangeable.
         Operable simplified1 = simplifyRightHand(getRight());
@@ -243,11 +248,6 @@ public class BinaryOperation extends Operation {
         }
         if (getRight() instanceof BinaryOperation) {
             Operable simplified = simplify(getLeft(), (BinaryOperation) getRight());
-            if (simplified != null) return simplified;
-        }
-
-        if (getLeft() instanceof UnaryOperation && getRight() instanceof UnaryOperation) {
-            Operable simplified = simplify(((UnaryOperation) getLeft()), ((UnaryOperation) getRight()));
             if (simplified != null) return simplified;
         }
 
@@ -385,7 +385,7 @@ public class BinaryOperation extends Operation {
                 Optional<BinaryOperation> reduced = pairs.stream()
                         .filter(p -> p[1] > 1)
                         .map(p -> Operation.exp(p[0], Operation.mult(p[1], r2)))
-                        .reduce(Operation::mult);
+                        .reduce(Operable::mult);
                 if (reduced.isPresent()) {
                     Optional<Integer> retained = pairs.stream()
                             .filter(p -> p[1] == 1)
@@ -436,8 +436,17 @@ public class BinaryOperation extends Operation {
             if (u1.getName().equals(u2.getName()))
                 switch (operation.name) {
                     case "+":
-
-
+                        switch (u1.getName()) {
+                            case "log":
+                            case "ln":
+                                return new UnaryOperation(u1.getOperand().mult(u2.getOperand()), u1.getName()).simplify();
+                        }
+                    case "-":
+                        switch (u1.getName()) {
+                            case "log":
+                            case "ln":
+                                return new UnaryOperation(u1.getOperand().div(u2.getOperand()), u1.getName()).simplify();
+                        }
                 }
         }
         return null;
@@ -771,7 +780,7 @@ public class BinaryOperation extends Operation {
                     } else if (isAddition(o1)) {
                         return ((BinaryOperation) o1).flattened().stream()
                                 .map(o -> Operation.mult(o, o2))
-                                .reduce(Operation::add).get();
+                                .reduce(Operable::add).get();
                     }
                     return null;
                 });
@@ -786,7 +795,7 @@ public class BinaryOperation extends Operation {
                             case "*": //(a*b)^# = a^#*b^#
                                 Optional<BinaryOperation> op1 = binOp.flattened().stream()
                                         .map(o -> Operation.exp(o, num))
-                                        .reduce(Operation::mult);
+                                        .reduce(Operable::mult);
                                 if (op1.isPresent()) return op1.get();
                                 break;
                             case "+": // (a+b)^# = ...

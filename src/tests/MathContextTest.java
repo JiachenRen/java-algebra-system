@@ -1,13 +1,14 @@
 package tests;
 
 import jmc.MathContext;
-import jmc.cas.Operation;
+import jmc.cas.Operable;
+import jmc.cas.RawValue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import static tests.TestPrint.l;
 import static jmc.utils.ColorFormatter.*;
+import static tests.TestPrint.l;
 
 public class MathContextTest {
 
@@ -19,8 +20,8 @@ public class MathContextTest {
         for (int i = 0; i < 10000; i++) {
             int finalI = i;
             MathContext.toBaseExponentPairs(i).stream()
-                    .map(pair -> Operation.exp(pair[0], pair[1]))
-                    .reduce(Operation::mult)
+                    .map(pair -> new RawValue(pair[0]).exp(pair[1]))
+                    .reduce(Operable::mult)
                     .ifPresent(o -> l(boldBlack(finalI + " -> ")
                             + lightBlue(o + " -> ")
                             + lightGreen(o.val())));

@@ -22,7 +22,7 @@ public class BinaryOperationTest {
         l(binOp.is("*"));
         l(Operation.mult(3, 5));
         l(Operation.exp(Math.random(), new RawValue(3)));
-        l(Operation.exp(new RawValue(3), Math.random()));
+        l(Operation.exp(3, Math.random()));
         l(Compiler.compile("x+x*a").simplify());
         ((BinaryOperation) Compiler.compile("x^b")).flattened().forEach(TestPrint::l);
         l(Operation.div(17, 4).setOperand(binOp.getOperand(1), 1).setOperands(binOp.getOperands()));

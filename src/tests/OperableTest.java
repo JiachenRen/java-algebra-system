@@ -47,14 +47,16 @@ public class OperableTest {
         l(Operable.commonTerms(Compiler.compile("x*2*b*a*b*x^2/x"), Compiler.compile("b*x^2*b*x*1")));
         l(Operable.commonTerms(Compiler.compile("x"), Compiler.compile("b*x^2*b*x*1")));
         l(Operable.commonTerms(Compiler.compile("x"), Compiler.compile("b")));
-        l(Operation.div(new Variable("x"), new Variable("p")));
-        l(Operation.add(new Variable("x"), new Variable("p")));
-        l(Operation.sub(new Variable("x"), new Variable("p")));
-        l(Operation.mult(new Variable("x"), new Variable("p")));
-        l(Operation.exp(new Variable("x"), new Variable("p")));
+        l(new Variable("x").div(new Variable("p")));
+        l(new Variable("x").add(new Variable("p")));
+        l(new Variable("x").sub(new Variable("p")));
+        l(new Variable("x").mult(new Variable("p")));
+        l(new Variable("x").exp(new Variable("p")));
         l(new Variable("x").negate());
         l(Compiler.compile("(-1)*((2x^2)*a^(-1))").simplify().beautify());
         Operable o = Operation.div(12, 3);
-        l(o);
+        l(o.div(Math.random()).simplify());
+        l(Operation.div(new Variable("x"), new Variable("x")));
+        l(o.isNaN());
     }
 }
