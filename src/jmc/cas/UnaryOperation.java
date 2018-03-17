@@ -326,11 +326,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return i + 1;
     }
 
-
-    public Operable beautify() {
-        return setOperand(getOperand().beautify());
-    }
-
     public Operable explicitNegativeForm() {
         return copy().setOperand(getOperand().explicitNegativeForm());
     }

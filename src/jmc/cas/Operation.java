@@ -143,6 +143,19 @@ public abstract class Operation extends Operable implements Nameable {
     }
 
     /**
+     * basically reversing the effects of toAdditionalOnly and toExponentialForm
+     * a*b^(-1) -> a/b,
+     * a*(1/3) -> a/3,
+     * a+(-1)*b -> a-b
+     *
+     * @return beautified version of the original
+     */
+    public Operable beautify() {
+        operands = operands.stream().map(Operable::beautify).collect(Collectors.toCollection(ArrayList::new));
+        return this;
+    }
+
+    /**
      * Note: modifies self.
      * Only delegates downward if it contains an operation.
      *

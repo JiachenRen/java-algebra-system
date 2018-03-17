@@ -1011,6 +1011,7 @@ public class BinaryOperation extends Operation {
      *
      * @return beautified version of the original
      */
+    @Override
     public Operable beautify() {
         Operable left = getLeft().beautify();
         Operable right = getRight().beautify();
