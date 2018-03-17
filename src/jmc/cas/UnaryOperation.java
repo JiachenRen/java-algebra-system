@@ -26,13 +26,16 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * This constructor accepts non-JMC standard functions; This means that as long as the function
      * of concern returns a value, it would be valid.
      *
-     * @param operand  e.g. "x" in "log(x)"
+     * @param operand   e.g. "x" in "log(x)"
      * @param operation "log" in "log(x)"
      */
     public UnaryOperation(Operable operand, Function operation) {
-        super(operand);
+        super(wrap(operand));
         this.operation = operation;
     }
+
+
+
 
     public static void define(String name, String expression) {
         UnaryOperation.define(name, Compiler.compile(expression));
@@ -156,7 +159,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             BinaryOperation binOp = (BinaryOperation) getOperand();
             switch (operation.getName()) {
                 case "ln":
-                    if (binOp.is("^") && binOp.getOperand().equals(Constants.getConstant("e"))) {
+                    if (binOp.is("^") && binOp.getLeft().equals(Constants.getConstant("e"))) {
                         return binOp.getRight();
                     }
             }
@@ -343,6 +346,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         int i = getOperand().levelOf(o);
         if (i == -1) return -1;
         return i + 1;
+    }
+
+    public Operable getOperand() {
+        return getOperand(0);
+    }
+
+    public Operable setOperand(Operable operable) {
+        return super.setOperand(operable, 0);
     }
 
 

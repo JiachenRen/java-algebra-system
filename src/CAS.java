@@ -16,7 +16,6 @@ import java.util.NoSuchElementException;
  * JMC Computer Algebra System user interface model
  */
 public class CAS extends Application {
-    private SimpleStringProperty expression;
 
     public static void main(String[] args) {
         launch(args);
@@ -28,7 +27,7 @@ public class CAS extends Application {
         Parent root = fxmlLoader.load();
         CasController controller = fxmlLoader.getController();
 
-        expression = new SimpleStringProperty("");
+        SimpleStringProperty expression = new SimpleStringProperty("");
         expression.bind(controller.input.textProperty());
         expression.addListener((observable, oldValue, newValue) -> {
             try {

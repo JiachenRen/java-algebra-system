@@ -1,14 +1,17 @@
 package jmc.cas;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 /**
  * Created by Jiachen on 16/05/2017.
  * Abstract parent of BinaryOperation and Unary Operation
  */
 public abstract class Operation implements Operable, Nameable {
-    private Operable operand;
+    private ArrayList<Operable> operands;
 
-    public Operation(Operable operand) {
-        this.operand = operand;
+    public Operation(ArrayList<Operable> operands) {
+        this.operands = operands;
     }
 
     /**
@@ -71,6 +74,12 @@ public abstract class Operation implements Operable, Nameable {
         return exp(new RawValue(a), b);
     }
 
+    static ArrayList<Operable> wrap(Operable... operables) {
+        ArrayList<Operable> operands = new ArrayList<>();
+        Collections.addAll(operands, operables);
+        return operands;
+    }
+
     public abstract double eval(double x);
 
     /**
@@ -79,13 +88,33 @@ public abstract class Operation implements Operable, Nameable {
      *
      * @return for BinaryOperation, the first arg is returned. For UnaryOperation, the only arg is returned.
      */
-    public Operable getOperand() {
-        return operand;
+    public ArrayList<Operable> getOperands() {
+        return operands;
     }
 
-    public Operable setOperand(Operable operable) {
-        this.operand = operable;
+    public Operation setOperands(ArrayList<Operable> operands) {
+        this.operands = operands;
         return this;
+    }
+
+    /**
+     * updates the an operand in the list of operands with a new one.
+     *
+     * @param operand the new operand
+     * @param idx     the index of the old operand to be replaced
+     * @return this
+     */
+    public Operable setOperand(Operable operand, int idx) {
+        operands.set(idx, operand);
+        return this;
+    }
+
+    /**
+     * @param idx the index of the operand
+     * @return operand at index idx
+     */
+    public Operable getOperand(int idx) {
+        return operands.get(idx);
     }
 
     public abstract Operable toExponentialForm();
@@ -98,7 +127,7 @@ public abstract class Operation implements Operable, Nameable {
     public abstract Operable simplify();
 
 
-    public Operation negate() {
+    public BinaryOperation negate() {
         return Operation.mult(RawValue.ONE.negate(), this.copy());
     }
 

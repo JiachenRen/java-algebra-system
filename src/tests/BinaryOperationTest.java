@@ -12,7 +12,7 @@ import jmc.cas.RawValue;
 public class BinaryOperationTest {
     public static void main(String args[]) {
         BinaryOperation binOp = new BinaryOperation(RawValue.ZERO, "*", RawValue.ONE);
-        l(binOp.getRight(), binOp.getOperand());
+        l(binOp.getRight(), binOp.getLeft());
         binOp.setRight(RawValue.ONE);
         BinaryOperation.define("&", 3, (a, b) -> a + b);
         l(BinaryOperation.binaryOperations(), BinaryOperation.binaryOperations(3));

@@ -172,10 +172,10 @@ public class Fraction extends RawValue {
             BinaryOperation nu = (BinaryOperation) o1;
             BinaryOperation de = (BinaryOperation) o2;
             BinaryOperation irr = (BinaryOperation) de.getRight();
-            Operable a = new BinaryOperation(de.getOperand(), "*", irr.getOperand());
+            Operable a = new BinaryOperation(de.getLeft(), "*", irr.getLeft());
             Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRight());
-            BinaryOperation conjugate = new BinaryOperation(irr.getOperand(), "^", c);
-            Operable d = new BinaryOperation(nu.getOperand(), "/", a);
+            BinaryOperation conjugate = new BinaryOperation(irr.getLeft(), "^", c);
+            Operable d = new BinaryOperation(nu.getLeft(), "/", a);
             BinaryOperation e = new BinaryOperation(nu.getRight(), "*", conjugate);
             return new BinaryOperation(d, "*", e).simplify();
         } else if (o.isInteger()) {
