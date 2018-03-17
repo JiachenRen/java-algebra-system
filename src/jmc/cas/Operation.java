@@ -110,15 +110,7 @@ public abstract class Operation extends Operable implements Nameable {
         return operands.get(idx);
     }
 
-    /**
-     * Note: modifies self
-     *
-     * @return exponential form of self
-     */
-    public Operable toExponentialForm() {
-        operands.forEach(Operable::toExponentialForm);
-        return this;
-    }
+    public abstract Operation copy();
 
     /**
      * post operation: the operation itself is modified
@@ -132,16 +124,6 @@ public abstract class Operation extends Operable implements Nameable {
         return this;
     }
 
-    public abstract Operation copy();
-
-    public boolean isUndefined() {
-        for (Operable operand : operands) {
-            if (operand.isUndefined())
-                return true;
-        }
-        return false;
-    }
-
     /**
      * basically reversing the effects of toAdditionalOnly and toExponentialForm
      * a*b^(-1) -> a/b,
@@ -151,7 +133,9 @@ public abstract class Operation extends Operable implements Nameable {
      * @return beautified version of the original
      */
     public Operable beautify() {
-        operands = operands.stream().map(Operable::beautify).collect(Collectors.toCollection(ArrayList::new));
+        operands = operands.stream()
+                .map(Operable::beautify)
+                .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
 
@@ -164,5 +148,32 @@ public abstract class Operation extends Operable implements Nameable {
     public Operation toAdditionOnly() {
         operands.forEach(Operable::toAdditionOnly);
         return this;
+    }
+
+    public Operable explicitNegativeForm() {
+        Operation clone = this.copy();
+        clone.setOperands(this.operands.stream()
+                .map(Operable::explicitNegativeForm)
+                .collect(Collectors.toCollection(ArrayList::new)));
+        return clone;
+    }
+
+
+    /**
+     * Note: modifies self
+     *
+     * @return exponential form of self
+     */
+    public Operable toExponentialForm() {
+        operands.forEach(Operable::toExponentialForm);
+        return this;
+    }
+
+    public boolean isUndefined() {
+        for (Operable operand : operands) {
+            if (operand.isUndefined())
+                return true;
+        }
+        return false;
     }
 }

@@ -1054,13 +1054,6 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-    public Operable explicitNegativeForm() {
-        BinaryOperation clone = this.copy();
-        clone.setLeft(getLeft().explicitNegativeForm());
-        clone.setRight(getRight().explicitNegativeForm());
-        return clone;
-    }
-
     public Operable plugIn(Variable var, Operable replacement) {
         if (this.getLeft().equals(var))
             this.setLeft(replacement);

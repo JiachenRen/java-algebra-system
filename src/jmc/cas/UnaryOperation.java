@@ -61,6 +61,11 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.eval(getOperand().eval(x));
     }
 
+    @Override
+    public UnaryOperation copy() {
+        return new UnaryOperation(getOperand(), operation);
+    }
+
     /**
      * Note: modifies self.
      * TODO: ln(a) - ln(b) should be ln(a/b)
@@ -149,19 +154,52 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return this;
     }
 
-    @Override
-    public UnaryOperation copy() {
-        return new UnaryOperation(getOperand(), operation);
+    public boolean isUndefined() {
+        if (super.isUndefined()) return true;
+        if (getOperand().val() != Double.NaN) {
+            double n = getOperand().val();
+            switch (operation.getName()) {
+                case "ln":
+                    return n <= 0;
+                case "log":
+                    return n <= 0;
+                case "asin":
+                    return n > 1 || n < -1;
+                case "acos":
+                    return n > 1 || n < -1;
+//                case "tan":
+//                case "cot":
+//                case "sec":
+//                case "csc":
+            }
+        }
+
+        Operable o;
+        switch (operation.getName()) {
+            case "tan": // domain: x != pi/2 + n*pi
+            case "sec":
+                o = Operation.div(this.getOperand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
+                if (o instanceof RawValue && ((RawValue) o).isInteger()) {
+                    return Math.abs(((RawValue) o).intValue() % 2) == 1;
+                }
+                break;
+            case "cot": // domain: x != n*pi
+            case "csc":
+                o = Operation.div(this.getOperand(), Constants.getConstant("pi")).simplify();
+                if (o instanceof RawValue && ((RawValue) o).isInteger())
+                    return true;
+
+        }
+
+        return false;
     }    public int complexity() {
         return getOperand().complexity() + 1;
     }
 
-    public Operable setOperand(Operable operable) {
-        return super.setOperand(operable, 0);
-    }
-
     public Operable getOperand() {
         return getOperand(0);
+    }    public Operable setOperand(Operable operable) {
+        return super.setOperand(operable, 0);
     }
 
     public String getName() {
@@ -237,12 +275,13 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         }
 
 
-    }    public String toString() {
-        return operation.getName() + "(" + getOperand().toString() + ")";
     }
 
 
 
+    public String toString() {
+        return operation.getName() + "(" + getOperand().toString() + ")";
+    }
 
 
     /**
@@ -279,55 +318,13 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.eval(getOperand().val());
     }
 
-    public boolean isUndefined() {
-        if (getOperand().isUndefined()) return true;
-        if (getOperand().val() != Double.NaN) {
-            double n = getOperand().val();
-            switch (operation.getName()) {
-                case "ln":
-                    return n <= 0;
-                case "log":
-                    return n <= 0;
-                case "asin":
-                    return n > 1 || n < -1;
-                case "acos":
-                    return n > 1 || n < -1;
-//                case "tan":
-//                case "cot":
-//                case "sec":
-//                case "csc":
-            }
-        }
 
-        Operable o;
-        switch (operation.getName()) {
-            case "tan": // domain: x != pi/2 + n*pi
-            case "sec":
-                o = Operation.div(this.getOperand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
-                if (o instanceof RawValue && ((RawValue) o).isInteger()) {
-                    return Math.abs(((RawValue) o).intValue() % 2) == 1;
-                }
-                break;
-            case "cot": // domain: x != n*pi
-            case "csc":
-                o = Operation.div(this.getOperand(), Constants.getConstant("pi")).simplify();
-                if (o instanceof RawValue && ((RawValue) o).isInteger())
-                    return true;
-
-        }
-
-        return false;
-    }
 
     public int levelOf(Operable o) {
         if (this.equals(o)) return 0;
         int i = getOperand().levelOf(o);
         if (i == -1) return -1;
         return i + 1;
-    }
-
-    public Operable explicitNegativeForm() {
-        return copy().setOperand(getOperand().explicitNegativeForm());
     }
 
     public Operable expand() {
