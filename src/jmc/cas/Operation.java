@@ -110,7 +110,15 @@ public abstract class Operation extends Operable implements Nameable {
         return operands.get(idx);
     }
 
-    public abstract Operable toExponentialForm();
+    /**
+     * Note: modifies self
+     *
+     * @return exponential form of self
+     */
+    public Operable toExponentialForm() {
+        operands.forEach(Operable::toExponentialForm);
+        return this;
+    }
 
     /**
      * post operation: the operation itself is modified

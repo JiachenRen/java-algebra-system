@@ -62,19 +62,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     /**
-     * Note: modifies self
-     *
-     * @return exponential form of self
-     */
-    @Override
-    public Operable toExponentialForm() {
-        if (getOperand() instanceof Operation) {
-            this.setOperand(getOperand().toExponentialForm());
-            return this;
-        } else return this;
-    }
-
-    /**
      * Note: modifies self.
      * TODO: ln(a) - ln(b) should be ln(a/b)
      * log(225) should be 2log(15) -> implemented

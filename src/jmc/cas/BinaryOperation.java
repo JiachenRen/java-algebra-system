@@ -169,8 +169,7 @@ public class BinaryOperation extends Operation {
      */
     @Override
     public BinaryOperation toExponentialForm() {
-        if (getLeft() instanceof Operation) getLeft().toExponentialForm();
-        if (getRight() instanceof Operation) getRight().toExponentialForm();
+        super.toExponentialForm();
         if (!this.operation.equals("/")) return this;
         if (getRight().equals(new RawValue(0))) return this;
         if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).operation.equals("*")) {

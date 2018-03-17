@@ -124,7 +124,7 @@ public class Compiler {
         while (segment.indexOf('<') != -1) {
             int indices[] = extractInnerParenthesis(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
-            Operable innerOperable = generateOperations(extracted, operables); //TODO: DEBUG
+            Operable operand = generateOperations(extracted, operables);
             String unaryOperation = segment.substring(0, indices[0]);
             int startIndex = 0;
             for (int i = indices[0] - 1; i >= 0; i--) {
@@ -135,7 +135,7 @@ public class Compiler {
                     break;
                 }
             }
-            pendingOperations.add(new UnaryOperation(innerOperable, unaryOperation));
+            pendingOperations.add(new UnaryOperation(operand, unaryOperation));
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
             log(lightBlue("unary:\t") + colorMathSymbols(segment));
             segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
@@ -195,7 +195,6 @@ public class Compiler {
 
 
     /**
-     * TODO: DEBUG
      *
      * @param segment the segment of expression
      * @param index   index of the binary operation
