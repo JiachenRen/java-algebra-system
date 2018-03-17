@@ -15,14 +15,6 @@ public abstract class Operation extends Operable implements Nameable {
         this.operands = operands;
     }
 
-    /**
-     * @param operable the Operable instance to be negated. IT IS NOT MODIFIED.
-     * @return a new Operable instance that represents the negated version of the original
-     */
-    public static BinaryOperation negate(Operable operable) {
-        return new BinaryOperation(new RawValue(-1), "*", operable);
-    }
-
     public static BinaryOperation div(Number a, Number b) {
         return div(new RawValue(a), new RawValue(b));
     }
@@ -130,11 +122,6 @@ public abstract class Operation extends Operable implements Nameable {
                 .map(Operable::simplify)
                 .collect(Collectors.toCollection(ArrayList::new));
         return this;
-    }
-
-
-    public BinaryOperation negate() {
-        return Operation.mult(RawValue.ONE.negate(), this.copy());
     }
 
     public abstract Operation copy();

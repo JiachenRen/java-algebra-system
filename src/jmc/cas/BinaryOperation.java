@@ -289,7 +289,7 @@ public class BinaryOperation extends Operation {
         this.setRight(getRight() instanceof Operation ? ((Operation) getRight()).toAdditionOnly() : getRight());
         if (operation.name.equals("-")) {
             operation = RegisteredBinaryOperation.extract("+");
-            setRight(UnaryOperation.negate(getRight()));
+            setRight(getRight().negate());
         }
         return this;
     }
@@ -432,10 +432,10 @@ public class BinaryOperation extends Operation {
     }
 
     private Operable simplify(UnaryOperation u1, UnaryOperation u2) {
-//        if (u1.)
-//        switch (operation.name) {
-//            case "+":
-//        }
+        if (!u1.isNaN() && !u2.isNaN())
+            switch (operation.name) {
+                case "+":
+            }
         return null;
     }
 

@@ -106,7 +106,16 @@ public abstract class Operable implements Evaluable {
      *
      * @return new instance that is the negated version of the original
      */
-    public abstract Operable negate();
+    public Operable negate() {
+        return Operation.mult(RawValue.ONE.negate(), this);
+    }
+
+    /**
+     * @return whether the operable represents a number
+     */
+    public boolean isNaN() {
+        return Double.isNaN(val());
+    }
 
     /**
      * @return level of complexity of the expression represented by an integer with 1 being
@@ -162,12 +171,12 @@ public abstract class Operable implements Evaluable {
 
     public abstract Operable toExponentialForm();
 
-    /**
-     * If this method is successfully implemented, it would be marked as a milestone.
-     *
-     * @param v the variable in which the first derivative is taken with respect to.
-     * @return first derivative of the expression
-     */
+//    /**
+//     * If this method is successfully implemented, it would be marked as a milestone.
+//     *
+//     * @param v the variable in which the first derivative is taken with respect to.
+//     * @return first derivative of the expression
+//     */
 //    Operable firstDerivative(Variable v);
 
     /**

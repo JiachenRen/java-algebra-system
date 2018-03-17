@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static tests.TestPrint.l;
 import static jmc.utils.ColorFormatter.*;
+import static tests.TestPrint.l;
 
 /**
  * Created by Jiachen on 3/10/18.
@@ -202,27 +202,33 @@ public class AutoTest {
             }
 
             String now = obj.toString();
-            if (prev.equals(now)) {
-                l(line + lightGreen("PASSED") + boldBlack(" = ") + lightBlue(prev + " "));
-            } else {
-                l(line + lightRed("FAILED ")
+            if (!prev.equals(now)) {
+                l(line + lightRed("CHANGED ")
                         + lightBlue(prev) + lightRed(" ≠ ")
                         + lightCyan(now));
             }
             if (testValue) {
                 Operable o1 = Compiler.compile(line), o2 = Compiler.compile(now);
                 if (o1.numVars() > 0) {
+                    ArrayList<String> errs = new ArrayList<>();
                     for (int k = 0; k <= 10; k++) {
                         int t = (int) Math.pow(k, 2);
                         double diffx = o1.eval(k) - o2.eval(k);
-                        if (diffx != 0) {
-                            l(ensureLength("", maxLength) + boldBlack("DIFF(x=" + t + "): ") + passOrPrint(diffx));
+                        if (diffx > 1E-10) {
+                            errs.add(ensureLength("", maxLength) + boldBlack("DIFF(x=" + t + "): ") + lightRed(diffx));
                         }
+                    }
+                    if (errs.size() > 0) {
+                        if (prev.equals(now))
+                            l(line + lightGreen("SAME") + boldBlack(" = ") + lightBlue(prev + " "));
+                        errs.forEach(TestPrint::l);
                     }
                 } else {
                     double v = o1.val() - o2.val();
-                    if (v != 0.0) {
-                        l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + passOrPrint(v));
+                    if (v > 1E-10) {
+                        if (prev.equals(now))
+                            l(line + lightGreen("SAME") + boldBlack(" = ") + lightBlue(prev + " "));
+                        l(ensureLength("", maxLength) + boldBlack("RAW DIFF: ") + lightRed(v));
                     }
                 }
             }
@@ -236,12 +242,6 @@ public class AutoTest {
     private static void writeLines(String fileName, ArrayList<String> lines) {
         Optional<String> content = lines.stream().map(l -> l + "\n").reduce((a, b) -> a + b);
         content.ifPresent(c -> Utils.write(fileName, c));
-    }
-
-    private static String passOrPrint(double d) {
-        if (Double.isNaN(d)) return boldBlack("NaN");
-        else if (d == 0 || Math.abs(d) < 1E-10) return lightGreen(Double.toString(d));
-        else return lightRed(Double.toString(d));
     }
 
     private static void configureCAS() {

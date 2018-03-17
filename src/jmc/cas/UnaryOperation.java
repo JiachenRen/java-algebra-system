@@ -160,13 +160,13 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
 
         return this;
-    }    public int complexity() {
-        return getOperand().complexity() + 1;
     }
 
     @Override
     public UnaryOperation copy() {
         return new UnaryOperation(getOperand(), operation);
+    }    public int complexity() {
+        return getOperand().complexity() + 1;
     }
 
     /**
@@ -189,10 +189,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     public Operable getOperand() {
         return getOperand(0);
-    }
-
-    public String toString() {
-        return operation.getName() + "(" + getOperand().toString() + ")";
     }
 
     public String getName() {
@@ -261,14 +257,22 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
         public boolean equals(RegisteredUnaryOperation other) {
             return other.unaryOperation.getName().equals(this.unaryOperation.getName());
-        }        public String getName() {
+        }
+
+        public String getName() {
             return unaryOperation.getName();
         }
 
 
+    }    public String toString() {
+        return operation.getName() + "(" + getOperand().toString() + ")";
+    }
 
 
-    }    /**
+
+
+
+    /**
      * Returns true if the operations (Function) e.g. "sin", "cos" are the same
      *
      * @param other the other operable, possibly UnaryOperation or BinaryOperation
@@ -348,10 +352,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         if (i == -1) return -1;
         return i + 1;
     }
-
-
-
-
 
 
     public Operable beautify() {

@@ -45,7 +45,4 @@ abstract class LeafNode extends Operable implements BinLeafNode {
         return this.equals(o) ? r : this;
     }
 
-    public Operable negate() {
-        return Operation.mult(RawValue.ONE.negate(), this.copy());
-    }
 }
