@@ -308,20 +308,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return a new instance with its original variable replaced with {nested}
      */
     public Operable plugIn(Variable var, Operable replacement) {
-        if (this.getOperand().equals(var))
-            this.setOperand(replacement);
-        else this.getOperand().plugIn(var, replacement);
+        if (getOperand().equals(var))
+            setOperand(replacement);
+        else getOperand().plugIn(var, replacement);
         return this;
     }
 
     public double val() {
         return operation.eval(getOperand().val());
-    }
-
-    public Operable replace(Operable o, Operable r) {
-        if (this.equals(o)) return r;
-        UnaryOperation clone = this.copy();
-        return clone.setOperand(clone.getOperand().replace(o, r));
     }
 
 

@@ -872,11 +872,6 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
-    private void expandSubNodes() {
-        setLeft(getLeft().expand());
-        setRight(getRight().expand());
-    }
-
     private boolean isVirtuallyNegative(Operable binOp) {
         return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), RawValue.ONE.negate());
     }
@@ -1051,7 +1046,7 @@ public class BinaryOperation extends Operation {
     @Override
     public Operable expand() {
         this.toAdditionOnly().toExponentialForm();
-        this.expandSubNodes();
+        super.expand();
         return expandBase();
     }
 
@@ -1081,14 +1076,5 @@ public class BinaryOperation extends Operation {
     public int complexity() {
         return getLeft().complexity() + getRight().complexity() + 1;
     }
-
-    public Operable replace(Operable o, Operable r) {
-        if (this.equals(o)) return r;
-        BinaryOperation clone = this.copy();
-        clone.setLeft(clone.getLeft().replace(o, r));
-        clone.setRight(clone.getRight().replace(o, r));
-        return clone;
-    }
-
 
 }

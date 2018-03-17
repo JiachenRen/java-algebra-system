@@ -190,7 +190,9 @@ public abstract class Operation extends Operable implements Nameable {
     }
 
     public Operable expand() {
-        operands.forEach(Operable::expand);
+        operands = operands.stream()
+                .map(Operable::expand)
+                .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
 
@@ -200,5 +202,13 @@ public abstract class Operation extends Operable implements Nameable {
                 return true;
         }
         return false;
+    }
+
+    public Operable replace(Operable o, Operable r) {
+        Operation clone = this.copy();
+        clone.setOperands(operands.stream()
+                .map(op -> op.replace(o,r))
+                .collect(Collectors.toCollection(ArrayList::new)));
+        return clone;
     }
 }

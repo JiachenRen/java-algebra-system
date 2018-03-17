@@ -138,6 +138,11 @@ public class CasComprehensiveTest {
         function.setEvaluable((x) -> x * x);
         l(function.getEvaluable().eval(3));
 
+        Operable o = Compiler.compile("(x+a)+3*4/(ln(x+7*x))");
+        o.replace(new Variable("x"), new Variable("k"));
+        l(o);
+        l(o.replace(new Variable("x"), new Variable("k")));
+
     }
 
 }
