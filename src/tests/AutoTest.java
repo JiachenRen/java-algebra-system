@@ -24,7 +24,7 @@ public class AutoTest {
         configureCAS();
 
         l(boldBlack("Updating expression library... this takes a while..."));
-        updateCandidates("additional/", "exponential/", "simplification/", "expansion/", "nodes/");
+        updateCandidates("additional/", "exponential/", "simplification/", "expansion/", "nodes/", "beautify/");
 
         String tests[] = new String[]{
                 "testSimplify",
@@ -32,60 +32,71 @@ public class AutoTest {
                 "testExpand",
                 "testToExponentialForm",
                 "testToAdditionOnly",
+                "testBeautify"
         };
-        for (String test: tests) {
-            getMethod(AutoTest.class,test).invoke(null);
+        for (String test : tests) {
+            getMethod(AutoTest.class, test).invoke(null);
         }
     }
 
     private static void testSimplify() throws Exception {
         l(lightPurple("\n---------------------------> Simplification <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/simplification/bin_ops.txt", "simplify", true);
+        test("/tests/files/simplification/bin_ops.txt", true, "simplify");
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/simplification/u_ops.txt", "simplify", true);
+        test("/tests/files/simplification/u_ops.txt", true, "simplify");
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/simplification/irr_num.txt", "simplify", true);
+        test("/tests/files/simplification/irr_num.txt", true, "simplify");
+    }
+
+    private static void testBeautify() throws Exception {
+        l(lightPurple("\n---------------------------> Beautification <---------------------------\n"));
+        l(boldBlack("\n---------> Binary Operations Test <----------\n"));
+        test("/tests/files/beautify/bin_ops.txt", true, "simplify", "beautify");
+        l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
+        test("/tests/files/beautify/u_ops.txt", true, "simplify", "beautify");
+        l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
+        test("/tests/files/beautify/irr_num.txt", true, "simplify", "beautify");
     }
 
     private static void testNumNodes() throws Exception {
         l(lightPurple("\n---------------------------> Number of Nodes <-------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/nodes/bin_ops.txt", "numNodes", false);
+        test("/tests/files/nodes/bin_ops.txt", false, "numNodes");
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/nodes/u_ops.txt", "numNodes", false);
+        test("/tests/files/nodes/u_ops.txt", false, "numNodes");
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/nodes/irr_num.txt", "numNodes", false);
+        test("/tests/files/nodes/irr_num.txt", false, "numNodes");
     }
 
     private static void testExpand() throws Exception {
         l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/expansion/bin_ops.txt", "expand", true);
+        test("/tests/files/expansion/bin_ops.txt", true, "expand");
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/expansion/u_ops.txt", "expand", true);
+        test("/tests/files/expansion/u_ops.txt", true, "expand");
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/expansion/irr_num.txt", "expand", true);
+        test("/tests/files/expansion/irr_num.txt", true, "expand");
     }
 
     private static void testToExponentialForm() throws Exception {
         l(lightPurple("\n---------------------------> Exponential Form <------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/exponential/bin_ops.txt", "toExponentialForm", true);
+        test("/tests/files/exponential/bin_ops.txt", true, "toExponentialForm");
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/exponential/u_ops.txt", "toExponentialForm", true);
+        test("/tests/files/exponential/u_ops.txt", true, "toExponentialForm");
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/exponential/irr_num.txt", "toExponentialForm", true);
+        test("/tests/files/exponential/irr_num.txt", true, "toExponentialForm");
     }
 
     private static void testToAdditionOnly() throws Exception {
         l(lightPurple("\n---------------------------> Addition Only Form <------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/additional/bin_ops.txt", "toAdditionOnly", true);
+        test("/tests/files/additional/bin_ops.txt", true, "toAdditionOnly");
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/additional/u_ops.txt", "toAdditionOnly", true);
+        test("/tests/files/additional/u_ops.txt", true, "toAdditionOnly");
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/additional/irr_num.txt", "toAdditionOnly", true);
+        test("/tests/files/additional/irr_num.txt", true, "toAdditionOnly");
     }
 
 
@@ -150,7 +161,7 @@ public class AutoTest {
         return l.contains("->") ? l.substring(l.indexOf("->") + 2) : "";
     }
 
-    private static void test(String fileName, String method, boolean testValue) throws Exception {
+    private static void test(String fileName, boolean testValue, String... methods) throws Exception {
         ArrayList<String> lines = getLines(Utils.read(fileName));
 
         ArrayList<Operable> ops = (ArrayList<Operable>) lines.stream()
@@ -175,7 +186,13 @@ public class AutoTest {
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i), prev = simplifiedStrs.get(i).replace(" ", "");
-            Object obj = getMethod(Operable.class, method).invoke(ops.get(i).copy());
+            Object obj = ops.get(i).copy();
+            for (String method : methods) {
+                if (obj instanceof Operable) {
+                    obj = getMethod(Operable.class, method).invoke(obj);
+                } else break;
+            }
+
             String now = obj.toString();
             if (prev.equals(now)) {
                 l(line + lightGreen("PASSED") + boldBlack(" = ") + lightBlue(prev + " "));
