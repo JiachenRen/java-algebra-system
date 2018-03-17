@@ -84,7 +84,7 @@ public class CasComprehensiveTest {
             l(boldBlack("plug in 5 for x: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)));
             l(boldBlack("evaluated at 5: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)).val());
             l(lightCyan("arbitrary value: ") + op.val());
-            l(boldBlack("# vars: ") + Operable.numVars(op));
+            l(boldBlack("# vars: ") + op.numVars());
             l(lightRed("undefined: ") + op.isUndefined());
             l(lightBlue("level of x: ") + op.levelOf(new Variable("x")));
             if (op instanceof Operation) {
@@ -109,8 +109,8 @@ public class CasComprehensiveTest {
         Operable operable = Compiler.compile("0^0");
         l(operable.eval(3));
 
-        l(Operable.numVars(Compiler.compile("a+b*x+a+b/ln(c+e+pi)")));
-        l(Operable.isMultiVar(Compiler.compile("x*3+e")));
+        l(Compiler.compile("a+b*x+a+b/ln(c+e+pi)").numVars());
+        l(Compiler.compile("x*3+e").isMultiVar());
         Operable operable1 = Compiler.compile("(x+a)*-3*(x+a)").simplify();
         l(operable1, operable1.explicitNegativeForm(), operable1);
 

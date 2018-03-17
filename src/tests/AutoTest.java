@@ -20,11 +20,19 @@ import static jmc.utils.ColorFormatter.*;
  */
 @SuppressWarnings("unused")
 public class AutoTest {
+
     public static void main(String args[]) throws Exception {
         configureCAS();
 
         l(boldBlack("Updating expression library... this takes a while..."));
-        updateCandidates("additional/", "exponential/", "simplification/", "expansion/", "nodes/", "beautify/");
+        updateCandidates(
+                "additional/",
+                "exponential/",
+                "simplification/",
+                "expansion/",
+                "nodes/",
+                "beautify/"
+        );
 
         String tests[] = new String[]{
                 "testSimplify",
@@ -72,11 +80,11 @@ public class AutoTest {
     private static void testExpand() throws Exception {
         l(lightPurple("\n---------------------------> Expansion <---------------------------\n"));
         l(boldBlack("\n---------> Binary Operations Test <----------\n"));
-        test("/tests/files/expansion/bin_ops.txt", true, "expand");
+        test("/tests/files/expansion/bin_ops.txt", true, "expand", "simplify");
         l(boldBlack("\n---------> Unary Operations Test <-----------\n"));
-        test("/tests/files/expansion/u_ops.txt", true, "expand");
+        test("/tests/files/expansion/u_ops.txt", true, "expand", "simplify");
         l(boldBlack("\n---------> Irrational Numbers Test <---------\n"));
-        test("/tests/files/expansion/irr_num.txt", true, "expand");
+        test("/tests/files/expansion/irr_num.txt", true, "expand", "simplify");
     }
 
     private static void testToExponentialForm() throws Exception {
@@ -203,7 +211,7 @@ public class AutoTest {
             }
             if (testValue) {
                 Operable o1 = Compiler.compile(line), o2 = Compiler.compile(now);
-                if (Operable.numVars(o1) > 0) {
+                if (o1.numVars() > 0) {
                     for (int k = 0; k <= 10; k++) {
                         int t = (int) Math.pow(k, 2);
                         double diffx = o1.eval(k) - o2.eval(k);

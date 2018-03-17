@@ -52,8 +52,8 @@ public class CAS extends Application {
                 controller.beautified.setText(operable.toString());
 
                 try {
-                    controller.vars.setText(Operable.extractVariables(operable)
-                            .stream().map(Variable::getName)
+                    controller.vars.setText(operable.extractVariables()
+                            .stream().map(Nameable::getName)
                             .reduce((a, b) -> a + ", " + b).get());
                 } catch (NoSuchElementException e) {
                     controller.vars.setText("None");

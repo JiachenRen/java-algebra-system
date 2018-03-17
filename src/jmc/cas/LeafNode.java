@@ -4,7 +4,7 @@ package jmc.cas;
  * Created by Jiachen on 3/10/18.
  * Leaf Node: super class of Variable and RawValue
  */
-abstract class LeafNode implements BinLeafNode, Operable {
+abstract class LeafNode extends Operable implements BinLeafNode {
     public abstract String toString();
 
     public abstract boolean isUndefined();

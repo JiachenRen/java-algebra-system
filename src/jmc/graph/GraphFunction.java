@@ -57,8 +57,8 @@ public class GraphFunction extends Function {
     }
 
     public void initSuppliedVars() {
-        if (Operable.isMultiVar(getOperable())) {
-            ArrayList<Variable> vars = Operable.extractVariables(getOperable());
+        if (getOperable().isMultiVar()) {
+            ArrayList<Variable> vars = getOperable().extractVariables();
             for (Variable v : vars) {
                 if (!v.equals(independentVar)) {
                     SuppliedVar sv = new SuppliedVar(v.getName());

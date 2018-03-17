@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
  * Created by Jiachen on 16/05/2017.
  * Abstract parent of BinaryOperation and Unary Operation
  */
-public abstract class Operation implements Operable, Nameable {
+public abstract class Operation extends Operable implements Nameable {
     private ArrayList<Operable> operands;
 
     public Operation(ArrayList<Operable> operands) {

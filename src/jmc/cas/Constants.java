@@ -71,7 +71,7 @@ public class Constants {
         double compute();
     }
 
-    public static class Constant extends Variable implements Nameable {
+    public static class Constant extends Variable {
         private ComputedConst computedConst;
 
         public Constant(String name, ComputedConst computedConst) {
@@ -87,10 +87,6 @@ public class Constants {
 
         public double eval(double x) {
             return computedConst.compute();
-        }
-
-        public String toString() {
-            return getName();
         }
 
         @Override

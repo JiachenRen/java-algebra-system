@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Created by Jiachen on 03/05/2017.
  * Operable
  */
-public interface Operable extends Evaluable {
+public abstract class Operable implements Evaluable {
     /**
      * invocation of commonTerms(o1 = "a*b*(c+d)*m", o2 = "f*(c+d)*m")
      * returns [(c+d), m]
@@ -16,7 +16,7 @@ public interface Operable extends Evaluable {
      * @param o2 Operable #2
      * @return an ArrayList containing common terms of o1 and o2
      */
-    static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
+    public static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
         ArrayList<Operable> terms = new ArrayList<>();
         if (o1 instanceof BinLeafNode && o2 instanceof BinLeafNode) {
             if (o1.equals(o2)) {
@@ -49,11 +49,11 @@ public interface Operable extends Evaluable {
         return terms;
     }
 
-    boolean equals(Operable other);
+    public abstract boolean equals(Operable other);
 
-    Operable copy();
+    public abstract Operable copy();
 
-    static boolean contains(ArrayList<Operable> operables, Operable target) {
+    public static boolean contains(ArrayList<Operable> operables, Operable target) {
         for (Operable operable : operables) {
             if (operable.equals(target))
                 return true;
@@ -61,23 +61,22 @@ public interface Operable extends Evaluable {
         return false;
     }
 
-    static boolean isMultiVar(Operable o) {
-        return numVars(o) > 1;
+    public boolean isMultiVar() {
+        return numVars() > 1;
     }
 
     /**
-     * @param o the Operable instance to be inspected.
-     * @return number of variables in the expression represented by o.
+     * @return number of variables in the expression represented by self.
      */
-    static int numVars(Operable o) {
-        return extractVariables(o).size();
+    public int numVars() {
+        return extractVariables().size();
     }
 
-    static ArrayList<Variable> extractVariables(Operable o) {
+    public ArrayList<Variable> extractVariables() {
         ArrayList<Variable> vars = new ArrayList<>();
         for (Character c : Assets.VARS.toCharArray()) {
             Variable var = new Variable(c.toString());
-            if (o.levelOf(var) != -1)
+            if (this.levelOf(var) != -1)
                 vars.add(var);
         }
         return vars;
@@ -89,9 +88,9 @@ public interface Operable extends Evaluable {
      * @param o the Operable instance that you are looking for.
      * @return the level at which operable is found.
      */
-    int levelOf(Operable o);
+    public abstract int levelOf(Operable o);
 
-    String toString();
+    public abstract String toString();
 
     /**
      * numNodes() of expression "(3 + 4.5) * 5.3 / 2.7" returns 7
@@ -100,20 +99,20 @@ public interface Operable extends Evaluable {
      *
      * @return number of nodes (including both leaf nodes and non-leaf nodes)
      */
-    int numNodes();
+    public abstract int numNodes();
 
     /**
      * negates the original expression
      *
      * @return new instance that is the negated version of the original
      */
-    Operable negate();
+    public abstract Operable negate();
 
     /**
      * @return level of complexity of the expression represented by an integer with 1 being
      * the most simplistic
      */
-    int complexity();
+    public abstract int complexity();
 
     /**
      * plugs in the operable nested for all variables in the expression
@@ -124,9 +123,9 @@ public interface Operable extends Evaluable {
      * @param replacement the operable to be plugged in
      * @return the resulting operable with nested plugged in
      */
-    Operable plugIn(Variable var, Operable replacement);
+    public abstract Operable plugIn(Variable var, Operable replacement);
 
-    Operable simplify();
+    public abstract Operable simplify();
 
     /**
      * traverses the composite tree and evaluates every single node that represents a raw value.
@@ -136,7 +135,7 @@ public interface Operable extends Evaluable {
      *
      * @return arbitrary value of the node.
      */
-    double val();
+    public abstract double val();
 
     /**
      * basically reversing the effects of toAdditionalOnly and toExponentialForm
@@ -149,7 +148,7 @@ public interface Operable extends Evaluable {
      *
      * @return beautified version of the original
      */
-    Operable beautify();
+    public abstract Operable beautify();
 
     /**
      * (-#)*x will be converted to (-1)*#*x, where # denotes a number
@@ -157,11 +156,11 @@ public interface Operable extends Evaluable {
      *
      * @return explicit negative form of the original Operable
      */
-    Operable explicitNegativeForm();
+    public abstract Operable explicitNegativeForm();
 
-    Operable toAdditionOnly();
+    public abstract Operable toAdditionOnly();
 
-    Operable toExponentialForm();
+    public abstract Operable toExponentialForm();
 
     /**
      * If this method is successfully implemented, it would be marked as a milestone.
@@ -177,14 +176,14 @@ public interface Operable extends Evaluable {
      *
      * @return expanded expression of type Operable
      */
-    Operable expand();
+    public abstract Operable expand();
 
     /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place
      * @return the original operable with o replaced by r.
      */
-    Operable replace(Operable o, Operable r);
+    public abstract Operable replace(Operable o, Operable r);
 
-    boolean isUndefined();
+    public abstract boolean isUndefined();
 }
