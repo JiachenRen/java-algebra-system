@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
  * Signature
  */
 public class Signature {
+    public static final Signature ANY = new Signature();
     private Argument[] args;
 
     Signature(Argument... args) {
@@ -38,6 +39,7 @@ public class Signature {
     }
 
     public String toString() {
+        if (this.args == null || args.length == 0) return "ANY...";
         ArrayList<Argument> args = new ArrayList<>();
         Collections.addAll(args, this.args);
         Optional<String> str = args.stream().map(Enum::toString).reduce((a, b) -> a + ", " + b);

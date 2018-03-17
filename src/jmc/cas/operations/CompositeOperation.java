@@ -1,6 +1,8 @@
 package jmc.cas.operations;
 
-import jmc.cas.*;
+import jmc.cas.BinLeafNode;
+import jmc.cas.JMCException;
+import jmc.cas.Nameable;
 import jmc.cas.Operable;
 import jmc.cas.components.RawValue;
 
@@ -17,7 +19,8 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     private RegisteredManipulation manipulation;
 
     static {
-        define("comp", new Signature(Argument.ANY, Argument.ANY, Argument.ANY), (operands -> new RawValue(0)));
+        define("sum", Signature.ANY, (operands -> new RawValue(0)));
+        define("sum", new Signature(Argument.INTEGER, Argument.OPERATION, Argument.OPERATION, Argument.VARIABLE), operands -> new RawValue(1));
     }
 
 
@@ -30,13 +33,21 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         this.manipulation = resolveManipulation(name, Signature.resolve(operands));
     }
 
-    public static RegisteredManipulation resolveManipulation(String name, Signature signature) {
-        for (RegisteredManipulation manipulation : registeredManipulations) {
-            if (manipulation.getName().equals(name) && manipulation.getSignature().equals(signature)) {
+    private static RegisteredManipulation resolveManipulation(String name, Signature signature) {
+        ArrayList<RegisteredManipulation> candidates = registeredManipulations.stream()
+                .filter(o -> o.getName().equals(name))
+                .collect(Collectors.toCollection(ArrayList::new));
+        for (RegisteredManipulation manipulation : candidates) { //prioritize explicit signatures
+            if (manipulation.getSignature().equals(signature)) {
                 return manipulation;
             }
         }
-        throw new JMCException("cannot resolve operation \""+name+"\" with signature "+signature);
+        for (RegisteredManipulation manipulation : candidates) {
+            if (manipulation.getSignature().equals(Signature.ANY)) {
+                return manipulation;
+            }
+        }
+        throw new JMCException("cannot resolve operation \"" + name + "\" with signature " + signature);
     }
 
     public static ArrayList<RegisteredManipulation> registeredManipulations() {

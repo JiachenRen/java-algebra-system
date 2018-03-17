@@ -156,7 +156,6 @@ public class Compiler {
                 flat(tree, operands);
                 pendingOperations.add(new CompositeOperation(operationName, operands));
             } else {
-                if (operand instanceof BinaryOperation) System.out.println(((BinaryOperation) operand).getName());
                 pendingOperations.add(new UnaryOperation(operand, operationName));
             }
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
@@ -208,7 +207,7 @@ public class Compiler {
                     try {
                         operands.add(new RawValue(Double.valueOf(string)));
                     } catch (NumberFormatException e) {
-                        throw new JMCException("undefined operand in \"" + string + "\"");
+                        throw new JMCException("undefined operand/operation in \"" + string + "\"");
                     }
                 }
             }
