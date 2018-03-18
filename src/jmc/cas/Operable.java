@@ -1,6 +1,12 @@
 package jmc.cas;
 
 
+import jmc.cas.components.Fraction;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.Operation;
+
 import java.util.ArrayList;
 
 /**
@@ -118,25 +124,6 @@ public abstract class Operable implements Evaluable {
     }
 
     /**
-     * @return level of complexity of the expression represented by an integer with 1 being
-     * the most simplistic
-     */
-    public abstract int complexity();
-
-    /**
-     * plugs in the operable nested for all variables in the expression
-     * NOTE: the method returns the operable with the desired nested operable plugged in, but
-     * the operable itself is not altered.
-     *
-     * @param var         the variable to be replaced
-     * @param replacement the operable to be plugged in
-     * @return the resulting operable with nested plugged in
-     */
-    public abstract Operable plugIn(Variable var, Operable replacement);
-
-    public abstract Operable simplify();
-
-    /**
      * traverses the composite tree and evaluates every single node that represents a raw value.
      * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
      * however, if variables exists in the expression, NaN is returned.
@@ -145,6 +132,14 @@ public abstract class Operable implements Evaluable {
      * @return arbitrary value of the node.
      */
     public abstract double val();
+
+    /**
+     * @return level of complexity of the expression represented by an integer with 1 being
+     * the most simplistic
+     */
+    public abstract int complexity();
+
+    public abstract Operable simplify();
 
     /**
      * basically reversing the effects of toAdditionalOnly and toExponentialForm
@@ -171,13 +166,13 @@ public abstract class Operable implements Evaluable {
 
     public abstract Operable toExponentialForm();
 
-//    /**
-//     * If this method is successfully implemented, it would be marked as a milestone.
-//     *
-//     * @param v the variable in which the first derivative is taken with respect to.
-//     * @return first derivative of the expression
-//     */
-//    Operable firstDerivative(Variable v);
+    /**
+     * If this method is successfully implemented, it would be marked as a milestone.
+     *
+     * @param v the variable in which the first derivative is taken with respect to.
+     * @return first derivative of the expression
+     */
+    public abstract Operable firstDerivative(Variable v);
 
     /**
      * Expand the expression; its behavior is exactly what you would expect.
@@ -234,5 +229,13 @@ public abstract class Operable implements Evaluable {
 
     public BinaryOperation exp(Number n) {
         return new BinaryOperation(this.copy(), "^", new RawValue(n));
+    }
+
+    public BinaryOperation sqrt() {
+        return exp(new Fraction(1, 2));
+    }
+
+    public BinaryOperation sq() {
+        return exp(2);
     }
 }

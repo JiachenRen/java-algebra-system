@@ -1,7 +1,12 @@
-package jmc.cas;
+package jmc.cas.operations;
 
 import jmc.Function;
 import jmc.MathContext;
+import jmc.cas.*;
+import jmc.cas.Compiler;
+import jmc.cas.components.Constants;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
 
@@ -63,7 +68,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     @Override
     public UnaryOperation copy() {
-        return new UnaryOperation(getOperand(), operation);
+        return new UnaryOperation(getOperand().copy(), operation);
     }
 
     /**
@@ -154,6 +159,61 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return this;
     }
 
+    @Override
+    public Operable firstDerivative(Variable v) {
+        Operable smallKahuna = getOperand().firstDerivative(v);
+        Operable bigKahuna = null;
+        switch (this.operation.getName()) {
+            case "cos": // d/dx cos(x) = -sin(x)
+                bigKahuna = RawValue.ONE.negate().mult(new UnaryOperation(getOperand(), "sin"));
+                break;
+            case "sin": // d/dx sin(x) = cos(x)
+                bigKahuna = new UnaryOperation(getOperand(), "cos");
+                break;
+            case "ln": // d/dx ln(x) = 1/x
+                bigKahuna = RawValue.ONE.div(getOperand());
+                break;
+            case "log": // d/dx log(x) = 1/x*log(e)
+                bigKahuna = RawValue.ONE.div(getOperand()).mult(new UnaryOperation(Constants.E, "log"));
+                break;
+            case "acos": // d/dx arccos(x) = (-1)/(1-x^2)^(1/2)
+                bigKahuna = RawValue.ONE.negate().div(RawValue.ONE.sub(getOperand().sq()).sqrt());
+                break;
+            case "asin": // d/dx arcsin(x) = -arccos(x)
+                bigKahuna = RawValue.ONE.div(RawValue.ONE.sub(getOperand().sq()).sqrt());
+                break;
+            case "tan": // d/dx tan(x) = 1/cos(x)^2
+                bigKahuna = RawValue.ONE.div(new UnaryOperation(getOperand(), "cos").sq());
+                break;
+            case "atan": // d/dx arctan(x) = 1/(x^2+1)
+                bigKahuna = RawValue.ONE.div(getOperand().sq().add(1));
+                break;
+            case "abs": // d/dx |x| = sign(x)
+                bigKahuna = new UnaryOperation(getOperand(), "sign");
+                break;
+            case "csc": // d/dx csc(x) = -cos(x)/sin(x)^2
+                bigKahuna = new UnaryOperation(getOperand(), "cos").mult(-1).div(new UnaryOperation(getOperand(), "sin").sq());
+                break;
+            case "sec": // d/dx sec(x) = sin(x)/cos(x)^2
+                bigKahuna = new UnaryOperation(getOperand(), "sin").div(new UnaryOperation(getOperand(), "cos").sq());
+                break;
+            case "cot": // d/dx cot(x) = -1/sin(x)^2
+                bigKahuna = RawValue.ONE.negate().div(new UnaryOperation(getOperand(), "sin").sq());
+                break;
+            case "cosh": // d/dx cosh(x) = sinh(x)
+                bigKahuna = new UnaryOperation(getOperand(), "sinh");
+                break;
+            case "sinh": // d/dx sinh(x) = cosh(x)
+                bigKahuna = new UnaryOperation(getOperand(), "cosh");
+                break;
+            case "tanh": // d/dx tanh(x) = 1/cosh(x)^2
+                bigKahuna = RawValue.ONE.div(new UnaryOperation(getOperand(), "cosh").sq());
+                break;
+        }
+        if (bigKahuna != null) return smallKahuna.mult(bigKahuna);
+        return new CompositeOperation(Calculus.DERIVATIVE, this.copy());
+    }
+
     public boolean isUndefined() {
         if (super.isUndefined()) return true;
         if (getOperand().val() != Double.NaN) {
@@ -192,14 +252,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         }
 
         return false;
-    }    public int complexity() {
-        return getOperand().complexity() + 1;
     }
 
     public Operable getOperand() {
         return getOperand(0);
-    }    public Operable setOperand(Operable operable) {
-        return super.setOperand(operable, 0);
     }
 
     public String getName() {
@@ -228,6 +284,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);
+            define("sign", x -> {
+                if (!Double.isNaN(x)) {
+                    return x == 0 ? 0 : x > 0 ? 1 : -1;
+                }
+                return Double.NaN;
+            });
             if (Mode.DEBUG) System.out.println("# reserved unary operations declared");
         }
 
@@ -277,6 +339,9 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     }
 
+    public Operable setOperand(Operable operable) {
+        return super.setOperand(operable, 0);
+    }
 
 
     public String toString() {
@@ -290,51 +355,15 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @param other the other operable, possibly UnaryOperation or BinaryOperation
      * @return whether or not the two instances are identical to each other.
      */
+    @Override
     public boolean equals(Operable other) {
         return other instanceof UnaryOperation
                 && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
                 && this.getOperand().equals(((UnaryOperation) other).getOperand()); //delegate down
     }
 
-    /**
-     * Creates a new Operable with its variable replaced with {nested}
-     * Note: modifies
-     *
-     * @param replacement the operable to be plugged in
-     * @return a new instance with its original variable replaced with {nested}
-     */
-    public Operable plugIn(Variable var, Operable replacement) {
-        if (this.getOperand().equals(var))
-            this.setOperand(replacement);
-        else this.getOperand().plugIn(var, replacement);
-        return this;
-    }
-
-    public int numNodes() {
-        return 1 + getOperand().numNodes();
-    }
-
     public double val() {
         return operation.eval(getOperand().val());
-    }
-
-
-
-    public int levelOf(Operable o) {
-        if (this.equals(o)) return 0;
-        int i = getOperand().levelOf(o);
-        if (i == -1) return -1;
-        return i + 1;
-    }
-
-    public Operable expand() {
-        return setOperand(getOperand().expand());
-    }
-
-    public Operable replace(Operable o, Operable r) {
-        if (this.equals(o)) return r;
-        UnaryOperation clone = this.copy();
-        return clone.setOperand(clone.getOperand().replace(o, r));
     }
 
 

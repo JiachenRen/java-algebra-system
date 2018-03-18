@@ -1,8 +1,8 @@
-package tests;
+package tests.specific;
 
 import jmc.MathContext;
 import jmc.cas.Operable;
-import jmc.cas.RawValue;
+import jmc.cas.components.RawValue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

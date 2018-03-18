@@ -1,8 +1,11 @@
 package tests;
 
 import jmc.Function;
-import jmc.cas.*;
 import jmc.cas.Compiler;
+import jmc.cas.Operable;
+import jmc.cas.components.*;
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.Operation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +34,7 @@ public class CasComprehensiveTest {
 
         //plug in test
         operation = (Operation) Compiler.compile("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
-        operation.plugIn(new Variable("x"), Compiler.compile("h"));
+        operation.replace(new Variable("x"), Compiler.compile("h"));
         l(operation);
 
         //fraction test
@@ -81,8 +84,8 @@ public class CasComprehensiveTest {
         operables = ops.stream().map(Compiler::compile).collect(Collectors.toList());
         operables.forEach(op -> {
             l(boldBlack("original: ") + Compiler.colorMathSymbols(op.toString()));
-            l(boldBlack("plug in 5 for x: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)));
-            l(boldBlack("evaluated at 5: ") + op.copy().plugIn(new Variable("x"), new RawValue(5)).val());
+            l(boldBlack("plug in 5 for x: ") + op.copy().replace(new Variable("x"), new RawValue(5)));
+            l(boldBlack("evaluated at 5: ") + op.copy().replace(new Variable("x"), new RawValue(5)).val());
             l(lightCyan("arbitrary value: ") + op.val());
             l(boldBlack("# vars: ") + op.numVars());
             l(lightRed("undefined: ") + op.isUndefined());
@@ -137,6 +140,11 @@ public class CasComprehensiveTest {
         l(function.eval(3), function.numericalSolve(3, -10, 10, 0.0001));
         function.setEvaluable((x) -> x * x);
         l(function.getEvaluable().eval(3));
+
+        Operable o = Compiler.compile("(x+a)+3*4/(ln(x+7*x))");
+        o.replace(new Variable("x"), new Variable("k"));
+        l(o);
+        l(o.replace(new Variable("x"), new Variable("k")));
 
     }
 

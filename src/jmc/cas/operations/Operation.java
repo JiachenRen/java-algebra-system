@@ -1,7 +1,14 @@
-package jmc.cas;
+package jmc.cas.operations;
+
+import jmc.cas.JMCException;
+import jmc.cas.Nameable;
+import jmc.cas.Operable;
+import jmc.cas.components.Fraction;
+import jmc.cas.components.RawValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +54,10 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "+", new RawValue(n));
     }
 
+    public static BinaryOperation add(Number a, Number b) {
+        return new BinaryOperation(new RawValue(a), "+", new RawValue(b));
+    }
+
     public static BinaryOperation sub(Operable o1, Operable o2) {
         return new BinaryOperation(o1.copy(), "-", o2.copy());
     }
@@ -65,6 +76,10 @@ public abstract class Operation extends Operable implements Nameable {
 
     public static BinaryOperation exp(Number a, Operable b) {
         return exp(new RawValue(a), b);
+    }
+
+    public static BinaryOperation sqrt(Operable o) {
+        return o.exp(new Fraction(1, 2));
     }
 
     static ArrayList<Operable> wrap(Operable... operables) {
@@ -169,11 +184,65 @@ public abstract class Operation extends Operable implements Nameable {
         return this;
     }
 
+    public int numNodes() {
+        Optional<Integer> nodes = operands.stream()
+                .map(Operable::numNodes)
+                .reduce((a, b) -> a + b);
+        if (!nodes.isPresent()) throw new JMCException("empty nodes");
+        return 1 + nodes.get();
+    }
+
+    public int levelOf(Operable o) {
+        if (this.equals(o)) return 0;
+        int minDepth = -1;
+        for (Operable operand : operands) {
+            int lev = operand.levelOf(o);
+            minDepth = lev > minDepth ? lev : minDepth;
+        }
+        if (minDepth == -1) return -1;
+        return minDepth + 1;
+    }
+
+    public Operable expand() {
+        operands = operands.stream()
+                .map(Operable::expand)
+                .collect(Collectors.toCollection(ArrayList::new));
+        return this;
+    }
+
     public boolean isUndefined() {
         for (Operable operand : operands) {
             if (operand.isUndefined())
                 return true;
         }
         return false;
+    }
+
+    public Operable replace(Operable o, Operable r) {
+        Operation clone = this.copy();
+        clone.setOperands(operands.stream()
+                .map(op -> op.replace(o, r))
+                .collect(Collectors.toCollection(ArrayList::new)));
+        return clone;
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public int complexity() {
+        return operands.stream()
+                .map(Operable::complexity)
+                .reduce((a, b) -> a + b).get() + 1;
+    }
+
+    public boolean equals(Operable other) {
+        if (!(other instanceof Operation)) return false;
+        Operation op = ((Operation) other);
+        if (op.getOperands().size() != this.getOperands().size()) return false;
+        ArrayList<Operable> operands1 = op.getOperands();
+        for (int i = 0; i < operands1.size(); i++) {
+            Operable operable = operands1.get(i);
+            if (!operable.equals(getOperand(i)))
+                return false;
+        }
+        return true;
     }
 }

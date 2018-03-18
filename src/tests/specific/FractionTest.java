@@ -1,8 +1,8 @@
-package tests;
+package tests.specific;
 
 import jmc.MathContext;
 import jmc.cas.Compiler;
-import jmc.cas.Fraction;
+import jmc.cas.components.Fraction;
 import jmc.cas.Operable;
 
 import java.util.ArrayList;

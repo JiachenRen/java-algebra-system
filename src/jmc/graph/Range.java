@@ -11,6 +11,12 @@ public class Range {
     private boolean hasNextStep;
     private double current;
 
+    Range(Range clone) {
+        this(clone.getLow(), clone.getHigh(), clone.getStep());
+        this.hasNextStep = clone.hasNextStep;
+        this.current = clone.current;
+    }
+
     Range(double low, double high, double step) {
         this.low = low;
         this.high = high;
@@ -18,16 +24,6 @@ public class Range {
         current = low;
         hasNextStep = true;
         assertValidity();
-    }
-
-    Range(Range clone) {
-        this(clone.getLow(), clone.getHigh(), clone.getStep());
-        this.hasNextStep = clone.hasNextStep;
-        this.current = clone.current;
-    }
-
-    Range(double low, double high) {
-        this(low, high, 0);
     }
 
     double getLow() {
@@ -38,29 +34,12 @@ public class Range {
         return this.high;
     }
 
-    double getCurStep() {
-        return current;
-    }
-
     double getStep() {
         return step;
     }
 
     void setStep(double step) {
         this.step = step;
-    }
-
-    void next() {
-        if (current < high) current += step;
-        else hasNextStep = false;
-    }
-
-    double getSpan() {
-        return high - low;
-    }
-
-    boolean hasNextStep() {
-        return hasNextStep;
     }
 
     private void assertValidity() {
@@ -76,16 +55,37 @@ public class Range {
 
     }
 
+    private int numSteps() {
+        return (int) (getSpan() / getStep());
+    }
+
+    double getSpan() {
+        return high - low;
+    }
+
+    Range(double low, double high) {
+        this(low, high, 0);
+    }
+
+    double getCurStep() {
+        return current;
+    }
+
+    void next() {
+        if (current < high) current += step;
+        else hasNextStep = false;
+    }
+
+    boolean hasNextStep() {
+        return hasNextStep;
+    }
+
     boolean isInScope(double val) {
         return val <= high && val >= low;
     }
 
     public String toString() {
         return "low: " + low + " high: " + high + " step: " + step;
-    }
-
-    private int numSteps() {
-        return (int) (getSpan() / getStep());
     }
 
     /**

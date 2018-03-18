@@ -1,5 +1,8 @@
-package jmc.cas;
+package jmc.cas.components;
 
+import jmc.cas.LeafNode;
+import jmc.cas.Operable;
+import jmc.cas.operations.BinaryOperation;
 import jmc.graph.Graph;
 
 /**
@@ -43,6 +46,19 @@ public class RawValue extends LeafNode {
         return doubleValue();
     }
 
+    public RawValue inverse() {
+        if (isInteger()) return new Fraction(1, intValue());
+        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
+    }
+
+    public boolean isZero() {
+        return doubleValue() == 0;
+    }
+
+    public boolean isInfinite() {
+        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
+    }
+
     /**
      * Removes the extra ".0" at the end of the number
      *
@@ -63,13 +79,20 @@ public class RawValue extends LeafNode {
         return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
+    public boolean isPositive() {
+        return doubleValue() > 0;
+    }
+
+
     public int intValue() {
         return number.intValue();
     }
 
+
     public boolean isUndefined() {
         return new Double(number.doubleValue()).isNaN();
     }
+
 
     public RawValue copy() {
         return new RawValue(number);
@@ -80,6 +103,12 @@ public class RawValue extends LeafNode {
         return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate()) : this.copy();
     }
 
+    @Override
+    public Operable firstDerivative(Variable v) {
+        if (isUndefined()) return RawValue.UNDEF;
+        return RawValue.ZERO;
+    }
+
     public boolean equals(Operable other) {
         return other instanceof RawValue
                 && other.isUndefined()
@@ -87,16 +116,6 @@ public class RawValue extends LeafNode {
                 || other instanceof RawValue
                 && ((RawValue) other).doubleValue()
                 == this.doubleValue();
-    }
-
-    /**
-     * Since plugIn only applies to variable, a RawValue type should only return itself.
-     *
-     * @param nested the operable to be plugged in
-     * @return new instance of self
-     */
-    public Operable plugIn(Variable var, Operable nested) {
-        return this;
     }
 
     public Operable simplify() {
@@ -111,25 +130,11 @@ public class RawValue extends LeafNode {
         return 1;
     }
 
+
     @Override
     public RawValue negate() {
         return new RawValue(this.doubleValue() * -1);
     }
 
-    public RawValue inverse() {
-        if (isInteger()) return new Fraction(1, intValue());
-        else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
-    }
 
-    public boolean isZero() {
-        return doubleValue() == 0;
-    }
-
-    public boolean isInfinite() {
-        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
-    }
-
-    public boolean isPositive() {
-        return doubleValue() > 0;
-    }
 }

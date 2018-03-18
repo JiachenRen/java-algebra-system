@@ -1,7 +1,8 @@
 package jmc.graph;
 
 import jmc.Function;
-import jmc.cas.*;
+import jmc.cas.Operable;
+import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
 
@@ -22,11 +23,6 @@ public class GraphFunction extends Function {
     private boolean autoAsymptoteExtension;
     private Variable independentVar = new Variable("x");
     private ArrayList<SuppliedVar> suppliedVars;
-
-
-    public enum Style {
-        CONTINUOUS, DISCRETE
-    }
 
     {
         isVisible = true;
@@ -69,10 +65,12 @@ public class GraphFunction extends Function {
         }
     }
 
+    public Operable getOperable() {
+        return (Operable) getEvaluable();
+    }
 
-    @Override
-    public double eval(double val) { // this might compromise speed
-        return getOperable().eval(val);
+    public void setOperable(Operable o) {
+        setEvaluable(o);
     }
 
     /**
@@ -124,6 +122,17 @@ public class GraphFunction extends Function {
         return plot;
     }
 
+    @Override
+    public double eval(double val) { // this might compromise speed
+        return getOperable().eval(val);
+    }
+
+    @Override
+    public GraphFunction setName(String name) {
+        super.setName(name);
+        return this;
+    }
+
     /**
      * Returns the calculated plot of a specific range according to the definition of this GraphFunction.
      */
@@ -131,31 +140,21 @@ public class GraphFunction extends Function {
         return plot;
     }
 
-    public void setVisible(boolean visible) {
-        this.isVisible = visible;
-    }
-
     public boolean isVisible() {
         return isVisible;
     }
 
-    public Style getStyle() {
-        return graphStyle;
-    }
-
-    public GraphFunction setGraphStyle(Style style) {
-        this.graphStyle = style;
-        return this;
-    }
-
-
-    public GraphFunction setDynamic(boolean temp) {
-        this.dynamic = temp;
-        return this;
+    public void setVisible(boolean visible) {
+        this.isVisible = visible;
     }
 
     public boolean isDynamic() {
         return dynamic;
+    }
+
+    public GraphFunction setDynamic(boolean temp) {
+        this.dynamic = temp;
+        return this;
     }
 
     public boolean isMultiVar() {
@@ -189,6 +188,15 @@ public class GraphFunction extends Function {
         this.setGraphStyle(other.getStyle());
         this.setDynamic(other.dynamic);
         return this;
+    }
+
+    public GraphFunction setGraphStyle(Style style) {
+        this.graphStyle = style;
+        return this;
+    }
+
+    public Style getStyle() {
+        return graphStyle;
     }
 
     public boolean isAsymptoteVisible() {
@@ -263,22 +271,12 @@ public class GraphFunction extends Function {
         return suppliedVars;
     }
 
-    public Operable getOperable() {
-        return (Operable) getEvaluable();
-    }
-
-    public void setOperable(Operable o) {
-        setEvaluable(o);
-    }
-
     public boolean isDiscrete() {
         return this.graphStyle.equals(Style.DISCRETE);
     }
 
-    @Override
-    public GraphFunction setName(String name) {
-        super.setName(name);
-        return this;
+    public enum Style {
+        CONTINUOUS, DISCRETE
     }
 
 

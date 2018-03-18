@@ -1,6 +1,8 @@
-package jmc.cas;
+package jmc.cas.components;
 
 import jmc.MathContext;
+import jmc.cas.Operable;
+import jmc.cas.operations.BinaryOperation;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -237,8 +239,27 @@ public class Fraction extends RawValue {
         return (double) numerator / (double) denominator;
     }
 
+    @Override
+    public Fraction inverse() {
+        if (isUndefined()) return Fraction.UNDEF;
+        long tmp = denominator;
+        denominator = numerator;
+        numerator = tmp;
+        return this;
+    }
+
+    @Override
+    public boolean isZero() {
+        return !isUndefined() && denominator == 0;
+    }
+
     public String toString() {
         return "(" + numerator + "/" + denominator + ")";
+    }
+
+    @Override
+    public boolean isPositive() {
+        return !isUndefined() && numerator / denominator > 0;
     }
 
     @Override
@@ -260,25 +281,6 @@ public class Fraction extends RawValue {
         clone.numerator *= -1;
         clone.reduce();
         return clone;
-    }
-
-    @Override
-    public Fraction inverse() {
-        if (isUndefined()) return Fraction.UNDEF;
-        long tmp = denominator;
-        denominator = numerator;
-        numerator = tmp;
-        return this;
-    }
-
-    @Override
-    public boolean isZero() {
-        return !isUndefined() && denominator == 0;
-    }
-
-    @Override
-    public boolean isPositive() {
-        return !isUndefined() && numerator / denominator > 0;
     }
 
     public Operable beautify() {

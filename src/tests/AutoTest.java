@@ -1,6 +1,6 @@
 package tests;
 
-import jmc.cas.BinaryOperation;
+import jmc.cas.operations.BinaryOperation;
 import jmc.cas.Compiler;
 import jmc.cas.Operable;
 import jmc.utils.Utils;
@@ -31,7 +31,8 @@ public class AutoTest {
                 "simplification/",
                 "expansion/",
                 "nodes/",
-                "beautify/"
+                "beautify/",
+                "complexity/"
         );
 
         String tests[] = new String[]{
@@ -40,12 +41,24 @@ public class AutoTest {
                 "testExpand",
                 "testToExponentialForm",
                 "testToAdditionOnly",
-                "testBeautify"
+                "testBeautify",
+                "testComplexity"
         };
         for (String test : tests) {
             getMethod(AutoTest.class, test).invoke(null);
         }
     }
+
+    private static void testComplexity() throws Exception {
+        l(lightPurple("\n---------> Complexity \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
+        test("/tests/files/complexity/bin_ops.txt", false, "complexity");
+        l(boldBlack("\n---------> Unary Operations Test \n"));
+        test("/tests/files/complexity/u_ops.txt", false, "complexity");
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
+        test("/tests/files/complexity/irr_num.txt", false, "complexity");
+    }
+
 
     private static void testSimplify() throws Exception {
         l(lightPurple("\n---------> Simplification \n"));
