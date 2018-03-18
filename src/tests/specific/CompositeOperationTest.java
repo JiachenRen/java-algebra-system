@@ -14,8 +14,9 @@ public class CompositeOperationTest {
     public static void main(String args[]) {
         l(Compiler.compile("a+log(3+a)+4"));
         CompositeOperation co = (CompositeOperation) Compiler.compile("sum(4+7+5,5+x,log(7+cos(x)),x)");
-        l(co);
+        l(co); //christ I finally did it!!!
         l(co.eval(5));
+        l(co.simplify());
 
 //        l(Compiler.compile("a+log(3+a)+4"));
         l(Argument.DECIMAL.equals(Argument.ANY));

@@ -4,7 +4,6 @@ import jmc.cas.BinLeafNode;
 import jmc.cas.JMCException;
 import jmc.cas.Nameable;
 import jmc.cas.Operable;
-import jmc.cas.components.RawValue;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -19,8 +18,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     private RegisteredManipulation manipulation;
 
     static {
-        define("sum", Signature.ANY, (operands -> new RawValue(0)));
-        define("sum", new Signature(Argument.INTEGER, Argument.OPERATION, Argument.OPERATION, Argument.VARIABLE), operands -> new RawValue(1));
+        define("sum", Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
     }
 
 
@@ -78,6 +76,12 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
 
     public double eval(double x) {
         return manipulation.manipulate(getOperands()).eval(x);
+    }
+
+    @Override
+    public Operable simplify() {
+        super.simplify();
+        return manipulation.manipulate(getOperands());
     }
 
     public CompositeOperation copy() {
