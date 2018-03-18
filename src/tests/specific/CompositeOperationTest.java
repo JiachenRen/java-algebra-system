@@ -1,7 +1,10 @@
 package tests.specific;
 
-import jmc.cas.operations.Argument;
 import jmc.cas.Compiler;
+import jmc.cas.components.Constants;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
+import jmc.cas.operations.Argument;
 import jmc.cas.operations.CompositeOperation;
 
 import static tests.TestPrint.l;
@@ -17,6 +20,8 @@ public class CompositeOperationTest {
         l(co); //christ I finally did it!!!
         l(co.eval(5));
         l(co.simplify());
+        l(RawValue.ONE.div(new Variable("x")).mult(Constants.E));
+        l(RawValue.ONE.negate().div(RawValue.ONE.sub(new Variable("x").sq()).sqrt()));
 
 //        l(Compiler.compile("a+log(3+a)+4"));
         l(Argument.DECIMAL.equals(Argument.ANY));

@@ -5,8 +5,8 @@ import jmc.MathContext;
 import jmc.cas.*;
 import jmc.cas.Compiler;
 import jmc.cas.components.Constants;
-import jmc.cas.Operable;
 import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
 
@@ -159,6 +159,61 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return this;
     }
 
+    @Override
+    public Operable firstDerivative(Variable v) {
+        Operable smallKahuna = getOperand().firstDerivative(v);
+        Operable bigKahuna = null;
+        switch (this.operation.getName()) {
+            case "cos": // d/dx cos(x) = -sin(x)
+                bigKahuna = RawValue.ONE.negate().mult(new UnaryOperation(getOperand(), "sin"));
+                break;
+            case "sin": // d/dx sin(x) = cos(x)
+                bigKahuna = new UnaryOperation(getOperand(), "cos");
+                break;
+            case "ln": // d/dx ln(x) = 1/x
+                bigKahuna = RawValue.ONE.div(getOperand());
+                break;
+            case "log": // d/dx log(x) = 1/x*log(e)
+                bigKahuna = RawValue.ONE.div(getOperand()).mult(new UnaryOperation(Constants.E, "log"));
+                break;
+            case "acos": // d/dx arccos(x) = (-1)/(1-x^2)^(1/2)
+                bigKahuna = RawValue.ONE.negate().div(RawValue.ONE.sub(getOperand().sq()).sqrt());
+                break;
+            case "asin": // d/dx arcsin(x) = -arccos(x)
+                bigKahuna = RawValue.ONE.div(RawValue.ONE.sub(getOperand().sq()).sqrt());
+                break;
+            case "tan": // d/dx tan(x) = 1/cos(x)^2
+                bigKahuna = RawValue.ONE.div(new UnaryOperation(getOperand(), "cos").sq());
+                break;
+            case "atan": // d/dx arctan(x) = 1/(x^2+1)
+                bigKahuna = RawValue.ONE.div(getOperand().sq().add(1));
+                break;
+            case "abs": // d/dx |x| = sign(x)
+                bigKahuna = new UnaryOperation(getOperand(), "sign");
+                break;
+            case "csc": // d/dx csc(x) = -cos(x)/sin(x)^2
+                bigKahuna = new UnaryOperation(getOperand(), "cos").mult(-1).div(new UnaryOperation(getOperand(), "sin").sq());
+                break;
+            case "sec": // d/dx sec(x) = sin(x)/cos(x)^2
+                bigKahuna = new UnaryOperation(getOperand(), "sin").div(new UnaryOperation(getOperand(), "cos").sq());
+                break;
+            case "cot": // d/dx cot(x) = -1/sin(x)^2
+                bigKahuna = RawValue.ONE.negate().div(new UnaryOperation(getOperand(), "sin").sq());
+                break;
+            case "cosh": // d/dx cosh(x) = sinh(x)
+                bigKahuna = new UnaryOperation(getOperand(), "sinh");
+                break;
+            case "sinh": // d/dx sinh(x) = cosh(x)
+                bigKahuna = new UnaryOperation(getOperand(), "cosh");
+                break;
+            case "tanh": // d/dx tanh(x) = 1/cosh(x)^2
+                bigKahuna = RawValue.ONE.div(new UnaryOperation(getOperand(), "cosh").sq());
+                break;
+        }
+        if (bigKahuna != null) return smallKahuna.mult(bigKahuna);
+        return new CompositeOperation(Calculus.DERIVATIVE, this.copy());
+    }
+
     public boolean isUndefined() {
         if (super.isUndefined()) return true;
         if (getOperand().val() != Double.NaN) {
@@ -229,6 +284,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);
+            define("sign", x -> {
+                if (!Double.isNaN(x)) {
+                    return x == 0 ? 0 : x > 0 ? 1 : -1;
+                }
+                return Double.NaN;
+            });
             if (Mode.DEBUG) System.out.println("# reserved unary operations declared");
         }
 

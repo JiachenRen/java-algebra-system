@@ -54,6 +54,11 @@ public class Variable extends LeafNode implements Nameable {
         return this;
     }
 
+    public Operable firstDerivative(Variable v) {
+        if (v.equals(this)) return RawValue.ONE;
+        return RawValue.ZERO;
+    }
+
     /**
      * Ensures that if "x" is defined as "x = 3", the value gets replicated as well.
      *

@@ -103,7 +103,12 @@ public class Constants {
 
         @Override
         public Constant copy() {
-            return new Constant(getName(), computedConst);
+            return new Constant(this);
+        }
+
+        @Override
+        public Operable firstDerivative(Variable v) {
+            return RawValue.ZERO;
         }
 
         public int complexity() {

@@ -1,6 +1,7 @@
 package jmc.cas;
 
 
+import jmc.cas.components.Fraction;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 import jmc.cas.operations.BinaryOperation;
@@ -165,13 +166,13 @@ public abstract class Operable implements Evaluable {
 
     public abstract Operable toExponentialForm();
 
-//    /**
-//     * If this method is successfully implemented, it would be marked as a milestone.
-//     *
-//     * @param v the variable in which the first derivative is taken with respect to.
-//     * @return first derivative of the expression
-//     */
-//    Operable firstDerivative(Variable v);
+    /**
+     * If this method is successfully implemented, it would be marked as a milestone.
+     *
+     * @param v the variable in which the first derivative is taken with respect to.
+     * @return first derivative of the expression
+     */
+    public abstract Operable firstDerivative(Variable v);
 
     /**
      * Expand the expression; its behavior is exactly what you would expect.
@@ -228,5 +229,13 @@ public abstract class Operable implements Evaluable {
 
     public BinaryOperation exp(Number n) {
         return new BinaryOperation(this.copy(), "^", new RawValue(n));
+    }
+
+    public BinaryOperation sqrt() {
+        return exp(new Fraction(1, 2));
+    }
+
+    public BinaryOperation sq() {
+        return exp(2);
     }
 }

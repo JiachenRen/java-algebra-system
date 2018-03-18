@@ -103,6 +103,12 @@ public class RawValue extends LeafNode {
         return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate()) : this.copy();
     }
 
+    @Override
+    public Operable firstDerivative(Variable v) {
+        if (isUndefined()) return RawValue.UNDEF;
+        return RawValue.ZERO;
+    }
+
     public boolean equals(Operable other) {
         return other instanceof RawValue
                 && other.isUndefined()
@@ -123,6 +129,7 @@ public class RawValue extends LeafNode {
     public int complexity() {
         return 1;
     }
+
 
     @Override
     public RawValue negate() {

@@ -4,6 +4,7 @@ import jmc.cas.BinLeafNode;
 import jmc.cas.JMCException;
 import jmc.cas.Nameable;
 import jmc.cas.Operable;
+import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -82,6 +83,11 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     public Operable simplify() {
         super.simplify();
         return manipulation.manipulate(getOperands());
+    }
+
+    @Override
+    public Operable firstDerivative(Variable v) {
+        return null;
     }
 
     public CompositeOperation copy() {

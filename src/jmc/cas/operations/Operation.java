@@ -3,6 +3,7 @@ package jmc.cas.operations;
 import jmc.cas.JMCException;
 import jmc.cas.Nameable;
 import jmc.cas.Operable;
+import jmc.cas.components.Fraction;
 import jmc.cas.components.RawValue;
 
 import java.util.ArrayList;
@@ -75,6 +76,10 @@ public abstract class Operation extends Operable implements Nameable {
 
     public static BinaryOperation exp(Number a, Operable b) {
         return exp(new RawValue(a), b);
+    }
+
+    public static BinaryOperation sqrt(Operable o) {
+        return o.exp(new Fraction(1, 2));
     }
 
     static ArrayList<Operable> wrap(Operable... operables) {

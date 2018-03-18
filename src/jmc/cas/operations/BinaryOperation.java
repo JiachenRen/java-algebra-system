@@ -2,10 +2,13 @@ package jmc.cas.operations;
 
 
 import jmc.MathContext;
-import jmc.cas.*;
-import jmc.cas.components.Fraction;
+import jmc.cas.BinLeafNode;
+import jmc.cas.Mode;
+import jmc.cas.Nameable;
 import jmc.cas.Operable;
+import jmc.cas.components.Fraction;
 import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -347,6 +350,11 @@ public class BinaryOperation extends Operation {
         return this;
     }
 
+    @Override
+    public Operable firstDerivative(Variable v) {
+        return null;
+    }
+
     public boolean isUndefined() {
         if (super.isUndefined()) return true;
         if (getRight() instanceof RawValue) {
@@ -439,6 +447,11 @@ public class BinaryOperation extends Operation {
             if (r1 instanceof Fraction) {
                 return ((Fraction) r1).exp(r2);
             } else if (r1.isInteger() && r2 instanceof Fraction) {
+                boolean r1Negative = false;
+                if (!r1.isPositive()) {
+                    r1Negative = true;
+                    r1 = r1.negate();
+                }
                 ArrayList<int[]> pairs = MathContext.toBaseExponentPairs(r1.intValue());
                 Optional<BinaryOperation> reduced = pairs.stream()
                         .filter(p -> p[1] > 1)
@@ -449,8 +462,8 @@ public class BinaryOperation extends Operation {
                             .filter(p -> p[1] == 1)
                             .map(p -> p[0])
                             .reduce((a, b) -> a * b);
-                    if (retained.isPresent()) {
-                        return Operation.mult(Operation.exp(retained.get(), r2), reduced.get()).simplify();
+                    if (retained.isPresent()) { //TODO: debug negative
+                        return Operation.mult(Operation.exp(retained.get() * (r1Negative ? -1 : 1), r2), reduced.get()).simplify();
                     } else {
                         return reduced.get().simplify();
                     }
