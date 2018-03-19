@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.Compiler;
+import jmc.cas.Mode;
 
 import static tests.TestPrint.l;
 
@@ -31,7 +32,12 @@ public class FirstDerivativeTest {
 //        l(Compiler.compile("derivative(x^(-1),x)").simplify());
 //        l(Compiler.compile("derivative(ln(2x),x)").simplify());
 //        l(Compiler.compile("derivative(2x*ln(x),x)").simplify());
-        l(Compiler.compile("derivative(x^(2x),x)").simplify()); //fixed
+//        l(Compiler.compile("derivative(x^(2x+x),x)").simplify()); //fixed
+
+        //ultimate test -> if this passes, I am just !!!!!!!!
+//        Mode.DEBUG = true;
+//        l(Compiler.compile("1*ln(10)-ln(3)").simplify());
+        l(Compiler.compile("derivative(-ln(10)*x^3*ln(x)/(ln(cos(x))-ln(10)*x),x)").simplify()); // problematic
 
     }
 

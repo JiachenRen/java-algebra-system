@@ -139,7 +139,9 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                             int[] num = numOccurrences(uniqueFactors, factors);
                             if (allTheSame(num)) {
                                 RawValue r1 = new RawValue(MathContext.mult(uniqueFactors));
-                                return Operation.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
+                                if (!r1.equals(r)) // do not return 1*ln(10), or it would cause StackOverflow error!
+                                    return Operation.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
+                                else return this;
                             }
                         }
                 }
