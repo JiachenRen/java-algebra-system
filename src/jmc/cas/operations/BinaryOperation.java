@@ -2,10 +2,7 @@ package jmc.cas.operations;
 
 
 import jmc.MathContext;
-import jmc.cas.BinLeafNode;
-import jmc.cas.Mode;
-import jmc.cas.Nameable;
-import jmc.cas.Operable;
+import jmc.cas.*;
 import jmc.cas.components.Fraction;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
@@ -352,7 +349,38 @@ public class BinaryOperation extends Operation {
 
     @Override
     public Operable firstDerivative(Variable v) {
-        return null;
+        switch (operation.name) {
+            case "+": // d/dx [f(x) + g(x)] = d/dx(g(x)) - d/dx(g(x))
+                return getLeft().firstDerivative(v).add(getRight().firstDerivative(v));
+            case "-": // d/dx [f(x) - g(x)] = d/dx(g(x)) - d/dx(g(x))
+                return getLeft().firstDerivative(v).sub(getRight().firstDerivative(v));
+            case "*": // apply product rule
+                // d/dx[f(x)*g(x)] = d/dx(f(x))*g(x) + d/dx(g(x))*f(x)
+                return getLeft().firstDerivative(v).mult(getRight())
+                        .add(getRight().firstDerivative(v).mult(getLeft()));
+            case "/": // apply quotient rule
+                // [f(x)/g(x)]' = [g(x)*f'(x) - f(x)*g'(x)]/g(x)^2
+                return getRight().mult(getLeft().firstDerivative(v))
+                        .sub(getLeft().mult(getRight().firstDerivative(v)))
+                        .div(getRight().sq());
+            case "^":
+                if (getRight().contains(v)) { // x^(x...) use logarithmic differentiation
+                    // y = f(x)^g(x)
+                    // ln(y) = g(x)*ln(f(x)) --apply implicit differentiation
+                    // dy/dx * 1/y = d/dx[g(x)*ln(f(x))]
+                    // dy/dx = d/dx[g(x)*ln(f(x))] * y
+                    return new UnaryOperation(getRight(), "ln").mult(getLeft())
+                            .firstDerivative(v)
+                            .mult(this);
+                } else {
+                    // the exponent part does not contain Variable v
+                    // apply power rule -> d/dx(f(x)^n) = n*f(x)^(n-1)
+                    return getRight().mult(getLeft().exp(getRight().sub(1)));
+                }
+
+        }
+        //the derivative cannot be calculated, return symbolic representation indeed
+        return new CompositeOperation(Calculus.DERIVATIVE, this.copy(), v);
     }
 
     public boolean isUndefined() {
@@ -403,7 +431,7 @@ public class BinaryOperation extends Operation {
      * @param o Operable operand
      * @return 1 if at left side operand, 2 if at right side operand, 0 if !levelOf.
      */
-    private int contains(Operable o) {
+    private int has(Operable o) {
         if (getLeft().equals(o)) return 1;
         else if (getRight().equals(o)) return 2;
         return 0;
@@ -677,7 +705,7 @@ public class BinaryOperation extends Operation {
                                 */
                             for (int i = 1; i <= 2; i++) {
                                 Operable o1 = binOp1.get(i);
-                                int idx = binOp2.contains(o1);
+                                int idx = binOp2.has(o1);
                                 if (idx != 0) {
                                     Operable add = new BinaryOperation(binOp1.getOther(i), "+", binOp2.getOther(idx));
                                     Operable simplified = add.copy().simplify();
@@ -1022,12 +1050,12 @@ public class BinaryOperation extends Operation {
         }
 
         private static String listAsString(int priority) {
-            String incrementer = "";
+            StringBuilder incrementer = new StringBuilder();
             for (RegisteredBinaryOperation operation : registeredBinOps) {
                 if (operation.priority == priority)
-                    incrementer += operation.name;
+                    incrementer.append(operation.name);
             }
-            return incrementer;
+            return incrementer.toString();
         }
 
         private static RegisteredBinaryOperation extract(String name) {

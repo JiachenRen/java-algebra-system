@@ -90,11 +90,16 @@ public abstract class Operable implements Evaluable {
 
     /**
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
+     * returns -1 if not found.
      *
      * @param o the Operable instance that you are looking for.
      * @return the level at which operable is found.
      */
     public abstract int levelOf(Operable o);
+
+    public boolean contains(Operable o) {
+        return levelOf(o) != -1;
+    }
 
     public abstract String toString();
 

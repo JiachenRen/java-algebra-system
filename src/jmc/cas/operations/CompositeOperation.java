@@ -1,9 +1,6 @@
 package jmc.cas.operations;
 
-import jmc.cas.BinLeafNode;
-import jmc.cas.JMCException;
-import jmc.cas.Nameable;
-import jmc.cas.Operable;
+import jmc.cas.*;
 import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
@@ -19,7 +16,8 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     private RegisteredManipulation manipulation;
 
     static {
-        define("sum", Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
+        define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
+        define(Calculus.DERIVATIVE, new Signature(Argument.ANY, Argument.VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
     }
 
 
@@ -64,7 +62,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
 
     public String toString() {
         Optional<String> args = getOperands().stream().map(Operable::toString).reduce((a, b) -> a + "," + b);
-        return getName() + "(" + (args.isPresent() ? args.get() : "") + ")";
+        return getName() + "(" + (args.orElse("")) + ")";
     }
 
     public double val() {
@@ -82,12 +80,12 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     @Override
     public Operable simplify() {
         super.simplify();
-        return manipulation.manipulate(getOperands());
+        return manipulation.manipulate(getOperands()).simplify(); //TODO: might cause StackOverflow
     }
 
     @Override
     public Operable firstDerivative(Variable v) {
-        return null;
+        return this.simplify().firstDerivative(v);
     }
 
     public CompositeOperation copy() {
