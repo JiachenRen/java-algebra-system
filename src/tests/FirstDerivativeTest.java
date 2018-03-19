@@ -20,8 +20,19 @@ public class FirstDerivativeTest {
 //            Operable derivative = derivatives.get(i);
 //            l(lines.get(i) + " -> " + derivative);
 //        }
-        l(Compiler.compile("derivative(x*x^2,x)").simplify());
-        l(Compiler.compile("derivative(x*x^a,x)").simplify());
+//        l(Compiler.compile("derivative(x*x^2,x)").simplify());
+//        l(Compiler.compile("derivative(x*x^a,x)").simplify());
+//        l(Compiler.compile("derivative(x*x^a+b*x^2,x)").simplify());
+//        l(Compiler.compile("derivative(x^x,x)").simplify());
+//        l(Compiler.compile("derivative(x,x)").simplify());
+//        l(Compiler.compile("derivative(a,x)").simplify());
+//        l(Compiler.compile("derivative(3,x)").simplify());
+//        l(Compiler.compile("derivative(ln(x),x)").simplify());
+//        l(Compiler.compile("derivative(x^(-1),x)").simplify());
+//        l(Compiler.compile("derivative(ln(2x),x)").simplify());
+//        l(Compiler.compile("derivative(2x*ln(x),x)").simplify());
+        l(Compiler.compile("derivative(x^(2x),x)").simplify()); //fixed
+
     }
 
 

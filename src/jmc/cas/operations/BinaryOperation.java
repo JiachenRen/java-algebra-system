@@ -369,7 +369,7 @@ public class BinaryOperation extends Operation {
                     // ln(y) = g(x)*ln(f(x)) --apply implicit differentiation
                     // dy/dx * 1/y = d/dx[g(x)*ln(f(x))]
                     // dy/dx = d/dx[g(x)*ln(f(x))] * y
-                    return new UnaryOperation(getRight(), "ln").mult(getLeft())
+                    return new UnaryOperation(getLeft(), "ln").mult(getRight())
                             .firstDerivative(v)
                             .mult(this);
                 } else {
