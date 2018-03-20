@@ -131,9 +131,9 @@ System.out.println(Compiler.compile("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0
 ```
 
 #### Composite Operation
-This operation type is what truly grants JMC computer algebra system's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JMC -- `diff(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
+This operation type is what truly grants JMC computer algebra system's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JMC -- `derivative(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
 ```java
-Compiler.compile("diff(diff(cos(x),x),x)") //returns an operable defined as -cos(x), which is the second derivative of cos(x)
+Compiler.compile("derivative(derivative(cos(x),x),x)") //returns an operable defined as -cos(x), which is the second derivative of cos(x)
 ```
 
 #### Unary Operation
