@@ -83,3 +83,4 @@ x^(a+b)
 1*ln(10)-ln(3)
 (x+4)(a-ln(x))*cos(a)+sin(a)(x+c)
 (a+b+c)*(c+a+b)
+2*ln(x)+2*1+1

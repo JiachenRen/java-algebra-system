@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.Compiler;
+import jmc.cas.components.Variable;
 
 import static tests.TestPrint.l;
 
@@ -47,7 +48,9 @@ public class FirstDerivativeTest {
 //        l(lightGreen("evaluated at 6 (checked with Ti-Nspire CAS): "+superLongExp.eval(6)));
 //        l(Compiler.compile("(1+2*<3)/4>").firstDerivative(new Variable("x")).expand().simplify().beautify());
 //        l(Compiler.compile("(1+2*<3)/4>"));
-        l(Compiler.compile("(a+b+c)*(c+a+b)").simplify());
+//        l(Compiler.compile("(a+b+c)*(c+a+b)").simplify());
+//        l(Compiler.compile("x^2*ln(x)").derivative(new Variable("x"), 2).expand().simplify());
+        l(Compiler.compile("2*ln(x)+2*1+1").simplify());
     }
 
 

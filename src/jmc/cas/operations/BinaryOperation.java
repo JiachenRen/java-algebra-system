@@ -767,7 +767,8 @@ public class BinaryOperation extends Operation {
                 break; // I always forget to put break!!!! So many bugs were born simply because I forgot to put this statement!!!!
             case "+":
                 return binOp.ambiguousIteration((o1, o2, operator) -> {
-                    if (o1.equals(op) && operator.equals("*")) {
+                    if (o1.equals(op) && operator.equals("*") && !(o1 instanceof RawValue)) {
+                        // prevent 2*ln(x)+2 be simplified to 2*(ln(x)+1)
                         return Operation.mult(op, Operation.add(o2, 1)).simplify();
                     }
                     return null;
@@ -1070,6 +1071,7 @@ public class BinaryOperation extends Operation {
             throw new RuntimeException("undefined binary operator \"" + name + "\"");
         }
 
+        @SuppressWarnings("BooleanMethodIsAlwaysInverted")
         private boolean isStandard() {
             return standardOperations.contains(name);
         }

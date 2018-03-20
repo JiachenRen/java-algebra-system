@@ -188,6 +188,20 @@ public abstract class Operable implements Evaluable {
     public abstract Operable firstDerivative(Variable v);
 
     /**
+     * @param v the variable in which the first derivative is taken with respect to.
+     * @param n the nth derivative
+     * @return the nth derivative of the expression
+     */
+    public Operable derivative(Variable v, int n) {
+        Operable der = this.copy();
+        while (n > 0) {
+            der = der.firstDerivative(v).simplify();
+            n--;
+        }
+        return der;
+    }
+
+    /**
      * Expand the expression; its behavior is exactly what you would expect.
      * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
      *
