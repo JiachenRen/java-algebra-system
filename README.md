@@ -1,9 +1,46 @@
 # J Math Context (JGrapher)
-An original but powerful math context library with experimental CAS capabilities.
+A math library with powerful CAS that is capable of performing algebraic simplifications, manipulations, and some calculus. (A Grapher is also included)
 ## What's new
 Epic update to JGrapher - introducing multi-variable graphing capability! Type in `x^a*cos(b*x)` and see what happens along the way! Play around with the sliders. Press `[TAB]` to hide/unhide function input. Significant improvements to the CAS, though not as powerful, it is no longer considered experimental with bugs now gone and inheritance optimized. Completely original & intuitive way of performing algebra manipulations by an ORIGINAL composite tree structure that proved to be immensely powerful and ingenious.
 ## Computer Algebra System (CAS)
 Powerful and bug-free multi-variable computer algebra system. Right now it handles simplification of many forms and convertion of output expression to a more human readable form. 
+
+### What can it do?
+As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
+
+* Commutative arithmetic & algebra
+* Nested unary operation simplification
+* Algebraic domain validation
+* Trigonometric simplification
+* Logarithmic exponential simplification
+* Basic irrational/rational number arithmetic
+* **(NEW!)** Some Calculus (I am currently working on it...)
+  * First derivative
+  * Logarithmic differentiation
+  * Implicit differentiation
+
+**Note: the following section demonstrates the power of the JMC computer algebra system, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
+
+## Meet... CAS
+This is as powerful and accurate as it gets... I've put my life into making this system...
+```java
+Operable o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
+System.out.println(o.copy().expand());
+//prints 3*x*cos(a)+(-1)*x*x*cos(a)+3*4*cos(a)+(-1)*x*4*cos(a)+ln(x)^2*sin(a)+c*sin(a)
+System.out.println(o.copy().expand().simplify()); 
+//prints (-1)*x^2*cos(a)+12*cos(a)+cos(a)*x*(-1)+ln(x)^2*sin(a)+c*sin(a)
+System.out.println(o.copy().expand().simplify().beautify());
+//prints 12*cos(a)-cos(a)*x^2-x*cos(a)+ln(x)^2*sin(a)+c*sin(a)
+System.out.println(o.copy().firstDerivative());
+//prints ((1+0)*(3-x)+(0-1)*(x+4))*cos(a)+0*(-1)*sin(a)*(x+4)*(3-x)+0*cos(a)*(ln(x)^2+c)+(2*ln(x)^(2-1)*1*(1/x)+0)*sin(a)
+System.out.println(o.copy().firstDerivative().simplify());
+//prints (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
+System.out.println(o.copy().firstDerivative().expand().simplify().beautify());
+//prints x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
+```
+
+For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
+
 ### Simplification
 The simplification algorithm is based on a **composite binary tree**, an original data structure.
 ```
@@ -114,9 +151,9 @@ System.out.println(Compiler.compile("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0
 ```
 
 #### Composite Operation
-This operation type is what truly grants JMC computer algebra system's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JMC -- `diff(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
+This operation type is what truly grants JMC computer algebra system's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JMC -- `derivative(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
 ```java
-Compiler.compile("diff(diff(cos(x),x),x)") //returns an operable defined as -cos(x), which is the second derivative of cos(x)
+Compiler.compile("derivative(derivative(cos(x),x),x)") //returns an operable defined as -cos(x), which is the second derivative of cos(x)
 ```
 
 #### Unary Operation
@@ -135,17 +172,4 @@ Constants.define("π", () -> Math.PI); // a constant having the value π. ("pi" 
 Constants.define("seed", Math::random); // a "dynamic constant" that returns a random value between 0 and 1 when evaluated
 System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
 System.out.println(Compiler.compile("seed*2-1").val()) // prints a random number between -1 and 1.
-```
-
-### What can it do?
-As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
-
-* Commutative arithmetic & algebra
-* Nested unary operation simplification
-* Algebraic domain validation
-* Trigonometric simplification
-* Logarithmic exponential simplification
-* Basic irrational/rational number arithmetic
-
-For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section. 
-
+``` 
