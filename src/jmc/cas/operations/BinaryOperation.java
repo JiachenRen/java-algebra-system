@@ -34,9 +34,10 @@ public class BinaryOperation extends Operation {
     /**
      * in ((a+b)+c), the parenthesis around (a+b) is not necessary.
      */
-    private void simplifyParenthesis() {
+    private BinaryOperation simplifyParenthesis() {
         processParentheticalNotation(getLeft(), false);
         processParentheticalNotation(getRight(), true);
+        return this;
     }
 
     /**
@@ -242,25 +243,24 @@ public class BinaryOperation extends Operation {
         //up to this point all simplifications should have been tried, except the recursive cross-simplification
         if (getLeft() instanceof BinLeafNode //e.g. ln(x) * x is not simplifiable
                 && getRight() instanceof BinLeafNode) {
-            return this; //no more could be done.
+            return this.simplifyParenthesis(); //no more could be done.
         } else if (getLeft() instanceof BinLeafNode //e.g. x * (3.5x + 4) is not simplifiable
                 && getRight() instanceof BinaryOperation
                 && ((BinaryOperation) getRight()).getPriority() != getPriority()) {
-            return this;
+            return this.simplifyParenthesis();
         } else if (getRight() instanceof BinLeafNode //e.g. (3.5x + 4) * x  is not simplifiable
                 && getLeft() instanceof BinaryOperation
                 && ((BinaryOperation) getLeft()).getPriority() != getPriority()) {
-            return this;
+            return this.simplifyParenthesis();
         } else if (getLeft() instanceof BinaryOperation //e.g. (3.5x + 4) * (4x + 3) is not simplifiable
                 && ((BinaryOperation) getLeft()).getPriority() != getPriority()
                 && getRight() instanceof BinaryOperation
                 && ((BinaryOperation) getRight()).getPriority() != getPriority()) {
-            return this;
+            return this.simplifyParenthesis();
         } else { //perform cross-simplification
             ArrayList<Operable> flattened = this.flattened(); //make operations of the same priority throughout the binary tree visible at the same level.
             crossSimplify(flattened);
-            if (flattened.size() < 2) return flattened.get(0);
-            else return reconstructBinTree(flattened);
+            return reconstructBinTree(flattened);
         }
     }
 
@@ -820,12 +820,13 @@ public class BinaryOperation extends Operation {
      *
      * @return reconstructed BinaryOperation tree.
      */
-    private BinaryOperation reconstructBinTree(ArrayList<Operable> flattened) {
-        if (flattened.size() < 2) return null;
+    private Operable reconstructBinTree(ArrayList<Operable> flattened) {
+        if (flattened.size() == 0) throw new JMCException("internal error");
+        else if (flattened.size() == 1) return flattened.get(0);
         String op = getPriority() == 2 ? "*" : "+";
         BinaryOperation root = new BinaryOperation(flattened.remove(0), op, flattened.remove(0));
         while (flattened.size() > 0) root = new BinaryOperation(root, op, flattened.remove(0));
-        return root;
+        return root.simplifyParenthesis();
     }
 
     /**
@@ -923,8 +924,11 @@ public class BinaryOperation extends Operation {
     }
 
     private Operable reconstruct(ArrayList<Operable> operables) {
-        if (operables.size() == 0) return null;
-        return operables.size() >= 2 ? reconstructBinTree(operables) : operables.get(0);
+        try {
+            return reconstructBinTree(operables);
+        } catch (JMCException e) {
+            return null;
+        }
     }
 
     /**
@@ -1101,12 +1105,15 @@ public class BinaryOperation extends Operation {
     public boolean equals(Operable other) {
         if (!(other instanceof BinaryOperation)) return false;
         BinaryOperation binOp = (BinaryOperation) other;
-        return binOp.operation.equals(operation)
-                && ((binOp.getLeft().equals(this.getLeft())
-                && binOp.getRight().equals(this.getRight()))
-                || (binOp.getLeft().equals(this.getRight())
-                && binOp.getRight().equals(this.getLeft())
-                && (binOp.is("*") || binOp.is("+"))));
+        if (("+-".contains(operation.name) && "+-".contains(binOp.operation.name)) || ("*/".contains(operation.name) && "*/".contains(binOp.operation.name))) {
+            ArrayList<Operable> pool1 = this.flattened();
+            ArrayList<Operable> pool2 = binOp.flattened();
+            if (pool1.size() != pool2.size()) return false;
+            return pool1.stream().map(o -> Operable.contains(pool2, o)).reduce((a, b) -> a && b).get();
+        } else if (operation.equals(binOp.operation)) {
+            return binOp.getLeft().equals(getLeft()) && binOp.getRight().equals(getRight());
+        }
+        return false;
     }
 
     @Override

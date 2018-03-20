@@ -14,7 +14,10 @@ public enum Argument {
     INTEGER,
     VARIABLE,
     ANY,
-    OPERATION;
+    OPERATION,
+    MATRIX,
+    LIST,
+    VECTOR;
 
     public static Argument resolve(Operable o) {
         if (!o.isNaN()) {
