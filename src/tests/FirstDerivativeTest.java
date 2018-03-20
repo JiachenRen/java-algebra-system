@@ -1,7 +1,8 @@
 package tests;
 
 import jmc.cas.Compiler;
-import jmc.cas.Mode;
+import jmc.cas.Operable;
+import static jmc.utils.ColorFormatter.*;
 
 import static tests.TestPrint.l;
 
@@ -36,10 +37,16 @@ public class FirstDerivativeTest {
 
         //ultimate test -> if this passes, I am just !!!!!!!!
 //        Mode.DEBUG = true;
-        l(Compiler.compile("x*a*(1-b)^2").simplify()); //problematic
+//        l(Compiler.compile("x*a*(1-b)^2").simplify()); //problematic
 //        l(Compiler.compile("-1*-1*-1").simplify());
-//        l(Compiler.compile("derivative(-ln(10)*x^3*ln(x)/(ln(cos(x))-ln(10)*x),x)").simplify()); // problematic
-
+        Operable superLongExp = Compiler.compile("derivative(-ln(10)*x^3*ln(x)/(ln(cos(x))-ln(10)*x),x)");
+        l(boldBlack("original: " + superLongExp));
+        superLongExp = superLongExp.simplify();
+        l(lightBlue("simplified(taken first derivative): "+superLongExp));
+        superLongExp = superLongExp.expand();
+        l(lightBlue("expanded: "+superLongExp));
+        superLongExp = superLongExp.expand();
+        l(lightGreen("evaluated at 6 (checked with Ti-Nspire CAS): "+superLongExp.eval(6)));
     }
 
 

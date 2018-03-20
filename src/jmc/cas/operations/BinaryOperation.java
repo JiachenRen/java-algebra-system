@@ -377,7 +377,8 @@ public class BinaryOperation extends Operation {
                 } else {
                     // the exponent part does not contain Variable v
                     // apply power rule -> d/dx(f(x)^n) = n*f(x)^(n-1)
-                    return getRight().mult(getLeft().exp(getRight().sub(1)));
+                    return getRight().mult(getLeft().exp(getRight().sub(1)))
+                            .mult(getLeft().firstDerivative(v));
                 }
 
         }
