@@ -14,10 +14,10 @@ As of now, the CAS will attempt to convert any decimal numbers to fractions when
 * Trigonometric simplification
 * Logarithmic exponential simplification
 * Basic irrational/rational number arithmetic
-* **(NEW!)** Calculus
-  * First Derivative
-  * Logarithmic Differentiation
-  * Implicit Differentiation
+* **(NEW!)** Some Calculus (I am currently working on it...)
+  * First derivative
+  * Logarithmic differentiation
+  * Implicit differentiation
 
 For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
 
