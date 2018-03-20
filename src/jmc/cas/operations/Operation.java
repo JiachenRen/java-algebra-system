@@ -219,6 +219,7 @@ public abstract class Operation extends Operable implements Nameable {
     }
 
     public Operable replace(Operable o, Operable r) {
+        if (this.equals(o)) return r;
         Operation clone = this.copy();
         clone.setOperands(operands.stream()
                 .map(op -> op.replace(o, r))

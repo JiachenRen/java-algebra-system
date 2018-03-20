@@ -28,7 +28,8 @@ public class Compiler {
     public static Operable compile(String expression) {
         if (expression.toLowerCase().contains("undef")) return RawValue.UNDEF;
         if (expression.equals("")) throw new JMCException("cannot compile an empty string");
-        if (expression.contains(">") || expression.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
+        if (expression.contains(">") || expression.contains("<"))
+            throw new JMCException("angle brackets '<>' no longer supported");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
         expression = formatOperations(expression.replace(" ", "").replace("(-", "(0-"));
@@ -134,7 +135,7 @@ public class Compiler {
     private static Operable generateOperations(String segment, ArrayList<Operable> operables) {
         log(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
         int operableHashId = 0;
-        ArrayList<Operable> pendingOperations = new ArrayList<>();
+        ArrayList<Operable> pending = new ArrayList<>(); //pending operations
         while (segment.indexOf('<') != -1) {
             int indices[] = extractInnerParenthesis(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
@@ -153,9 +154,11 @@ public class Compiler {
                 BinaryOperation tree = ((BinaryOperation) operand);
                 ArrayList<Operable> operands = new ArrayList<>();
                 flat(tree, operands);
-                pendingOperations.add(new CompositeOperation(operationName, operands));
+                pending.add(new CompositeOperation(operationName, operands));
             } else {
-                pendingOperations.add(new UnaryOperation(operand, operationName));
+                if (UnaryOperation.isDefined(operationName)) {
+                    pending.add(new UnaryOperation(operand, operationName));
+                } else pending.add(new CompositeOperation(operationName, operand));
             }
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
             log(lightBlue("unary:\t") + colorMathSymbols(segment));
@@ -168,9 +171,9 @@ public class Compiler {
                 if (BinaryOperation.binaryOperations(p).contains(op) || p == 4 && op.charAt(0) == ',') {
                     int[] indices = extractOperationIndices(segment, i);
                     String[] operandStrs = new String[]{segment.substring(indices[0], i), segment.substring(i + 1, indices[1] + 1)};
-                    ArrayList<Operable> operands = getOperands(pendingOperations, operables, operandStrs);
+                    ArrayList<Operable> operands = getOperands(pending, operables, operandStrs);
                     BinaryOperation operation = new BinaryOperation(operands.get(0), op.toString(), operands.get(1));
-                    pendingOperations.add(operation);
+                    pending.add(operation);
                     String left = indices[0] == 0 ? "" : segment.substring(0, indices[0]);
                     segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
                     log("->\t\t" + colorMathSymbols(segment));
@@ -179,10 +182,10 @@ public class Compiler {
                 }
             }
         }
-        if (pendingOperations.size() == 0) {
-            return getOperands(pendingOperations, operables, new String[]{segment}).get(0);
+        if (pending.size() == 0) {
+            return getOperands(pending, operables, new String[]{segment}).get(0);
         }
-        return pendingOperations.get(pendingOperations.size() - 1);
+        return pending.get(pending.size() - 1);
     }
 
     private static ArrayList<Operable> getOperands(ArrayList<Operable> pendingOperations, ArrayList<Operable> operables, String[] operandStrs) {

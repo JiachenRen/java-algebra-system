@@ -450,7 +450,7 @@ public class BinaryOperation extends Operation {
      * @return simplified r1 [RegisteredBinaryOperation] r2
      */
     private Operable simplify(RawValue r1, RawValue r2) {
-        if (getLeft() instanceof Fraction && 是加减乘除()) {
+        if (getLeft() instanceof Fraction && "+-*/".contains(operation.name)) {
             Fraction f = (Fraction) getLeft().copy();
             RawValue r = (RawValue) getRight().copy();
             switch (operation.name) {
@@ -463,7 +463,7 @@ public class BinaryOperation extends Operation {
                 case "/":
                     return f.div(r);
             }
-        } else if (getRight() instanceof Fraction && 是加减乘除()) {
+        } else if (getRight() instanceof Fraction && "+-*/".contains(operation.name)) {
             Fraction f = (Fraction) getRight().copy();
             RawValue r = (RawValue) getLeft().copy();
             switch (operation.name) {
@@ -866,10 +866,6 @@ public class BinaryOperation extends Operation {
                 pool.add(binOp);
             }
         }
-    }
-
-    private boolean 是加减乘除() {
-        return "+-*/".contains(operation.name);
     }
 
     /**

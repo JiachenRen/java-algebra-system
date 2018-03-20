@@ -1,6 +1,7 @@
 package jmc.cas.operations;
 
 import jmc.cas.*;
+import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
@@ -15,9 +16,18 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     private static ArrayList<RegisteredManipulation> registeredManipulations = new ArrayList<>();
     private RegisteredManipulation manipulation;
 
-    static {
+    static { //TODO: automatically link CAS operations with Operable methods using reflect.
         define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
         define(Calculus.DERIVATIVE, new Signature(Argument.ANY, Argument.VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
+        define("simplify", new Signature(Argument.ANY), operands -> operands.get(0).simplify());
+        define("expand", new Signature(Argument.ANY), operands -> operands.get(0).expand());
+        define("num_nodes", new Signature(Argument.ANY), operands -> new RawValue(operands.get(0).numNodes()));
+        define("complexity", new Signature(Argument.ANY), operands -> new RawValue(operands.get(0).complexity()));
+        define("replace", new Signature(Argument.ANY, Argument.ANY, Argument.ANY), operands -> operands.get(0).replace(operands.get(1), operands.get(2)));
+        define("beautify", new Signature(Argument.ANY), operands -> operands.get(0).beautify());
+        define("val", new Signature(Argument.ANY), operands -> new RawValue(operands.get(0).val()));
+        define("eval", new Signature(Argument.ANY, Argument.DECIMAL), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //TODO: Argument type Number
+        define("eval", new Signature(Argument.ANY, Argument.INTEGER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //method overloading
     }
 
 

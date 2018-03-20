@@ -58,6 +58,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return RegisteredUnaryOperation.list();
     }
 
+    public static boolean isDefined(String name) {
+        for (Function function : registeredOperations()) {
+            if (function.getName().equals(name))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * @param x input, double x
      * @return the computed value by plugging in the value of x into the designated unary operation
@@ -264,6 +272,31 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.getName();
     }
 
+    public Operable setOperand(Operable operable) {
+        return super.setOperand(operable, 0);
+    }
+
+    public String toString() {
+        return operation.getName() + "(" + getOperand().toString() + ")";
+    }
+
+    /**
+     * Returns true if the operations (Function) e.g. "sin", "cos" are the same
+     *
+     * @param other the other operable, possibly UnaryOperation or BinaryOperation
+     * @return whether or not the two instances are identical to each other.
+     */
+    @Override
+    public boolean equals(Operable other) {
+        return other instanceof UnaryOperation
+                && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
+                && this.getOperand().equals(((UnaryOperation) other).getOperand()); //delegate down
+    }
+
+    public double val() {
+        return operation.eval(getOperand().val());
+    }
+
     private static class RegisteredUnaryOperation implements Evaluable, Nameable {
         private static ArrayList<Function> reservedFunctions;
 
@@ -339,33 +372,6 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         }
 
 
-    }
-
-    public Operable setOperand(Operable operable) {
-        return super.setOperand(operable, 0);
-    }
-
-
-    public String toString() {
-        return operation.getName() + "(" + getOperand().toString() + ")";
-    }
-
-
-    /**
-     * Returns true if the operations (Function) e.g. "sin", "cos" are the same
-     *
-     * @param other the other operable, possibly UnaryOperation or BinaryOperation
-     * @return whether or not the two instances are identical to each other.
-     */
-    @Override
-    public boolean equals(Operable other) {
-        return other instanceof UnaryOperation
-                && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
-                && this.getOperand().equals(((UnaryOperation) other).getOperand()); //delegate down
-    }
-
-    public double val() {
-        return operation.eval(getOperand().val());
     }
 
 
