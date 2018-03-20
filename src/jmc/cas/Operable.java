@@ -67,6 +67,14 @@ public abstract class Operable implements Evaluable {
         return false;
     }
 
+    public static boolean remove(ArrayList<Operable> operables, Operable target) {
+        for (Operable operable : operables) {
+            if (operable.equals(target))
+                return operables.remove(operable);
+        }
+        return false;
+    }
+
     public boolean isMultiVar() {
         return numVars() > 1;
     }

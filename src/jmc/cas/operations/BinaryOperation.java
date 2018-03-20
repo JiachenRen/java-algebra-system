@@ -1109,7 +1109,7 @@ public class BinaryOperation extends Operation {
             ArrayList<Operable> pool1 = this.flattened();
             ArrayList<Operable> pool2 = binOp.flattened();
             if (pool1.size() != pool2.size()) return false;
-            return pool1.stream().map(o -> Operable.contains(pool2, o)).reduce((a, b) -> a && b).get();
+            return pool1.stream().map(o -> Operable.remove(pool2, o)).reduce((a, b) -> a && b).get();
         } else if (operation.equals(binOp.operation)) {
             return binOp.getLeft().equals(getLeft()) && binOp.getRight().equals(getRight());
         }
