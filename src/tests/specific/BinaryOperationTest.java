@@ -1,9 +1,9 @@
 package tests.specific;
 
-import jmc.cas.operations.BinaryOperation;
 import jmc.cas.Compiler;
-import jmc.cas.operations.Operation;
 import jmc.cas.components.RawValue;
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.Operation;
 import tests.TestPrint;
 
 /**
@@ -28,6 +28,7 @@ public class BinaryOperationTest {
         ((BinaryOperation) Compiler.compile("x^b")).flattened().forEach(TestPrint::l);
         l(Operation.div(17, 4).setOperand(binOp.getOperand(1), 1).setOperands(binOp.getOperands()));
         l(Operation.div(3, 4).setLeft(new RawValue(5)));
+        l(((BinaryOperation) Compiler.compile("a+b")).isCommutative());
     }
 
     private static void l(Object... objects) {

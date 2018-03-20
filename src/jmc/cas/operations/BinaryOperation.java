@@ -450,7 +450,7 @@ public class BinaryOperation extends Operation {
      * @return simplified r1 [RegisteredBinaryOperation] r2
      */
     private Operable simplify(RawValue r1, RawValue r2) {
-        if (getLeft() instanceof Fraction && "+-*/".contains(operation.name)) {
+        if (getLeft() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getLeft().copy();
             RawValue r = (RawValue) getRight().copy();
             switch (operation.name) {
@@ -463,7 +463,7 @@ public class BinaryOperation extends Operation {
                 case "/":
                     return f.div(r);
             }
-        } else if (getRight() instanceof Fraction && "+-*/".contains(operation.name)) {
+        } else if (getRight() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getRight().copy();
             RawValue r = (RawValue) getLeft().copy();
             switch (operation.name) {
@@ -1100,12 +1100,15 @@ public class BinaryOperation extends Operation {
         return expandBase();
     }
 
+    public boolean isCommutative() {
+        return "+-*/".contains(operation.name);
+    }
 
     @Override
     public boolean equals(Operable other) {
         if (!(other instanceof BinaryOperation)) return false;
         BinaryOperation binOp = (BinaryOperation) other;
-        if (("+-".contains(operation.name) && "+-".contains(binOp.operation.name)) || ("*/".contains(operation.name) && "*/".contains(binOp.operation.name))) {
+        if (this.isCommutative() && binOp.isCommutative() && this.getPriority() == binOp.getPriority()) {
             ArrayList<Operable> pool1 = this.flattened();
             ArrayList<Operable> pool2 = binOp.flattened();
             if (pool1.size() != pool2.size()) return false;
