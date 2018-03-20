@@ -49,7 +49,8 @@ public class FirstDerivativeTest {
 //        l(lightBlue("expanded: "+superLongExp));
 //        superLongExp = superLongExp.expand();
 //        l(lightGreen("evaluated at 6 (checked with Ti-Nspire CAS): "+superLongExp.eval(6)));
-        l(Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)").firstDerivative(new Variable("x")).expand().simplify().beautify());
+//        l(Compiler.compile("(1+2*<3)/4>").firstDerivative(new Variable("x")).expand().simplify().beautify());
+        l(Compiler.compile("(1+2*<3)/4>"));
     }
 
 
