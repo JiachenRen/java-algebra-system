@@ -19,6 +19,26 @@ As of now, the CAS will attempt to convert any decimal numbers to fractions when
   * Logarithmic differentiation
   * Implicit differentiation
 
+**Note: the following section demonstrates the power of the JMC computer algebra system, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
+
+## Meet... CAS
+This is as powerful and accurate as it gets... I've put my life into making this system...
+```java
+Operable o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
+System.out.println(o.copy().expand());
+//prints 3*x*cos(a)+(-1)*x*x*cos(a)+3*4*cos(a)+(-1)*x*4*cos(a)+ln(x)^2*sin(a)+c*sin(a)
+System.out.println(o.copy().expand().simplify()); 
+//prints (-1)*x^2*cos(a)+12*cos(a)+cos(a)*x*(-1)+ln(x)^2*sin(a)+c*sin(a)
+System.out.println(o.copy().expand().simplify().beautify());
+//prints 12*cos(a)-cos(a)*x^2-x*cos(a)+ln(x)^2*sin(a)+c*sin(a)
+System.out.println(o.copy().firstDerivative());
+//prints ((1+0)*(3-x)+(0-1)*(x+4))*cos(a)+0*(-1)*sin(a)*(x+4)*(3-x)+0*cos(a)*(ln(x)^2+c)+(2*ln(x)^(2-1)*1*(1/x)+0)*sin(a)
+System.out.println(o.copy().firstDerivative().simplify());
+//prints (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
+System.out.println(o.copy().firstDerivative().expand().simplify().beautify());
+//prints x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
+```
+
 For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
 
 ### Simplification
