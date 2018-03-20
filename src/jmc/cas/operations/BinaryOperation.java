@@ -171,7 +171,6 @@ public class BinaryOperation extends Operation {
      * @return the simplified version of self
      */
     public Operable simplify() {
-
         super.simplify();
         simplifyParenthesis();
 
@@ -233,7 +232,10 @@ public class BinaryOperation extends Operation {
         }
 
 
-        if (getPriority() == 1) return this.beautify(); //up to this point the ^ operator cannot be simplified.
+        if (getPriority() == 1) {
+            simplifyParenthesis();
+            return this; //up to this point the ^ operator cannot be simplified.
+        }
 
         //up to this point all simplifications should have been tried, except the recursive cross-simplification
         if (getLeft() instanceof BinLeafNode //e.g. ln(x) * x is not simplifiable

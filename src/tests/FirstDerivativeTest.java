@@ -36,8 +36,9 @@ public class FirstDerivativeTest {
 
         //ultimate test -> if this passes, I am just !!!!!!!!
 //        Mode.DEBUG = true;
-//        l(Compiler.compile("1*ln(10)-ln(3)").simplify());
-        l(Compiler.compile("derivative(-ln(10)*x^3*ln(x)/(ln(cos(x))-ln(10)*x),x)").simplify()); // problematic
+        l(Compiler.compile("x*a*(1-b)^2").simplify()); //problematic
+//        l(Compiler.compile("-1*-1*-1").simplify());
+//        l(Compiler.compile("derivative(-ln(10)*x^3*ln(x)/(ln(cos(x))-ln(10)*x),x)").simplify()); // problematic
 
     }
 
