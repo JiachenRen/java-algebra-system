@@ -28,7 +28,7 @@ public class Compiler {
     public static Operable compile(String expression) {
         if (expression.toLowerCase().contains("undef")) return RawValue.UNDEF;
         if (expression.equals("")) throw new JMCException("cannot compile an empty string");
-        if (expression.contains(">") || expression.contains("<")) throw new JMCException("angle brackets no longer supported");
+        if (expression.contains(">") || expression.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
         expression = formatOperations(expression.replace(" ", "").replace("(-", "(0-"));

@@ -31,10 +31,12 @@ public class BinaryOperation extends Operation {
         simplifyParenthesis();
     }
 
-    private BinaryOperation simplifyParenthesis() {
+    /**
+     * in ((a+b)+c), the parenthesis around (a+b) is not necessary.
+     */
+    private void simplifyParenthesis() {
         processParentheticalNotation(getLeft(), false);
         processParentheticalNotation(getRight(), true);
-        return this;
     }
 
     /**
@@ -48,7 +50,7 @@ public class BinaryOperation extends Operation {
             if (op.getPriority() < this.getPriority()) {
                 op.setOmitParenthesis(true);
             } else if (op.getPriority() == this.getPriority()) {
-                if (op.operation.equals(operation) && op.operation.equals("^"))
+                if (op.operation.equals(operation) && op.is("^"))
                     op.setOmitParenthesis(false);
                 else op.setOmitParenthesis(op.operation.equals(operation) || !isRightHand);
             } else {
@@ -123,7 +125,7 @@ public class BinaryOperation extends Operation {
     }
 
     private static boolean isAddition(Operable op) {
-        return op instanceof BinaryOperation && ((BinaryOperation) op).operation.equals("+");
+        return op instanceof BinaryOperation && ((BinaryOperation) op).is("+");
     }
 
     /**
@@ -140,12 +142,12 @@ public class BinaryOperation extends Operation {
     public static int expFormIdx(Operable o) {
         if (!(o instanceof BinaryOperation)) return 0;
         BinaryOperation binOp = (BinaryOperation) o;
-        if (!binOp.operation.equals("^")) return 0;
+        if (!binOp.is("^")) return 0;
         if (binOp.getRight() instanceof RawValue && binOp.getRight().val() < 0)
             return binOp.getRight() instanceof Fraction ? 1 : 2;
         if (binOp.getRight() instanceof BinaryOperation) {
             BinaryOperation binOp1 = ((BinaryOperation) binOp.getRight());
-            if (binOp1.operation.equals("*")) {
+            if (binOp1.is("*")) {
                 ArrayList<Operable> pool = ((BinaryOperation) binOp1.explicitNegativeForm()).flattened();
                 if (Operable.contains(pool, RawValue.ONE.negate()))
                     return 3;
@@ -336,9 +338,9 @@ public class BinaryOperation extends Operation {
     @Override
     public BinaryOperation toExponentialForm() {
         super.toExponentialForm();
-        if (!this.operation.equals("/")) return this;
+        if (!this.is("/")) return this;
         if (getRight().equals(new RawValue(0))) return this;
-        if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).operation.equals("*")) {
+        if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).is("*")) {
             BinaryOperation enclosed = ((BinaryOperation) getRight());
             enclosed.setLeft(new BinaryOperation(enclosed.getLeft(), "^", new RawValue(-1)));
             enclosed.setRight(new BinaryOperation(enclosed.getRight(), "^", new RawValue(-1)));
@@ -756,7 +758,7 @@ public class BinaryOperation extends Operation {
     private Operable simplify(Operable op, BinaryOperation binOp) {
         switch (operation.name) {
             case "*":
-                if (op.equals(binOp.getLeft()) && binOp.operation.equals("^")) {
+                if (op.equals(binOp.getLeft()) && binOp.is("^")) {
                     if (!(op instanceof RawValue)) { //only when a is a variable or expression, a*a^b = a^(b+1) applies
                         BinaryOperation exp = new BinaryOperation(binOp.getRight(), "+", RawValue.ONE);
                         return new BinaryOperation(op, "^", exp).simplify();
@@ -793,7 +795,7 @@ public class BinaryOperation extends Operation {
      * @param pool ArrayList containing flattened operables
      */
     private void crossSimplify(ArrayList<Operable> pool) {
-        if (!(operation.equals("*") || operation.equals("+"))) return;
+        if (!(is("*") || is("+"))) return;
         for (int i = 0; i < pool.size() - 1; i++) {
             Operable operable = pool.get(i);
             for (int k = i + 1; k < pool.size(); k++) {
@@ -990,7 +992,7 @@ public class BinaryOperation extends Operation {
      * @return whether operation of o is "/"
      */
     private boolean isDivision(Operable o) {
-        return o instanceof BinaryOperation && ((BinaryOperation) o).operation.equals("/");
+        return o instanceof BinaryOperation && ((BinaryOperation) o).is("/");
     }
 
     public String getName() {
@@ -1108,7 +1110,7 @@ public class BinaryOperation extends Operation {
                 && binOp.getRight().equals(this.getRight()))
                 || (binOp.getLeft().equals(this.getRight())
                 && binOp.getRight().equals(this.getLeft())
-                && (binOp.operation.equals("*") || binOp.operation.equals("+"))));
+                && (binOp.is("*") || binOp.is("+"))));
     }
 
     @Override
