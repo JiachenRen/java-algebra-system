@@ -4,6 +4,23 @@ An original but powerful math context library with experimental CAS capabilities
 Epic update to JGrapher - introducing multi-variable graphing capability! Type in `x^a*cos(b*x)` and see what happens along the way! Play around with the sliders. Press `[TAB]` to hide/unhide function input. Significant improvements to the CAS, though not as powerful, it is no longer considered experimental with bugs now gone and inheritance optimized. Completely original & intuitive way of performing algebra manipulations by an ORIGINAL composite tree structure that proved to be immensely powerful and ingenious.
 ## Computer Algebra System (CAS)
 Powerful and bug-free multi-variable computer algebra system. Right now it handles simplification of many forms and convertion of output expression to a more human readable form. 
+
+### What can it do?
+As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
+
+* Commutative arithmetic & algebra
+* Nested unary operation simplification
+* Algebraic domain validation
+* Trigonometric simplification
+* Logarithmic exponential simplification
+* Basic irrational/rational number arithmetic
+* **(NEW!)** Calculus
+  * First Derivative
+  * Logarithmic Differentiation
+  * Implicit Differentiation
+
+For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
+
 ### Simplification
 The simplification algorithm is based on a **composite binary tree**, an original data structure.
 ```
@@ -135,17 +152,4 @@ Constants.define("π", () -> Math.PI); // a constant having the value π. ("pi" 
 Constants.define("seed", Math::random); // a "dynamic constant" that returns a random value between 0 and 1 when evaluated
 System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
 System.out.println(Compiler.compile("seed*2-1").val()) // prints a random number between -1 and 1.
-```
-
-### What can it do?
-As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
-
-* Commutative arithmetic & algebra
-* Nested unary operation simplification
-* Algebraic domain validation
-* Trigonometric simplification
-* Logarithmic exponential simplification
-* Basic irrational/rational number arithmetic
-
-For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section. 
-
+``` 
