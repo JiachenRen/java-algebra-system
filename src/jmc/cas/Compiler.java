@@ -28,10 +28,9 @@ public class Compiler {
     public static Operable compile(String expression) {
         if (expression.toLowerCase().contains("undef")) return RawValue.UNDEF;
         if (expression.equals("")) throw new JMCException("cannot compile an empty string");
+        expression = expression.replace(">", ")").replace("<", "(");
         if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
-        if (numOccurrence(expression, '<') != numOccurrence(expression, '>'))
-            throw new JMCException("'<>' mismatch in " + "\"" + expression + "\"");
         expression = formatOperations(expression.replace(" ", "").replace("(-", "(0-"));
         String exp = formatCoefficients(expression);
         exp = handleParentheticalNotation(handleCalcPriority(exp));
