@@ -1,4 +1,4 @@
-package tests;
+package tests.cas;
 
 import jmc.Function;
 import jmc.cas.Compiler;

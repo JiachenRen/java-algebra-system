@@ -7,6 +7,7 @@ import jmc.cas.components.Variable;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import static jmc.cas.operations.Argument.*;
 
 /**
@@ -20,6 +21,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     static { //TODO: automatically link CAS operations with Operable methods using reflect.
         define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
+        define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, INTEGER), (operands -> operands.get(0).derivative((Variable) operands.get(1), (int) operands.get(2).val())));
         define("simplify", new Signature(ANY), operands -> operands.get(0).simplify());
         define("expand", new Signature(ANY), operands -> operands.get(0).expand());
         define("num_nodes", new Signature(ANY), operands -> new RawValue(operands.get(0).numNodes()));
@@ -92,6 +94,10 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
     public Operable simplify() {
         super.simplify();
         return manipulation.manipulate(getOperands()).simplify(); //TODO: might cause StackOverflow
+    }
+
+    public Operable exec() {
+        return manipulation.manipulate(getOperands());
     }
 
     @Override

@@ -193,12 +193,16 @@ public abstract class Operable implements Evaluable {
      * @return the nth derivative of the expression
      */
     public Operable derivative(Variable v, int n) {
-        Operable der = this.copy();
+        Operable der = this.copy().simplify();
         while (n > 0) {
             der = der.firstDerivative(v).simplify();
             n--;
         }
         return der;
+    }
+
+    public Operable exec() {
+        return this;
     }
 
     /**

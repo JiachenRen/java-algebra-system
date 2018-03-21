@@ -29,5 +29,6 @@ public class CompositeOperationTest {
         l(Argument.VARIABLE.equals(Argument.DECIMAL));
         l(Argument.INTEGER.equals(Argument.DECIMAL));
         l(Argument.OPERATION.equals(Argument.INTEGER));
+        l(Compiler.compile("expand(a*(b+c))").exec());
     }
 }

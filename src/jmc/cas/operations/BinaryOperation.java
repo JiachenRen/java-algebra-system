@@ -274,6 +274,10 @@ public class BinaryOperation extends Operation {
      */
     @Override
     public Operable beautify() {
+        if (getRight() instanceof RawValue && is("*")) {
+            //keeps numbers to the left side of the operator
+            flip(); // there is space for improvement...
+        }
         Operable left = getLeft().beautify();
         Operable right = getRight().beautify();
         switch (operation.name) {
@@ -286,7 +290,10 @@ public class BinaryOperation extends Operation {
                 Operable denominator = reconstruct(denominators);
                 if (denominator == null || denominator.equals(RawValue.ONE))
                     return numerator;
-                else return new BinaryOperation(numerator, "/", denominator);
+                else {
+                    if (numerator == null) numerator = RawValue.ONE;
+                    return new BinaryOperation(numerator, "/", denominator);
+                }
             case "+":
                 if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
                     Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
@@ -313,6 +320,12 @@ public class BinaryOperation extends Operation {
         this.setLeft(left);
         this.setRight(right);
         return this;
+    }
+
+    private void flip() {
+        Operable tmp = getLeft();
+        setLeft(getRight());
+        setRight(tmp);
     }
 
     public BinaryOperation toAdditionOnly() {
@@ -384,7 +397,7 @@ public class BinaryOperation extends Operation {
                 }
 
         }
-        //the derivative cannot be calculated, return symbolic representation indeed
+        //the derivative cannot be calculated, return symbolic representation instead
         return new CompositeOperation(Calculus.DERIVATIVE, this.copy(), v);
     }
 

@@ -1,4 +1,4 @@
-package tests;
+package tests.cas;
 
 import jmc.cas.Compiler;
 import jmc.cas.components.Constants;
