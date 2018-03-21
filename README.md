@@ -18,6 +18,7 @@ As of now, the CAS will attempt to convert any decimal numbers to fractions when
   * First derivative
   * Logarithmic differentiation
   * Implicit differentiation
+  * n<sup>th</sup> derivative
 
 **Note: the following section demonstrates the power of the JMC computer algebra system, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
 
