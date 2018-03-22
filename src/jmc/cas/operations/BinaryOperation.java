@@ -494,7 +494,7 @@ public class BinaryOperation extends Operation {
                     r1Negative = true;
                     r1 = r1.negate();
                 }
-                ArrayList<int[]> pairs = MathContext.toBaseExponentPairs(r1.intValue());
+                ArrayList<int[]> pairs = MathContext.toBaseExponentPairs(r1.longValue());
                 Optional<BinaryOperation> reduced = pairs.stream()
                         .filter(p -> p[1] > 1)
                         .map(p -> Operation.exp(p[0], Operation.mult(p[1], r2)))
@@ -532,8 +532,8 @@ public class BinaryOperation extends Operation {
 
         if (r1.isInteger() && r2.isInteger()) {
             if (operation.name.equals("/")) {
-                return new Fraction(r1.intValue(), r2.intValue()).reduce();
-            } else return new RawValue(operation.eval(r1.intValue(), r2.intValue()));
+                return new Fraction(r1.longValue(), r2.longValue()).reduce();
+            } else return new RawValue(operation.eval(r1.longValue(), r2.longValue()));
         } else if (!r1.isInteger() && !(r1 instanceof Fraction)) {
             RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
             return new BinaryOperation(f1, operation, r2).simplify();
@@ -573,7 +573,7 @@ public class BinaryOperation extends Operation {
      * @param i the integer that represents the value of the right operand.
      * @return simplified Operable
      */
-    private Operable simplifyRightHand(int i) {
+    private Operable simplifyRightHand(long i) {
         if (i == 0) {
             switch (operation.name) {
                 case "+":
@@ -623,7 +623,7 @@ public class BinaryOperation extends Operation {
     private Operable simplifyRightHand(Operable o) {
         if (o instanceof RawValue && ((RawValue) o).isInteger()) {
             RawValue r = (RawValue) o;
-            Operable simplified = simplifyRightHand(r.intValue());
+            Operable simplified = simplifyRightHand(r.longValue());
             if (simplified != null) return simplified;
         } else if (o instanceof UnaryOperation) {
             UnaryOperation uop = (UnaryOperation) o;
@@ -919,7 +919,7 @@ public class BinaryOperation extends Operation {
                 break;
             case "^":
                 if (getRight() instanceof RawValue && ((RawValue) getRight()).isInteger()) {
-                    int num = ((RawValue) getRight()).intValue();
+                    long num = ((RawValue) getRight()).longValue();
                     if (getLeft() instanceof BinaryOperation) {
                         BinaryOperation binOp = ((BinaryOperation) getLeft());
                         switch (binOp.operation.name) {

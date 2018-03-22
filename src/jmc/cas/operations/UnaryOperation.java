@@ -141,7 +141,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 switch (operation.getName()) {
                     case "ln": // ln(a^3) = 3ln(a), where a is a^3 is an integer
                     case "log":
-                        ArrayList<Long> factors = getFactors(r.intValue());
+                        ArrayList<Long> factors = getFactors(r.longValue());
                         if (factors.size() > 1) {
                             ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
                             int[] num = numOccurrences(uniqueFactors, factors);
@@ -250,7 +250,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             case "sec":
                 o = Operation.div(this.getOperand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger()) {
-                    return Math.abs(((RawValue) o).intValue() % 2) == 1;
+                    return Math.abs(((RawValue) o).longValue() % 2) == 1;
                 }
                 break;
             case "cot": // domain: x != n*pi
@@ -315,7 +315,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             define("sec", x -> 1 / cos(x));
             define("csc", x -> 1 / sin(x));
             define("cot", x -> 1 / tan(x));
-            define("!", x -> MathContext.factorial(abs((long) x)));
+            define("factorial", x -> MathContext.factorial(abs((long) x))); //TODO: overflows! simplification of factorials; handle special notations like ! in the compiler
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);

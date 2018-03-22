@@ -1,5 +1,6 @@
 package jmc.cas.operations;
 
+import jmc.MathContext;
 import jmc.cas.*;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;

@@ -150,7 +150,7 @@ public class Fraction extends RawValue {
     public RawValue add(RawValue o) {
         if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (!(o instanceof Fraction)) {
-            if (o.isInteger()) o = new Fraction(o.intValue(), 1);
+            if (o.isInteger()) o = new Fraction(o.longValue(), 1);
             else o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
         } else o = o.copy();
         Fraction f = (Fraction) o;
@@ -181,7 +181,7 @@ public class Fraction extends RawValue {
             BinaryOperation e = new BinaryOperation(nu.getRight(), "*", conjugate);
             return new BinaryOperation(d, "*", e).simplify();
         } else if (o.isInteger()) {
-            this.exp(o.intValue());
+            this.exp(o.longValue());
             this.reduce();
             return this;
         } else {
@@ -211,7 +211,7 @@ public class Fraction extends RawValue {
             denominator *= ((Fraction) o).denominator;
             return this.reduce();
         } else if (o.isInteger()) {
-            numerator *= o.intValue();
+            numerator *= o.longValue();
             return this.reduce();
         } else {
             o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);

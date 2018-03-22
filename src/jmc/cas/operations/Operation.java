@@ -22,7 +22,7 @@ public abstract class Operation extends Operable implements Nameable {
         this.operands = operands;
     }
 
-    public static BinaryOperation div(Number a, Number b) {
+    public static BinaryOperation div(double a, double b) {
         return div(new RawValue(a), new RawValue(b));
     }
 
@@ -30,7 +30,7 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "/", o2.copy());
     }
 
-    public static BinaryOperation mult(Number a, Number b) {
+    public static BinaryOperation mult(double a, double b) {
         return mult(new RawValue(a), new RawValue(b));
     }
 
@@ -38,11 +38,11 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "*", o2.copy());
     }
 
-    public static BinaryOperation mult(Operable a, Number b) {
+    public static BinaryOperation mult(Operable a, double b) {
         return mult(a, new RawValue(b));
     }
 
-    public static BinaryOperation mult(Number a, Operable b) {
+    public static BinaryOperation mult(double a, Operable b) {
         return mult(new RawValue(a), b);
     }
 
@@ -50,11 +50,11 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "+", o2.copy());
     }
 
-    public static BinaryOperation add(Operable o1, Number n) {
+    public static BinaryOperation add(Operable o1, double n) {
         return new BinaryOperation(o1.copy(), "+", new RawValue(n));
     }
 
-    public static BinaryOperation add(Number a, Number b) {
+    public static BinaryOperation add(double a, double b) {
         return new BinaryOperation(new RawValue(a), "+", new RawValue(b));
     }
 
@@ -62,7 +62,7 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "-", o2.copy());
     }
 
-    public static BinaryOperation exp(Number a, Number b) {
+    public static BinaryOperation exp(double a, double b) {
         return exp(new RawValue(a), new RawValue(b));
     }
 
@@ -70,11 +70,11 @@ public abstract class Operation extends Operable implements Nameable {
         return new BinaryOperation(o1.copy(), "^", o2.copy());
     }
 
-    public static BinaryOperation exp(Operable a, Number b) {
+    public static BinaryOperation exp(Operable a, double b) {
         return exp(a, new RawValue(b));
     }
 
-    public static BinaryOperation exp(Number a, Operable b) {
+    public static BinaryOperation exp(double a, Operable b) {
         return exp(new RawValue(a), b);
     }
 

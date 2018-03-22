@@ -19,14 +19,14 @@ public class RawValue extends LeafNode {
     public static RawValue TWO = new RawValue(2);
     public static RawValue INFINITY = new RawValue(Double.POSITIVE_INFINITY);
 
-    private Number number;
+    private Double n;
 
     public RawValue(RawValue rawValue) {
-        this(rawValue.number);
+        this(rawValue.n);
     }
 
-    public RawValue(Number number) {
-        this.number = number;
+    public RawValue(double n) {
+        this.n = n;
     }
 
     public static boolean isInteger(double n) {
@@ -34,14 +34,11 @@ public class RawValue extends LeafNode {
     }
 
     public boolean isInteger() {
-        double val = doubleValue();
-        if (Double.isNaN(val) || Double.isInfinite(val)) return false;
-        String s = number.toString();
-        return s.endsWith(".0") || !s.contains(".");
+        return (n % 1) == 0;
     }
 
     public double doubleValue() {
-        return number.doubleValue();
+        return n;
     }
 
     public double eval(double x) {
@@ -49,7 +46,7 @@ public class RawValue extends LeafNode {
     }
 
     public RawValue inverse() {
-        if (isInteger()) return new Fraction(1, intValue());
+        if (isInteger()) return new Fraction(1, longValue());
         else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
     }
 
@@ -58,19 +55,19 @@ public class RawValue extends LeafNode {
     }
 
     public boolean isInfinite() {
-        return doubleValue() == Double.POSITIVE_INFINITY || doubleValue() == Double.NEGATIVE_INFINITY;
+        return n.isInfinite();
     }
 
     /**
-     * Removes the extra ".0" at the end of the number
+     * Removes the extra ".0" at the end of the n
      *
-     * @return the formatted String representation of the number.
+     * @return the formatted String representation of the n.
      */
     public String toString() {
         if (isUndefined()) {
             return "undef";
         } else if (isInteger()) {
-            return Integer.toString(intValue());
+            return n.toString().replace(".0", "");
         } else {
             return format(doubleValue());
         }
@@ -87,18 +84,18 @@ public class RawValue extends LeafNode {
     }
 
 
-    public int intValue() {
-        return number.intValue();
+    public long longValue() {
+        return n.longValue();
     }
 
 
     public boolean isUndefined() {
-        return new Double(number.doubleValue()).isNaN();
+        return n.isNaN();
     }
 
 
     public RawValue copy() {
-        return new RawValue(number);
+        return new RawValue(n);
     }
 
     public Operable explicitNegativeForm() {

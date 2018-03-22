@@ -248,7 +248,7 @@ public abstract class Operable implements Evaluable {
         return new BinaryOperation(this.copy(), "*", o);
     }
 
-    public BinaryOperation mult(Number n) {
+    public BinaryOperation mult(double n) {
         return new BinaryOperation(this.copy(), "*", new RawValue(n));
     }
 
@@ -256,7 +256,7 @@ public abstract class Operable implements Evaluable {
         return new BinaryOperation(this.copy(), "+", o.copy());
     }
 
-    public BinaryOperation add(Number n) {
+    public BinaryOperation add(double n) {
         return new BinaryOperation(this.copy(), "+", new RawValue(n));
     }
 
@@ -264,7 +264,7 @@ public abstract class Operable implements Evaluable {
         return new BinaryOperation(this.copy(), "-", o.copy());
     }
 
-    public BinaryOperation sub(Number n) {
+    public BinaryOperation sub(double n) {
         return new BinaryOperation(this.copy(), "-", new RawValue(n));
     }
 
@@ -272,7 +272,7 @@ public abstract class Operable implements Evaluable {
         return new BinaryOperation(this.copy(), "/", o.copy());
     }
 
-    public BinaryOperation div(Number n) {
+    public BinaryOperation div(double n) {
         return new BinaryOperation(this.copy(), "/", new RawValue(n));
     }
 
@@ -280,7 +280,7 @@ public abstract class Operable implements Evaluable {
         return new BinaryOperation(this.copy(), "^", o.copy());
     }
 
-    public BinaryOperation exp(Number n) {
+    public BinaryOperation exp(double n) {
         return new BinaryOperation(this.copy(), "^", new RawValue(n));
     }
 
