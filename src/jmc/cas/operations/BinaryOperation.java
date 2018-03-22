@@ -457,6 +457,7 @@ public class BinaryOperation extends Operation {
      * @return simplified r1 [RegisteredBinaryOperation] r2
      */
     private Operable simplify(RawValue r1, RawValue r2) {
+        if (!Mode.FRACTION) return new RawValue(val());
         if (getLeft() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getLeft().copy();
             RawValue r = (RawValue) getRight().copy();
