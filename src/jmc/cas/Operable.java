@@ -152,7 +152,28 @@ public abstract class Operable implements Evaluable {
      */
     public abstract int complexity();
 
+    /**
+     * NOTE: useful for simple simplifications.
+     * Operable::simplify(Operable o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
+     *
+     * @return simplified expression
+     */
     public abstract Operable simplify();
+
+    /**
+     * handles super complex simplifications. Unless you have hundreds of nested binary operations, don't use this method.
+     *
+     * @return the simplest representation of the expression in expanded form.
+     */
+    public Operable simplest() {
+        ArrayList<Operable> simplifiedForms = new ArrayList<>();
+        Operable s = this.copy();
+        while (!contains(simplifiedForms, s)) {
+            simplifiedForms.add(s.copy());
+            s = s.expand().simplify();
+        }
+        return simplifiedForms.get(simplifiedForms.size() - 1);
+    }
 
     /**
      * basically reversing the effects of toAdditionalOnly and toExponentialForm
@@ -195,7 +216,8 @@ public abstract class Operable implements Evaluable {
     public Operable derivative(Variable v, int n) {
         Operable der = this.copy().simplify();
         while (n > 0) {
-            der = der.firstDerivative(v).simplify();
+            //.expand().simplify() gives the completely simplified form.
+            der = der.firstDerivative(v).simplest();
             n--;
         }
         return der;

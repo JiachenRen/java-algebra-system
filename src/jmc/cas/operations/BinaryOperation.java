@@ -212,7 +212,6 @@ public class BinaryOperation extends Operation {
 
         //converting to exponential form and additional only, allowing further simplification.
         this.toAdditionOnly().toExponentialForm();
-        super.simplify();
 
         //handle special cases
         Operable simplified2 = simplifyZeroOne();
@@ -332,7 +331,7 @@ public class BinaryOperation extends Operation {
         super.toAdditionOnly();
         if (operation.name.equals("-")) {
             operation = RegisteredBinaryOperation.extract("+");
-            setRight(getRight().negate());
+            setRight(getRight().negate().simplify());
         }
         return this;
     }
@@ -352,15 +351,10 @@ public class BinaryOperation extends Operation {
     public BinaryOperation toExponentialForm() {
         super.toExponentialForm();
         if (!this.is("/")) return this;
-        if (getRight().equals(new RawValue(0))) return this;
-        if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).is("*")) {
-            BinaryOperation enclosed = ((BinaryOperation) getRight());
-            enclosed.setLeft(new BinaryOperation(enclosed.getLeft(), "^", new RawValue(-1)));
-            enclosed.setRight(new BinaryOperation(enclosed.getRight(), "^", new RawValue(-1)));
-        } else this.setRight(new BinaryOperation(getRight(), "^", new RawValue(-1)));
+        if (getRight().equals(new RawValue(0))) return this; //x/0 cannot be converted to exponential form
+        this.setRight(getRight().exp(new RawValue(-1)).simplify());
         operation = RegisteredBinaryOperation.extract("*");
-        processParentheticalNotation(getLeft(), false);
-        processParentheticalNotation(getRight(), true);
+        simplifyParenthesis();
         return this;
     }
 
@@ -463,6 +457,7 @@ public class BinaryOperation extends Operation {
      * @return simplified r1 [RegisteredBinaryOperation] r2
      */
     private Operable simplify(RawValue r1, RawValue r2) {
+        if (!Mode.FRACTION) return new RawValue(val());
         if (getLeft() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getLeft().copy();
             RawValue r = (RawValue) getRight().copy();
@@ -493,6 +488,7 @@ public class BinaryOperation extends Operation {
             if (r1 instanceof Fraction) {
                 return ((Fraction) r1).exp(r2);
             } else if (r1.isInteger() && r2 instanceof Fraction) {
+                if (r1.val() == 0) return RawValue.ZERO; // 0^x = 0, as long as x != 0
                 boolean r1Negative = false;
                 if (!r1.isPositive()) {
                     r1Negative = true;
@@ -700,6 +696,19 @@ public class BinaryOperation extends Operation {
                 }
             }
         }
+
+        switch (operation.name) {
+            case "-":
+                if (getLeft().equals(RawValue.ZERO)) {
+                    return getRight().negate();
+                } else if (getRight().equals(RawValue.ZERO)) {
+                    return getLeft();
+                }
+            case "/":
+                if (getRight().equals(RawValue.ZERO)) return RawValue.UNDEF; // x/0 = undef
+                else if (getRight().equals(RawValue.ONE)) return getLeft(); // x/1 = x
+                else if (getLeft().equals(RawValue.ZERO)) return RawValue.ZERO; // 0/x = 0
+        }
         return null;
     }
 
@@ -781,8 +790,10 @@ public class BinaryOperation extends Operation {
             case "+":
                 return binOp.ambiguousIteration((o1, o2, operator) -> {
                     if (o1.equals(op) && operator.equals("*") && !(o1 instanceof RawValue)) {
-                        // prevent 2*ln(x)+2 be simplified to 2*(ln(x)+1)
-                        return Operation.mult(op, Operation.add(o2, 1)).simplify();
+                        // prevent 2*ln(x)+2 be simplified to 2*(ln(x)+1). NOTE: only happens if (o + 1) is simplifiable.
+                        Operation add = o2.add(1);
+                        if (add.copy().simplify().complexity() < add.complexity())
+                            return Operation.mult(op, add).simplify();
                     }
                     return null;
                 });

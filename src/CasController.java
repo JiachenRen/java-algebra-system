@@ -24,8 +24,8 @@ public class CasController {
     public Label vars;
     public Label expanded;
 
+    @SuppressWarnings("unused")
     public void textFieldInput(KeyEvent keyEvent) {
-        keyEvent.getEventType();
 //        System.out.println(keyEvent.getEventType());
         simplified.setVisible(true);
         beautified.setVisible(true);

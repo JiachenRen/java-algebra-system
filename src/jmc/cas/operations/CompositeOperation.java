@@ -23,6 +23,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, INTEGER), (operands -> operands.get(0).derivative((Variable) operands.get(1), (int) operands.get(2).val())));
         define("simplify", new Signature(ANY), operands -> operands.get(0).simplify());
+        define("simplest", new Signature(ANY), operands -> operands.get(0).simplest());
         define("expand", new Signature(ANY), operands -> operands.get(0).expand());
         define("num_nodes", new Signature(ANY), operands -> new RawValue(operands.get(0).numNodes()));
         define("complexity", new Signature(ANY), operands -> new RawValue(operands.get(0).complexity()));

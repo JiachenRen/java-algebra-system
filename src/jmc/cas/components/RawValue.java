@@ -1,9 +1,11 @@
 package jmc.cas.components;
 
 import jmc.cas.LeafNode;
+import jmc.cas.Mode;
 import jmc.cas.Operable;
 import jmc.cas.operations.BinaryOperation;
-import jmc.graph.Graph;
+
+import java.text.DecimalFormat;
 
 /**
  * Created by Jiachen on 03/05/2017.
@@ -68,17 +70,18 @@ public class RawValue extends LeafNode {
         if (isUndefined()) {
             return "undef";
         } else if (isInteger()) {
-            String s = Integer.toString(intValue());
-            if (s.length() <= 10) return s;
+            return Integer.toString(intValue());
         } else {
-            String s = Double.toString(doubleValue());
-            if (s.length() <= 10) return s;
+            return format(doubleValue());
         }
-        double extracted = number.doubleValue();
-        String formatted = Graph.formatForDisplay(extracted);
-        return extracted >= 0 ? formatted : "(" + formatted + ")";
     }
 
+    private String format(double d) {
+        DecimalFormat decimalFormat = new DecimalFormat(Mode.DECIMAL_FORMAT);
+        return decimalFormat.format(d);
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isPositive() {
         return doubleValue() > 0;
     }
