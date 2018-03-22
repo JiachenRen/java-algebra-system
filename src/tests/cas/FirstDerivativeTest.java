@@ -51,8 +51,9 @@ public class FirstDerivativeTest {
 //        l(Compiler.compile("(a+b+c)*(c+a+b)").simplify());
 //        l(Compiler.compile("x^2*ln(x)").derivative(new Variable("x"), 2).expand().simplify());
 //        l(Compiler.compile("2*ln(x)+2*1+1").simplify());
-//        l(Compiler.compile("derivative(x*cos(x)*sin(x)/3+ln(x)*x,x,10)").exec().beautify()); //wow, check this out...
-        l(Compiler.compile("ln(x)^(-2)/x").simplify().beautify());
+//        l(Compiler.compile("derivative(x*cos(x/3)*sin(x/3)/3+ln(x)*x,x,10)").exec()); //wow, check this out...
+        l(Compiler.compile("derivative(ln(x)^x,x,4)").exec());
+//        l(Compiler.compile("ln(x)^(-2)/x").simplify().beautify());
     }
 
 

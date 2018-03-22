@@ -212,7 +212,6 @@ public class BinaryOperation extends Operation {
 
         //converting to exponential form and additional only, allowing further simplification.
         this.toAdditionOnly().toExponentialForm();
-        super.simplify();
 
         //handle special cases
         Operable simplified2 = simplifyZeroOne();
@@ -332,7 +331,7 @@ public class BinaryOperation extends Operation {
         super.toAdditionOnly();
         if (operation.name.equals("-")) {
             operation = RegisteredBinaryOperation.extract("+");
-            setRight(getRight().negate());
+            setRight(getRight().negate().simplify());
         }
         return this;
     }
@@ -353,11 +352,7 @@ public class BinaryOperation extends Operation {
         super.toExponentialForm();
         if (!this.is("/")) return this;
         if (getRight().equals(new RawValue(0))) return this;
-        if (getRight() instanceof BinaryOperation && ((BinaryOperation) getRight()).is("*")) {
-            BinaryOperation enclosed = ((BinaryOperation) getRight());
-            enclosed.setLeft(new BinaryOperation(enclosed.getLeft(), "^", new RawValue(-1)));
-            enclosed.setRight(new BinaryOperation(enclosed.getRight(), "^", new RawValue(-1)));
-        } else this.setRight(new BinaryOperation(getRight(), "^", new RawValue(-1)));
+        this.setRight(getRight().exp(new RawValue(-1)).simplify());
         operation = RegisteredBinaryOperation.extract("*");
         processParentheticalNotation(getLeft(), false);
         processParentheticalNotation(getRight(), true);
@@ -699,6 +694,19 @@ public class BinaryOperation extends Operation {
                         return i == 1 ? RawValue.ONE : getLeft();
                 }
             }
+        }
+
+        switch (operation.name) {
+            case "-":
+                if (getLeft().equals(RawValue.ZERO)) {
+                    return getRight().negate();
+                } else if (getRight().equals(RawValue.ZERO)) {
+                    return getLeft();
+                }
+            case "/":
+                if (getRight().equals(RawValue.ZERO)) return RawValue.UNDEF; // x/0 = undef
+                else if (getRight().equals(RawValue.ONE)) return getLeft(); // x/1 = x
+                else if (getLeft().equals(RawValue.ZERO)) return RawValue.ZERO; // 0/x = 0
         }
         return null;
     }
