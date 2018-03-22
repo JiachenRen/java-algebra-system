@@ -351,11 +351,10 @@ public class BinaryOperation extends Operation {
     public BinaryOperation toExponentialForm() {
         super.toExponentialForm();
         if (!this.is("/")) return this;
-        if (getRight().equals(new RawValue(0))) return this;
+        if (getRight().equals(new RawValue(0))) return this; //x/0 cannot be converted to exponential form
         this.setRight(getRight().exp(new RawValue(-1)).simplify());
         operation = RegisteredBinaryOperation.extract("*");
-        processParentheticalNotation(getLeft(), false);
-        processParentheticalNotation(getRight(), true);
+        simplifyParenthesis();
         return this;
     }
 
@@ -488,6 +487,7 @@ public class BinaryOperation extends Operation {
             if (r1 instanceof Fraction) {
                 return ((Fraction) r1).exp(r2);
             } else if (r1.isInteger() && r2 instanceof Fraction) {
+                if (r1.val() == 0) return RawValue.ZERO; // 0^x = 0, as long as x != 0
                 boolean r1Negative = false;
                 if (!r1.isPositive()) {
                     r1Negative = true;
