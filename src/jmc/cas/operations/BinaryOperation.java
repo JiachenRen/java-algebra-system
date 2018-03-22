@@ -790,8 +790,10 @@ public class BinaryOperation extends Operation {
             case "+":
                 return binOp.ambiguousIteration((o1, o2, operator) -> {
                     if (o1.equals(op) && operator.equals("*") && !(o1 instanceof RawValue)) {
-                        // prevent 2*ln(x)+2 be simplified to 2*(ln(x)+1)
-                        return Operation.mult(op, Operation.add(o2, 1)).simplify();
+                        // prevent 2*ln(x)+2 be simplified to 2*(ln(x)+1). NOTE: only happens if (o + 1) is simplifiable.
+                        Operation add = o2.add(1);
+                        if (add.copy().simplify().complexity() < add.complexity())
+                            return Operation.mult(op, add).simplify();
                     }
                     return null;
                 });

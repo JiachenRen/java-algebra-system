@@ -75,9 +75,10 @@ public class JGrapher extends PApplet {
         try {
             Process process = Runtime.getRuntime().exec("ulimit -c -l");
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String response = "", temp;
-            while ((temp = input.readLine()) != null) response += temp;
-            if (response.contains("(blocks, -c) 0")) {
+            StringBuilder response = new StringBuilder();
+            String temp;
+            while ((temp = input.readLine()) != null) response.append(temp);
+            if (response.toString().contains("(blocks, -c) 0")) {
                 System.err.println("# Fatal Error: Core Dump Failed --> Resurrecting... Failed");
             } else System.out.println("# Core Dump Successfully Enabled");
         } catch (IOException e) {
@@ -600,8 +601,6 @@ public class JGrapher extends PApplet {
         Constants.define("$C", () -> 1);
 
         Element.getList().forEach(e -> Constants.define("$" + e, e::getAtomicMass));
-
-        Constants.list();
 
         graph.equalizeAxes();
     }

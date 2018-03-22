@@ -1,8 +1,8 @@
 package tests;
 
-import jmc.cas.operations.BinaryOperation;
 import jmc.cas.Compiler;
 import jmc.cas.Operable;
+import jmc.cas.operations.BinaryOperation;
 import jmc.utils.Utils;
 
 import java.lang.reflect.Method;
@@ -32,11 +32,13 @@ public class AutoTest {
                 "expansion/",
                 "nodes/",
                 "beautify/",
-                "complexity/"
+                "complexity/",
+                "simplest/"
         );
 
         String tests[] = new String[]{
                 "testSimplify",
+                "testSimplest",
                 "testNumNodes",
                 "testExpand",
                 "testToExponentialForm",
@@ -68,6 +70,16 @@ public class AutoTest {
         test("/tests/files/simplification/u_ops.txt", true, "simplify");
         l(boldBlack("\n---------> Irrational Numbers Test \n"));
         test("/tests/files/simplification/irr_num.txt", true, "simplify");
+    }
+
+    private static void testSimplest() throws Exception {
+        l(lightPurple("\n---------> Simplest (Complex Simplification) \n"));
+        l(boldBlack("\n---------> Binary Operations Test \n"));
+        test("/tests/files/simplest/bin_ops.txt", true, "simplest");
+        l(boldBlack("\n---------> Unary Operations Test \n"));
+        test("/tests/files/simplest/u_ops.txt", true, "simplest");
+        l(boldBlack("\n---------> Irrational Numbers Test \n"));
+        test("/tests/files/simplest/irr_num.txt", true, "simplest");
     }
 
     private static void testBeautify() throws Exception {
@@ -262,9 +274,11 @@ public class AutoTest {
     }
 
     private static String ensureLength(String s, int length) {
-        while (s.length() < length) {
-            s += " ";
+        StringBuilder sBuilder = new StringBuilder(s);
+        while (sBuilder.length() < length) {
+            sBuilder.append(" ");
         }
+        s = sBuilder.toString();
         return s;
     }
 }
