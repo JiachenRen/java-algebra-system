@@ -14,4 +14,8 @@ public class TestPrint {
     public static void l(Object o) {
         System.out.println(o);
     }
+
+    public static void p(Object o) {
+        System.out.print(o);
+    }
 }
