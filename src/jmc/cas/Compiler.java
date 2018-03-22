@@ -20,20 +20,19 @@ import static jmc.utils.ColorFormatter.*;
 public class Compiler {
 
     /**
-     * @param expression the string representation of an expression to be incorporated into JMC.
+     * @param exp the string representation of an expression to be incorporated into JMC.
      * @return the Function instance derived from the String representation
      * @since May 19th. This method is the core of JMC. Took Jiachen tremendous effort. This system of
      * method represents his life's work
      */
-    public static Operable compile(String expression) {
-        if (expression.toLowerCase().contains("undef")) return RawValue.UNDEF;
-        if (expression.equals("")) throw new JMCException("cannot compile an empty string");
-        if (expression.contains(">") || expression.contains("<"))
-            throw new JMCException("angle brackets '<>' no longer supported");
-        if (numOccurrence(expression, '(') != numOccurrence(expression, ')'))
-            throw new JMCException("'()' mismatch in " + "\"" + expression + "\"");
-        expression = formatOperations(expression.replace(" ", "").replace("(-", "(0-"));
-        String exp = formatCoefficients(expression);
+    public static Operable compile(String exp) {
+        if (exp.toLowerCase().contains("undef")) return RawValue.UNDEF;
+        if ((exp = exp.replace(" ", "")).equals("")) throw new JMCException("cannot compile an empty string");
+        if (exp.contains(">") || exp.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
+        if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
+            throw new JMCException("'()' mismatch in " + "\"" + exp + "\"");
+        exp = formatOperations(exp.replace("(-", "(0-"));
+        exp = formatCoefficients(exp);
         exp = handleParentheticalNotation(handleCalcPriority(exp));
         log(boldBlack("formatted input: ") + exp);
         ArrayList<Operable> components = new ArrayList<>();

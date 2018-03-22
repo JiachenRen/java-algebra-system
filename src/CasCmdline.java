@@ -1,7 +1,5 @@
 import jmc.cas.Compiler;
 import jmc.cas.JMCException;
-import jmc.cas.Operable;
-import jmc.cas.components.RawValue;
 
 import java.util.Scanner;
 
