@@ -7,5 +7,5 @@ package jmc.cas;
 public class Mode {
     public static boolean DEBUG = false;
     public static boolean FRACTION = true;
-    public static String DECIMAL_FORMAT = "0.############"; //needs improvement!
+    public static String DECIMAL_FORMAT = "0.##################"; //needs improvement!
 }

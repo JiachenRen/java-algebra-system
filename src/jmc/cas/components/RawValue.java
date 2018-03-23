@@ -66,11 +66,8 @@ public class RawValue extends LeafNode {
     public String toString() {
         if (isUndefined()) {
             return "undef";
-        } else if (isInteger()) {
-            return n.toString().replace(".0", "");
-        } else {
-            return format(doubleValue());
         }
+        return format(doubleValue());
     }
 
     private String format(double d) {

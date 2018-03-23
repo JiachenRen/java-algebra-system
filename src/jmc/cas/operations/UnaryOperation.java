@@ -8,6 +8,7 @@ import jmc.cas.components.Constants;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import static java.lang.Math.*;
@@ -315,7 +316,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             define("sec", x -> 1 / cos(x));
             define("csc", x -> 1 / sin(x));
             define("cot", x -> 1 / tan(x));
-            define("factorial", x -> MathContext.factorial(abs((long) x))); //TODO: overflows! simplification of factorials; handle special notations like ! in the compiler
+            define("factorial", x -> MathContext.factorial(new BigDecimal(x).toBigInteger()).doubleValue()); //TODO: overflows! simplification of factorials; handle special notations like ! in the compiler
             define("cosh", Math::cosh);
             define("sinh", Math::sinh);
             define("tanh", Math::tanh);
