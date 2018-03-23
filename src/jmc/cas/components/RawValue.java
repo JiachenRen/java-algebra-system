@@ -66,7 +66,7 @@ public class RawValue extends LeafNode {
     public String toString() {
         if (isUndefined()) {
             return "undef";
-        }
+        } else if (doubleValue() == 0) return "0"; // fix a bug where 0.negate().toString() returns "-0"
         return format(doubleValue());
     }
 
