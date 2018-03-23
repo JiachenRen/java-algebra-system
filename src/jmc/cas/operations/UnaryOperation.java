@@ -24,7 +24,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     private Function operation;
 
     public UnaryOperation(Operable operand, String operation) {
-        this(operand, RegisteredUnaryOperation.extract(operation));
+        this(operand, UnaryOperator.extract(operation));
     }
 
     /**
@@ -46,7 +46,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     public static void define(String name, Evaluable evaluable) {
-        RegisteredUnaryOperation.define(name, evaluable);
+        UnaryOperator.define(name, evaluable);
     }
 
     /**
@@ -56,7 +56,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return an ArrayList containing all of the defined unary operations.
      */
     public static ArrayList<Function> registeredOperations() {
-        return RegisteredUnaryOperation.list();
+        return UnaryOperator.list();
     }
 
     public static boolean isDefined(String name) {
@@ -298,7 +298,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.eval(getOperand().val());
     }
 
-    private static class RegisteredUnaryOperation implements Evaluable, Nameable {
+    private static class UnaryOperator implements Evaluable, Nameable {
         private static ArrayList<Function> reservedFunctions;
 
         static {
@@ -331,7 +331,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
         private Function unaryOperation;
 
-        RegisteredUnaryOperation(String name) {
+        UnaryOperator(String name) {
             for (Function function : reservedFunctions) {
                 if (function.getName().equals(name))
                     unaryOperation = function;
@@ -364,7 +364,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             return unaryOperation.eval(x);
         }
 
-        public boolean equals(RegisteredUnaryOperation other) {
+        public boolean equals(UnaryOperator other) {
             return other.unaryOperation.getName().equals(this.unaryOperation.getName());
         }
 

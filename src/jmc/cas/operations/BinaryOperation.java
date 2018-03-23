@@ -18,15 +18,15 @@ import java.util.Optional;
  */
 public class BinaryOperation extends Operation {
     private boolean omitParenthesis;
-    private RegisteredBinaryOperation operation;
+    private BinaryOperator operator;
 
-    public BinaryOperation(Operable leftHand, String operation, Operable rightHand) {
-        this(leftHand, RegisteredBinaryOperation.extract(operation), rightHand);
+    public BinaryOperation(Operable leftHand, String operator, Operable rightHand) {
+        this(leftHand, BinaryOperator.extract(operator), rightHand);
     }
 
-    private BinaryOperation(Operable leftHand, RegisteredBinaryOperation operation, Operable rightHand) {
+    private BinaryOperation(Operable leftHand, BinaryOperator operator, Operable rightHand) {
         super(wrap(leftHand, rightHand));
-        this.operation = operation;
+        this.operator = operator;
         omitParenthesis = true;
         simplifyParenthesis();
     }
@@ -51,9 +51,9 @@ public class BinaryOperation extends Operation {
             if (op.getPriority() < this.getPriority()) {
                 op.setOmitParenthesis(true);
             } else if (op.getPriority() == this.getPriority()) {
-                if (op.operation.equals(operation) && op.is("^"))
+                if (op.operator.equals(operator) && op.is("^"))
                     op.setOmitParenthesis(false);
-                else op.setOmitParenthesis(op.operation.equals(operation) || !isRightHand);
+                else op.setOmitParenthesis(op.operator.equals(operator) || !isRightHand);
             } else {
                 op.setOmitParenthesis(false);
             }
@@ -69,7 +69,7 @@ public class BinaryOperation extends Operation {
     }
 
     public int getPriority() {
-        return operation.priority;
+        return operator.priority;
     }
 
     public void setOmitParenthesis(boolean temp) {
@@ -82,16 +82,16 @@ public class BinaryOperation extends Operation {
     }
 
     /**
-     * @param name      name of the new binary operation
+     * @param name      name of the new binary operator
      * @param priority  1 is the most prioritized
-     * @param evaluable (a,b) -> a [operation] b
+     * @param evaluable (a,b) -> a [operator] b
      */
     public static void define(String name, int priority, BinEvaluable evaluable) {
-        RegisteredBinaryOperation.define(name, priority, evaluable);
+        BinaryOperator.define(name, priority, evaluable);
     }
 
     public static int getPriority(String operation) {
-        return RegisteredBinaryOperation.extract(operation).priority;
+        return BinaryOperator.extract(operation).priority;
     }
 
     public static String binaryOperations() {
@@ -102,16 +102,16 @@ public class BinaryOperation extends Operation {
      * @return a complete list of binary operations (with corresponding priority)
      */
     public static String binaryOperations(int priority) {
-        return RegisteredBinaryOperation.listAsString(priority);
+        return BinaryOperator.listAsString(priority);
     }
 
     /**
      * HELPER METHOD
-     * this's operation should be "*" to invoke this method
+     * this's operator should be "*" to invoke this method
      * (a+b)*(a+ln(c)+d) -> a*a + a*ln(c) + a*d + b*a + b*ln(c) + b*d
      *
-     * @param o1 binary operation "+"
-     * @param o2 binary operation "+"
+     * @param o1 binary operator "+"
+     * @param o2 binary operator "+"
      * @return o1*o2 expanded
      */
     private static Operable crossExpand(BinaryOperation o1, BinaryOperation o2) {
@@ -160,12 +160,12 @@ public class BinaryOperation extends Operation {
     public double eval(double x) {
         double leftVal = getLeft().eval(x);
         double rightVal = getRight().eval(x);
-        return operation.eval(leftVal, rightVal);
+        return operator.eval(leftVal, rightVal);
     }
 
     @Override
     public BinaryOperation copy() {
-        return new BinaryOperation(getLeft().copy(), operation, getRight().copy());
+        return new BinaryOperation(getLeft().copy(), operator, getRight().copy());
     }
 
     /**
@@ -177,7 +177,7 @@ public class BinaryOperation extends Operation {
         super.simplify();
         simplifyParenthesis();
 
-        if (!operation.isStandard())
+        if (!operator.isStandard())
             return this; // nothing could be done with non-standard operations
         if (isUndefined()) return RawValue.UNDEF;
 
@@ -198,7 +198,7 @@ public class BinaryOperation extends Operation {
 
 
         if (getLeft().equals(getRight())) {
-            switch (operation.name) {
+            switch (operator.name) {
                 case "+":
                     return new BinaryOperation(new RawValue(2), "*", getLeft());
                 case "-":
@@ -279,7 +279,7 @@ public class BinaryOperation extends Operation {
         }
         Operable left = getLeft().beautify();
         Operable right = getRight().beautify();
-        switch (operation.name) {
+        switch (operator.name) {
             case "*":
                 ArrayList<Operable> numerators = new ArrayList<>();
                 ArrayList<Operable> denominators = new ArrayList<>();
@@ -329,15 +329,15 @@ public class BinaryOperation extends Operation {
 
     public BinaryOperation toAdditionOnly() {
         super.toAdditionOnly();
-        if (operation.name.equals("-")) {
-            operation = RegisteredBinaryOperation.extract("+");
+        if (operator.name.equals("-")) {
+            operator = BinaryOperator.extract("+");
             setRight(getRight().negate().simplify());
         }
         return this;
     }
 
     public double val() {
-        return operation.eval(getLeft().val(), getRight().val());
+        return operator.eval(getLeft().val(), getRight().val());
     }
 
     /**
@@ -353,14 +353,14 @@ public class BinaryOperation extends Operation {
         if (!this.is("/")) return this;
         if (getRight().equals(new RawValue(0))) return this; //x/0 cannot be converted to exponential form
         this.setRight(getRight().exp(new RawValue(-1)).simplify());
-        operation = RegisteredBinaryOperation.extract("*");
+        operator = BinaryOperator.extract("*");
         simplifyParenthesis();
         return this;
     }
 
     @Override
     public Operable firstDerivative(Variable v) {
-        switch (operation.name) {
+        switch (operator.name) {
             case "+": // d/dx [f(x) + g(x)] = d/dx(g(x)) - d/dx(g(x))
                 return getLeft().firstDerivative(v).add(getRight().firstDerivative(v));
             case "-": // d/dx [f(x) - g(x)] = d/dx(g(x)) - d/dx(g(x))
@@ -399,7 +399,7 @@ public class BinaryOperation extends Operation {
         if (super.isUndefined()) return true;
         if (getRight() instanceof RawValue) {
             RawValue r = ((RawValue) getRight());
-            switch (operation.name) {
+            switch (operator.name) {
                 case "/":
                     return r.isZero();
                 case "^":
@@ -454,14 +454,14 @@ public class BinaryOperation extends Operation {
      *
      * @param r1 RawValue #1
      * @param r2 RawValue #2
-     * @return simplified r1 [RegisteredBinaryOperation] r2
+     * @return simplified r1 [BinaryOperator] r2
      */
     private Operable simplify(RawValue r1, RawValue r2) {
         if (!Mode.FRACTION) return new RawValue(val());
         if (getLeft() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getLeft().copy();
             RawValue r = (RawValue) getRight().copy();
-            switch (operation.name) {
+            switch (operator.name) {
                 case "+":
                     return f.add(r);
                 case "-":
@@ -474,7 +474,7 @@ public class BinaryOperation extends Operation {
         } else if (getRight() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getRight().copy();
             RawValue r = (RawValue) getLeft().copy();
-            switch (operation.name) {
+            switch (operator.name) {
                 case "+":
                     return f.add(r);
                 case "-":
@@ -484,7 +484,7 @@ public class BinaryOperation extends Operation {
                 case "/":
                     return f.inverse().mult(r);
             }
-        } else if (operation.name.equals("^")) { //fractional mode
+        } else if (operator.name.equals("^")) { //fractional mode
             if (r1 instanceof Fraction) {
                 return ((Fraction) r1).exp(r2);
             } else if (r1.isInteger() && r2 instanceof Fraction) {
@@ -531,15 +531,15 @@ public class BinaryOperation extends Operation {
 
 
         if (r1.isInteger() && r2.isInteger()) {
-            if (operation.name.equals("/")) {
+            if (operator.name.equals("/")) {
                 return new Fraction(r1.longValue(), r2.longValue()).reduce();
-            } else return new RawValue(operation.eval(r1.longValue(), r2.longValue()));
+            } else return new RawValue(operator.eval(r1.longValue(), r2.longValue()));
         } else if (!r1.isInteger() && !(r1 instanceof Fraction)) {
             RawValue f1 = Fraction.convertToFraction(r1.doubleValue(), Fraction.TOLERANCE);
-            return new BinaryOperation(f1, operation, r2).simplify();
+            return new BinaryOperation(f1, operator, r2).simplify();
         } else if (!r2.isInteger() && !(r2 instanceof Fraction)) {
             RawValue f2 = Fraction.convertToFraction(r2.doubleValue(), Fraction.TOLERANCE);
-            return new BinaryOperation(r1, operation, f2).simplify();
+            return new BinaryOperation(r1, operator, f2).simplify();
         }
         return null;
     }
@@ -547,7 +547,7 @@ public class BinaryOperation extends Operation {
     private Operable simplify(UnaryOperation u1, UnaryOperation u2) {
         if (!u1.getOperand().isNaN() && !u2.getOperand().isNaN()) {
             if (u1.getName().equals(u2.getName()))
-                switch (operation.name) {
+                switch (operator.name) {
                     case "+":
                         switch (u1.getName()) {
                             case "log":
@@ -575,7 +575,7 @@ public class BinaryOperation extends Operation {
      */
     private Operable simplifyRightHand(long i) {
         if (i == 0) {
-            switch (operation.name) {
+            switch (operator.name) {
                 case "+":
                     return getLeft();
                 case "-":
@@ -588,7 +588,7 @@ public class BinaryOperation extends Operation {
                     return RawValue.ONE;
             }
         } else if (i == 1) {
-            switch (operation.name) {
+            switch (operator.name) {
                 case "+":
                     break;
                 case "-":
@@ -609,7 +609,7 @@ public class BinaryOperation extends Operation {
         boolean q = getRight() instanceof RawValue && getRight().val() < 0;
         String left = k ? "(" + getLeft().toString() + ")" : getLeft().toString();
         String right = q ? "(" + getRight().toString() + ")" : getRight().toString();
-        String temp = left + operation.name + right;
+        String temp = left + operator.name + right;
         return omitParenthesis ? temp : "(" + temp + ")";
     }
 
@@ -627,7 +627,7 @@ public class BinaryOperation extends Operation {
             if (simplified != null) return simplified;
         } else if (o instanceof UnaryOperation) {
             UnaryOperation uop = (UnaryOperation) o;
-            switch (operation.name) {
+            switch (operator.name) {
                 case "^":
                     switch (uop.getName()) {
                         case "log": // (10^n)^log(b) = b^n
@@ -651,9 +651,9 @@ public class BinaryOperation extends Operation {
         }
         if (getLeft() instanceof BinaryOperation) {
             BinaryOperation binOp = (BinaryOperation) getLeft();
-            switch (operation.name) {
+            switch (operator.name) {
                 case "^":
-                    switch (binOp.operation.name) {
+                    switch (binOp.operator.name) {
                         case "*": // (a*b)^# = a^#*b^#
                             if (o instanceof RawValue) {
                                 RawValue r = (RawValue) o;
@@ -679,7 +679,7 @@ public class BinaryOperation extends Operation {
     private Operable simplifyZeroOne() {
         for (int i = 1; i <= 2; i++) {
             if (get(i).val() == 0) {
-                switch (operation.name) {
+                switch (operator.name) {
                     case "+":
                         return getOther(i); //should this call .simplify()?
                     case "*":
@@ -688,7 +688,7 @@ public class BinaryOperation extends Operation {
                         return i == 1 ? RawValue.ZERO : RawValue.ONE;
                 }
             } else if (get(i).equals(RawValue.ONE)) {
-                switch (operation.name) {
+                switch (operator.name) {
                     case "*":
                         return getOther(i);
                     case "^":
@@ -697,7 +697,7 @@ public class BinaryOperation extends Operation {
             }
         }
 
-        switch (operation.name) {
+        switch (operator.name) {
             case "-":
                 if (getLeft().equals(RawValue.ZERO)) {
                     return getRight().negate();
@@ -720,10 +720,10 @@ public class BinaryOperation extends Operation {
      * @return simplified self of type Operable
      */
     private Operable simplify(BinaryOperation binOp1, BinaryOperation binOp2) {
-        if (binOp1.operation.equals(binOp2.operation)) //e.g. x*a + x*b, "*" == "*"
-            switch (operation.name) {
+        if (binOp1.operator.equals(binOp2.operator)) //e.g. x*a + x*b, "*" == "*"
+            switch (operator.name) {
                 case "+":
-                    switch (binOp1.operation.name) {
+                    switch (binOp1.operator.name) {
                         case "*":
                                 /*
                                 1. for the form x*(a+b) + x*c, should it be simplified to x*(a+b+c)?
@@ -747,7 +747,7 @@ public class BinaryOperation extends Operation {
                     }
                     break;
                 case "*":
-                    switch (binOp1.operation.name) {
+                    switch (binOp1.operator.name) {
                         case "^":
                                 /*
                                 1. for the form x^(a+b) * x^c, should it be simplified to x^(a+b+c)?
@@ -774,11 +774,11 @@ public class BinaryOperation extends Operation {
      * handles a*a^b = a^(b+1) when a is not a number
      *
      * @param op    generic Operation
-     * @param binOp BinaryOperation with operation == "^"
+     * @param binOp BinaryOperation with operator == "^"
      * @return simplified Operable
      */
     private Operable simplify(Operable op, BinaryOperation binOp) {
-        switch (operation.name) {
+        switch (operator.name) {
             case "*":
                 if (op.equals(binOp.getLeft()) && binOp.is("^")) {
                     if (!(op instanceof RawValue)) { //only when a is a variable or expression, a*a^b = a^(b+1) applies
@@ -808,14 +808,14 @@ public class BinaryOperation extends Operation {
      */
     private Operable ambiguousIteration(AmbiguousOperation ao) {
         for (int i = 1; i <= 2; i++) {
-            Operable o = ao.operate(get(i), getOther(i), operation);
+            Operable o = ao.operate(get(i), getOther(i), operator);
             if (o != null) return o;
         }
         return null;
     }
 
     /**
-     * This method shouldn't be used when priority == 1, or with the operation ^, since it is not commutative.
+     * This method shouldn't be used when priority == 1, or with the operator ^, since it is not commutative.
      *
      * @param pool ArrayList containing flattened operables
      */
@@ -865,8 +865,8 @@ public class BinaryOperation extends Operation {
      */
     public ArrayList<Operable> flattened() {
         ArrayList<Operable> pool = new ArrayList<>();
-        if (operation.priority == 1 || !operation.isStandard())
-            return pool; //if the operation is ^, then no commutative property applies.
+        if (operator.priority == 1 || !operator.isStandard())
+            return pool; //if the operator is ^, then no commutative property applies.
         BinaryOperation clone = this.copy().toAdditionOnly().toExponentialForm();
         clone.flat(pool, clone.getLeft());
         clone.flat(pool, clone.getRight());
@@ -874,8 +874,8 @@ public class BinaryOperation extends Operation {
     }
 
     /**
-     * this method is specific to binary operation because it tears down the binary tree
-     * and extracts nodes of the same binary operation priority, making applying commutative properties
+     * this method is specific to binary operator because it tears down the binary tree
+     * and extracts nodes of the same binary operator priority, making applying commutative properties
      * of + and * possible.
      *
      * @param pool     pool of flattened binary tree nodes.
@@ -901,7 +901,7 @@ public class BinaryOperation extends Operation {
      * @return expanded expression of type Operable
      */
     private Operable expandBase() {
-        switch (operation.name) {
+        switch (operator.name) {
             case "*": // (a+b)*c || (a+b+...)*(c+d+...) = a*c + a*d + ...
                 Operable result = this.ambiguousIteration((o1, o2, operation) -> {
                     if (isAddition(o1) && isAddition(o2)) {
@@ -922,7 +922,7 @@ public class BinaryOperation extends Operation {
                     long num = ((RawValue) getRight()).longValue();
                     if (getLeft() instanceof BinaryOperation) {
                         BinaryOperation binOp = ((BinaryOperation) getLeft());
-                        switch (binOp.operation.name) {
+                        switch (binOp.operator.name) {
                             case "*": //(a*b)^# = a^#*b^#
                                 Optional<BinaryOperation> op1 = binOp.flattened().stream()
                                         .map(o -> Operation.exp(o, num))
@@ -1014,18 +1014,18 @@ public class BinaryOperation extends Operation {
      * HELPER METHOD
      * "a/b" returns true
      *
-     * @return whether operation of o is "/"
+     * @return whether operator of o is "/"
      */
     private boolean isDivision(Operable o) {
         return o instanceof BinaryOperation && ((BinaryOperation) o).is("/");
     }
 
     public String getName() {
-        return operation.name;
+        return operator.name;
     }
 
     public boolean is(String s) {
-        return operation.equals(s);
+        return operator.equals(s);
     }
 
     public Operable setLeft(Operable operable) {
@@ -1038,15 +1038,15 @@ public class BinaryOperation extends Operation {
      * a series of operations in which the order of left, right hands is unimportant.
      */
     private interface AmbiguousOperation {
-        Operable operate(Operable o1, Operable o2, RegisteredBinaryOperation operator);
+        Operable operate(Operable o1, Operable o2, BinaryOperator operator);
     }
 
     public interface BinEvaluable {
         double eval(double a, double b);
     }
 
-    private static class RegisteredBinaryOperation implements BinEvaluable, Nameable {
-        private static ArrayList<RegisteredBinaryOperation> registeredBinOps;
+    public static class BinaryOperator implements BinEvaluable, Nameable {
+        private static ArrayList<BinaryOperator> registeredBinOps;
 
         static {
             registeredBinOps = new ArrayList<>();
@@ -1064,7 +1064,7 @@ public class BinaryOperation extends Operation {
         private int priority; //1 is the most prioritized
         private String standardOperations = "+-*/^";
 
-        private RegisteredBinaryOperation(String name, int priority, BinEvaluable evaluable) {
+        private BinaryOperator(String name, int priority, BinEvaluable evaluable) {
             this.name = name;
             this.binEvaluable = evaluable;
             this.priority = priority;
@@ -1072,24 +1072,24 @@ public class BinaryOperation extends Operation {
 
         private static void define(String name, int priority, BinEvaluable evaluable) {
             for (int i = 0; i < registeredBinOps.size(); i++) {
-                RegisteredBinaryOperation function = registeredBinOps.get(i);
+                BinaryOperator function = registeredBinOps.get(i);
                 if (function.name.equals(name))
                     registeredBinOps.remove(i);
             }
-            registeredBinOps.add(new RegisteredBinaryOperation(name, priority, evaluable));
+            registeredBinOps.add(new BinaryOperator(name, priority, evaluable));
         }
 
         private static String listAsString(int priority) {
             StringBuilder incrementer = new StringBuilder();
-            for (RegisteredBinaryOperation operation : registeredBinOps) {
+            for (BinaryOperator operation : registeredBinOps) {
                 if (operation.priority == priority)
                     incrementer.append(operation.name);
             }
             return incrementer.toString();
         }
 
-        private static RegisteredBinaryOperation extract(String name) {
-            for (RegisteredBinaryOperation binaryOperation : registeredBinOps)
+        private static BinaryOperator extract(String name) {
+            for (BinaryOperator binaryOperation : registeredBinOps)
                 if (binaryOperation.name.equals(name))
                     return binaryOperation;
             throw new RuntimeException("undefined binary operator \"" + name + "\"");
@@ -1104,7 +1104,7 @@ public class BinaryOperation extends Operation {
             return binEvaluable.eval(a, b);
         }
 
-        public boolean equals(RegisteredBinaryOperation other) {
+        public boolean equals(BinaryOperator other) {
             return this.name.equals(other.name);
         }
 
@@ -1127,7 +1127,7 @@ public class BinaryOperation extends Operation {
     }
 
     public boolean isCommutative() {
-        return "+-*/".contains(operation.name);
+        return "+-*/".contains(operator.name);
     }
 
     @Override
@@ -1139,7 +1139,7 @@ public class BinaryOperation extends Operation {
             ArrayList<Operable> pool2 = binOp.flattened();
             if (pool1.size() != pool2.size()) return false;
             return pool1.stream().map(o -> Operable.remove(pool2, o)).reduce((a, b) -> a && b).get();
-        } else if (operation.equals(binOp.operation)) {
+        } else if (operator.equals(binOp.operator)) {
             return binOp.getLeft().equals(getLeft()) && binOp.getRight().equals(getRight());
         }
         return false;
