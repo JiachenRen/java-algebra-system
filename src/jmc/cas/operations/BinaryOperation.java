@@ -168,14 +168,34 @@ public class BinaryOperation extends Operation {
         return new BinaryOperation(getLeft().copy(), operator, getRight().copy());
     }
 
+    private Operable simplifyCommutative() {
+        //make operations of the same priority throughout the binary tree visible at the same level.
+        //for example, (a+c)+c becomes a+b+c; (a*b)*c becomes a*b*c
+        this.toAdditionOnly().toExponentialForm();
+        ArrayList<Operable> flattened = this.flattened();
+        crossSimplify(flattened);
+        return reconstructBinTree(flattened);
+    }
+
+    /**
+     * e.g. (a+b)+c is commutable to a+(b+c)
+     *
+     * @return whether or not the BinaryOperation should be flattened for further simplification.
+     */
+    private boolean isCommutable() {
+        return (is("*") || is("+")) && (((getLeft() instanceof BinaryOperation) && ((BinaryOperation) getLeft()).is(operator.name))
+                || ((getRight() instanceof BinaryOperation) && ((BinaryOperation) getRight()).is(operator.name)));
+    }
+
     /**
      * Note: modifies self, but may not
      *
      * @return the simplified version of self
      */
     public Operable simplify() {
+        if (isCommutable()) return simplifyCommutative();
+
         super.simplify();
-        simplifyParenthesis();
 
         if (!operator.isStandard())
             return this; // nothing could be done with non-standard operations
@@ -233,34 +253,9 @@ public class BinaryOperation extends Operation {
             if (simplified != null) return simplified;
         }
 
+        if (isCommutable()) return simplifyCommutative();
 
-        if (getPriority() == 1) {
-            simplifyParenthesis();
-            return this; //up to this point the ^ operator cannot be simplified.
-        }
-
-        //up to this point all simplifications should have been tried, except the recursive cross-simplification
-        if (getLeft() instanceof BinLeafNode //e.g. ln(x) * x is not simplifiable
-                && getRight() instanceof BinLeafNode) {
-            return this.simplifyParenthesis(); //no more could be done.
-        } else if (getLeft() instanceof BinLeafNode //e.g. x * (3.5x + 4) is not simplifiable
-                && getRight() instanceof BinaryOperation
-                && ((BinaryOperation) getRight()).getPriority() != getPriority()) {
-            return this.simplifyParenthesis();
-        } else if (getRight() instanceof BinLeafNode //e.g. (3.5x + 4) * x  is not simplifiable
-                && getLeft() instanceof BinaryOperation
-                && ((BinaryOperation) getLeft()).getPriority() != getPriority()) {
-            return this.simplifyParenthesis();
-        } else if (getLeft() instanceof BinaryOperation //e.g. (3.5x + 4) * (4x + 3) is not simplifiable
-                && ((BinaryOperation) getLeft()).getPriority() != getPriority()
-                && getRight() instanceof BinaryOperation
-                && ((BinaryOperation) getRight()).getPriority() != getPriority()) {
-            return this.simplifyParenthesis();
-        } else { //perform cross-simplification
-            ArrayList<Operable> flattened = this.flattened(); //make operations of the same priority throughout the binary tree visible at the same level.
-            crossSimplify(flattened);
-            return reconstructBinTree(flattened);
-        }
+        return simplifyParenthesis();
     }
 
     /**
@@ -835,7 +830,7 @@ public class BinaryOperation extends Operation {
                     pool.add(op);
                     crossSimplify(pool);//result maybe bin tree or just Operable.
                     break;
-                } else if (pool.size() <= 2) return;
+                }
             }
         }
     }
