@@ -1,7 +1,8 @@
 package jmc.cas.operations;
 
-import jmc.MathContext;
 import jmc.cas.*;
+import jmc.cas.components.Constants;
+import jmc.cas.components.Literal;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
@@ -33,6 +34,15 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         define("val", new Signature(ANY), operands -> new RawValue(operands.get(0).val()));
         define("eval", new Signature(ANY, DECIMAL), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //TODO: Argument type Number
         define("eval", new Signature(ANY, INTEGER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //method overloading
+
+        Manipulation constClosure = operands -> {
+            String constant = ((Literal) operands.get(0)).get();
+            Constants.define(constant, () -> operands.get(1).val());
+            return Constants.get(constant);
+        };
+
+        define("define", new Signature(LITERAL, INTEGER), constClosure);
+        define("define", new Signature(LITERAL, DECIMAL), constClosure);
     }
 
 

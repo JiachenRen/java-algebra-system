@@ -43,6 +43,6 @@ public class Signature {
         ArrayList<Argument> args = new ArrayList<>();
         Collections.addAll(args, this.args);
         Optional<String> str = args.stream().map(Enum::toString).reduce((a, b) -> a + ", " + b);
-        return str.isPresent() ? str.get() : "";
+        return str.orElse("");
     }
 }
