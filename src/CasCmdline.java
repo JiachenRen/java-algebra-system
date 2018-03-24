@@ -1,5 +1,6 @@
 import jmc.cas.Compiler;
 import jmc.cas.JMCException;
+import jmc.cas.Mode;
 
 import java.util.Scanner;
 
@@ -15,6 +16,7 @@ public class CasCmdline {
     public static void main(String args[]) {
         System.out.println("Welcome to JMC computer algebra system (CAS)\nDesigned by Jiachen Ren\nMIT licensed (c) 2018\n");
         Scanner scanner = new Scanner(System.in);
+//        Mode.DEBUG = true;
         while (true) {
             p(boldBlack("\t: "));
             String input = scanner.nextLine();

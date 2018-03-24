@@ -39,6 +39,7 @@ public interface Assets {
         names.addAll(CompositeOperation.registeredManipulations().stream()
                 .map(RegisteredManipulation::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
+        names.add("list");
         return names;
     }
 }

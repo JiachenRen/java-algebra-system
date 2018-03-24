@@ -3,6 +3,7 @@ package jmc.cas.components;
 import jmc.cas.Operable;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * Created by Jiachen on 3/20/18.
@@ -55,7 +56,8 @@ public class List extends Operable {
 
     @Override
     public String toString() {
-        return null;
+        Optional<String> args = operables.stream().map(Operable::toString).reduce((a, b) -> a + "," + b);
+        return "{" + (args.orElse("")) + "}";
     }
 
     /**
@@ -100,7 +102,7 @@ public class List extends Operable {
      */
     @Override
     public Operable simplify() {
-        return null;
+        return this;
     }
 
     /**

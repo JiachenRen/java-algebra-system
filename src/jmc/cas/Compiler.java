@@ -1,9 +1,6 @@
 package jmc.cas;
 
-import jmc.cas.components.Constants;
-import jmc.cas.components.Literal;
-import jmc.cas.components.RawValue;
-import jmc.cas.components.Variable;
+import jmc.cas.components.*;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.CompositeOperation;
 import jmc.cas.operations.UnaryOperation;
@@ -33,6 +30,7 @@ public class Compiler {
         if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + exp + "\"");
         if (numOccurrence(exp, '\'') % 2 != 0) throw new JMCException("'' mismatch in " + "\"" + exp + "\"");
+        exp = formatList(exp); // this has to happen before formatOperation()
         exp = formatOperations(exp.replace("(-", "(0-"));
         exp = formatCoefficients(exp);
         exp = formatParenthesis(exp);
@@ -65,6 +63,29 @@ public class Compiler {
             i++;
         }
         return exp;
+    }
+
+    private static String formatList(String exp) {
+        while (exp.contains("{")) {
+            exp = replace(exp, '{', '}', "list(", ")");
+        }
+        return exp;
+    }
+
+    /**
+     * @param exp    the expression to be modified
+     * @param open   open bracket symbol
+     * @param close  close bracket symbol
+     * @param open1  replacement for "open"
+     * @param close1 replacement for "close"
+     * @return expression with "open" replaced with "open1" and close replaced with "close1"
+     */
+    @SuppressWarnings("SameParameterValue")
+    private static String replace(String exp, char open, char close, String open1, String close1) {
+        int[] indices = innermostIndices(exp, open, close);
+        return exp.substring(0, indices[0])
+                + open1 + exp.substring(indices[0] + 1, indices[1]) + close1
+                + exp.substring(indices[1] + 1, exp.length());
     }
 
 
@@ -162,12 +183,17 @@ public class Compiler {
                     break;
                 }
             }
-            if (operand instanceof BinaryOperation && ((BinaryOperation) operand).is(",")) {
-                BinaryOperation tree = ((BinaryOperation) operand);
-                ArrayList<Operable> operands = new ArrayList<>();
-                flat(tree, operands);
-                pending.add(new CompositeOperation(operationName, operands));
+            if (operationName.equals("list")) {
+                ArrayList<Operable> list = new ArrayList<>();
+                if (!isList(operand)) {
+                    if (!operand.equals(RawValue.UNDEF))
+                        list.add(operand);
+                } else list = toList(operand);
+                pending.add(new List(list));
+            } else if (isList(operand)) {
+                pending.add(new CompositeOperation(operationName, toList(operand)));
             } else {
+                ensureValidity(operand);
                 if (UnaryOperation.isDefined(operationName)) {
                     pending.add(new UnaryOperation(operand, operationName));
                 } else pending.add(new CompositeOperation(operationName, operand));
@@ -184,6 +210,7 @@ public class Compiler {
                     int[] indices = operationIndices(segment, i);
                     String[] operandStrs = new String[]{segment.substring(indices[0], i), segment.substring(i + 1, indices[1] + 1)};
                     ArrayList<Operable> operands = getOperands(pending, operables, operandStrs);
+                    ensureValidity(operands); // check to see if operands are missing
                     BinaryOperation operation = new BinaryOperation(operands.get(0), op.toString(), operands.get(1));
                     pending.add(operation);
                     String left = indices[0] == 0 ? "" : segment.substring(0, indices[0]);
@@ -200,10 +227,29 @@ public class Compiler {
         return pending.get(pending.size() - 1);
     }
 
+    /**
+     * @param operand a list in the form of a binary tree -> (a,b),c...
+     * @return list converted from the binary tree.
+     */
+    private static ArrayList<Operable> toList(Operable operand) {
+        BinaryOperation tree = ((BinaryOperation) operand);
+        ArrayList<Operable> operands = new ArrayList<>();
+        ensureValidity(operands);
+        flat(tree, operands);
+        return operands;
+    }
+
+    private static boolean isList(Operable operable) {
+        return operable instanceof BinaryOperation && ((BinaryOperation) operable).is(",");
+    }
+
     private static ArrayList<Operable> getOperands(ArrayList<Operable> pending, ArrayList<Operable> operables, String[] operandStrs) {
         ArrayList<Operable> operands = new ArrayList<>();
         for (String operand : operandStrs) {
-            if (operand.equals("")) throw new JMCException("missing operand(s)");
+            if (operand.equals("")) { // pending operands... x/... x*..., etc.
+                operands.add(RawValue.UNDEF);
+                continue;
+            }
             int componentIndex = operand.indexOf("#");
             int bundleIndex = operand.indexOf("&");
             if (componentIndex != -1)
@@ -225,6 +271,15 @@ public class Compiler {
             }
         }
         return operands;
+    }
+
+    private static void ensureValidity(ArrayList<Operable> operands) {
+        operands.forEach(Compiler::ensureValidity);
+    }
+
+    private static void ensureValidity(Operable operable) {
+        if (operable.equals(RawValue.UNDEF))
+            throw new JMCException("missing operand(s)");
     }
 
 
