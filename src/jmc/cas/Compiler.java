@@ -1,6 +1,7 @@
 package jmc.cas;
 
 import jmc.cas.components.Constants;
+import jmc.cas.components.Literal;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 import jmc.cas.operations.BinaryOperation;
@@ -31,19 +32,21 @@ public class Compiler {
         if (exp.contains(">") || exp.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
         if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + exp + "\"");
+        if (numOccurrence(exp, '\'') % 2 != 0) throw new JMCException("'' mismatch in " + "\"" + exp + "\"");
         exp = formatOperations(exp.replace("(-", "(0-"));
         exp = formatCoefficients(exp);
-        exp = handleParentheticalNotation(handleCalcPriority(exp));
+        exp = formatParenthesis(exp);
+        exp = formatLiteral(exp);
         log(boldBlack("formatted input: ") + exp);
         ArrayList<Operable> components = new ArrayList<>();
         int hashId = 0;
         while (exp.indexOf(')') != -1) {
-            int[] innerIndices = extractInnerParenthesis(exp, '(', ')');
-            String extractedContent = exp.substring(innerIndices[0] + 1, innerIndices[1]);
-            Operable formulated = generateOperations(extractedContent, components);
-            components.add(formulated);
-            String left = innerIndices[0] > 0 ? exp.substring(0, innerIndices[0]) : "";
-            exp = left + "&" + hashId + exp.substring(innerIndices[1] + 1);
+            int[] indices = innermostIndices(exp, '(', ')');
+            String innermost = exp.substring(indices[0] + 1, indices[1]);
+            Operable compiled = generateOperations(innermost, components);
+            components.add(compiled);
+            String left = indices[0] > 0 ? exp.substring(0, indices[0]) : "";
+            exp = left + "&" + hashId + exp.substring(indices[1] + 1);
             log(lightCyan("func:\t") + colorMathSymbols(exp));
             hashId++;
         }
@@ -54,24 +57,34 @@ public class Compiler {
         return operable;
     }
 
-
-    private static String formatOperations(String exp) {
-        while (isUnformatted(exp)) {
-            int idx1 = -1;
-            for (String s : Assets.reservedNames()) {
-                String candidate = s + "(";
-                if (exp.contains(candidate)) {
-                    idx1 = exp.indexOf(candidate) + candidate.length() - 1;
-                    break;
-                }
-            }
-            int idx2 = findMatchingIndex(exp, idx1, ')');
-            exp = replaceAt(replaceAt(exp, idx1, '<'), idx2, '>');
+    private static String formatLiteral(String exp) {
+        exp = exp.replace("'", "''");
+        int i = 0;
+        while (exp.contains("''")) {
+            exp = exp.replaceFirst("''", i % 2 == 0 ? "('" : "')");
+            i++;
         }
         return exp;
     }
 
-    private static String replaceAt(String s, int idx, char c) {
+
+    private static String formatOperations(String exp) {
+        while (isUnformatted(exp)) {
+            int idx1 = -1;
+            for (String name : Assets.reservedNames()) {
+                String prefix = name + "(";
+                if (exp.contains(prefix)) {
+                    idx1 = exp.indexOf(prefix) + prefix.length() - 1;
+                    break;
+                }
+            }
+            int idx2 = findMatchingIndex(exp, idx1, ')');
+            exp = replaceAt(replaceAt(exp, idx1, "<("), idx2 + 1, ")>");
+        }
+        return exp;
+    }
+
+    private static String replaceAt(String s, int idx, String c) {
         return s.substring(0, idx) + c + s.substring(idx + 1);
     }
 
@@ -114,7 +127,7 @@ public class Compiler {
      * @return the indices of the innermost opening parenthesis and the closing parenthesis
      * @since May 16th
      */
-    private static int[] extractInnerParenthesis(String exp, char open, char close) {
+    private static int[] innermostIndices(String exp, char open, char close) {
         int closeIndex = exp.indexOf(close);
         int openIndex = exp.substring(0, closeIndex).lastIndexOf(open);
         return new int[]{openIndex, closeIndex};
@@ -136,14 +149,14 @@ public class Compiler {
         int operableHashId = 0;
         ArrayList<Operable> pending = new ArrayList<>(); //pending operations
         while (segment.indexOf('<') != -1) {
-            int indices[] = extractInnerParenthesis(segment, '<', '>');
+            int indices[] = innermostIndices(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
             Operable operand = generateOperations(extracted, operables);
             String operationName = segment.substring(0, indices[0]);
             int startIndex = 0;
             for (int i = indices[0] - 1; i >= 0; i--) {
                 char c = segment.charAt(i);
-                if (SYMBOLS.contains(Character.toString(c))) {
+                if (isSymbol(c)) {
                     operationName = segment.substring(i + 1, indices[0]);
                     startIndex = i;
                     break;
@@ -167,8 +180,8 @@ public class Compiler {
         for (int p = 1; p <= 4; p++) { //prioritize ^ over */ over +-. This way it is flexible for adding more operations.
             for (int i = 0; i < segment.length(); i++) { // p == 4 -> ',' for composite operations
                 CharSequence op = segment.subSequence(i, i + 1);
-                if (BinaryOperation.binaryOperations(p).contains(op) || p == 4 && op.charAt(0) == ',') {
-                    int[] indices = extractOperationIndices(segment, i);
+                if (BinaryOperation.operators(p).contains(op) || p == 4 && op.charAt(0) == ',') {
+                    int[] indices = operationIndices(segment, i);
                     String[] operandStrs = new String[]{segment.substring(indices[0], i), segment.substring(i + 1, indices[1] + 1)};
                     ArrayList<Operable> operands = getOperands(pending, operables, operandStrs);
                     BinaryOperation operation = new BinaryOperation(operands.get(0), op.toString(), operands.get(1));
@@ -187,30 +200,28 @@ public class Compiler {
         return pending.get(pending.size() - 1);
     }
 
-    private static ArrayList<Operable> getOperands(ArrayList<Operable> pendingOperations, ArrayList<Operable> operables, String[] operandStrs) {
+    private static ArrayList<Operable> getOperands(ArrayList<Operable> pending, ArrayList<Operable> operables, String[] operandStrs) {
         ArrayList<Operable> operands = new ArrayList<>();
-        for (String string : operandStrs) {
-            int componentIndex = string.indexOf("#");
-            int bundleIndex = string.indexOf("&");
-            if (componentIndex != -1) {
-                int hashId = Integer.valueOf(string.substring(componentIndex + 1));
-                operands.add(pendingOperations.get(hashId));
-            } else if (bundleIndex != -1) {
-                int bundleId = Integer.valueOf(string.substring(bundleIndex + 1));
-                operands.add(operables.get(bundleId));
-            } else {
-                if (VARS.contains(string.toLowerCase())) {
-                    operands.add(new Variable(string.toLowerCase()));
-                } else if (Constants.contains(string)) {
-                    operands.add(Constants.getConstant(string));
-                } else {
-                    if (string.equals("")) throw new JMCException("missing operand(s)");
-                    try {
-                        operands.add(new RawValue(Double.valueOf(string)));
-                    } catch (NumberFormatException e) {
-                        throw new JMCException("undefined operand/operation in \"" + string + "\"");
-                    }
-                }
+        for (String operand : operandStrs) {
+            if (operand.equals("")) throw new JMCException("missing operand(s)");
+            int componentIndex = operand.indexOf("#");
+            int bundleIndex = operand.indexOf("&");
+            if (componentIndex != -1)
+                operands.add(pending.get(Integer.valueOf(operand.substring(componentIndex + 1))));
+            else if (bundleIndex != -1)
+                operands.add(operables.get(Integer.valueOf(operand.substring(bundleIndex + 1))));
+            else if (Constants.contains(operand)) {
+                operands.add(Constants.get(operand));
+            } else if (operand.charAt(0) == '\'') {
+                if (numOccurrence(operand, '\'') != 2)
+                    throw new JMCException("syntax error due to ' in \"" + operand + "\"");
+                else operands.add(new Literal(operand.substring(1, operand.length() - 1)));
+            } else if (VARS.contains(operand.toLowerCase().substring(0, 1))) {
+                operands.add(new Variable(operand.toLowerCase()));
+            } else try {
+                operands.add(new RawValue(Double.valueOf(operand)));
+            } catch (NumberFormatException e) {
+                throw new JMCException("undefined operand/operation in \"" + operand + "\"");
             }
         }
         return operands;
@@ -218,30 +229,32 @@ public class Compiler {
 
 
     /**
+     * e.g. call to operationIndices("a*2*x^2-a*x^2",5) would give {4,6}
+     *
      * @param segment the segment of expression
      * @param index   index of the binary operation
      * @return the indices of the beginning and the end of the binary operation, both inclusive
      */
-    private static int[] extractOperationIndices(String segment, int index) {
-        String leftHand = segment.substring(0, index);
-        String rightHand = segment.substring(index + 1);
-        int lastOccurrence = 0;
-        for (int i = 0; i < leftHand.length(); i++) {
-            CharSequence op = leftHand.subSequence(i, i + 1);
-            if (BinaryOperation.binaryOperations().contains(op) || SYMBOLS.contains(op))
-                lastOccurrence = i + 1;
+    private static int[] operationIndices(String segment, int index) {
+        String left = segment.substring(0, index);
+        String right = segment.substring(index + 1);
+        int begin = 0;
+        for (int i = 0; i < left.length(); i++) {
+            char op = left.charAt(i);
+            if (isSymbol(op))
+                begin = i + 1;
         }
 
-        int firstOccurrence = segment.length() - 1;// debugged May 16th
-        for (int i = 0; i < rightHand.length(); i++) {
-            CharSequence op = rightHand.subSequence(i, i + 1);
-            if (BinaryOperation.binaryOperations().contains(op) || SYMBOLS.contains(op)) {
-                firstOccurrence = index + i;
+        int end = segment.length() - 1;// debugged May 16th
+        for (int i = 0; i < right.length(); i++) {
+            char op = right.charAt(i);
+            if (isSymbol(op)) {
+                end = index + i;
                 break;
             }
         }
-        //log("single statement indices: " + lastOccurrence + " " + firstOccurrence);// debug completed May 16th
-        return new int[]{lastOccurrence, firstOccurrence};
+        //log("single statement indices: " + begin + " " + end);// debug completed May 16th
+        return new int[]{begin, end};
     }
 
 
@@ -277,11 +290,11 @@ public class Compiler {
                 }
             }
         }
-        if (exp.charAt(0) == '-') exp = "0" + exp;
+        if (exp.charAt(0) == '-') exp = "0" + exp; // -x becomes 0-x
         for (int i = 1; i < exp.length() - 1; i++) {
             char subtract = exp.charAt(i), symbol = exp.charAt(i - 1);
             if (subtract == '-' && "(*/^<".contains(Character.toString(symbol))) {
-                int[] indices = extractOperationIndices(exp, i);
+                int[] indices = operationIndices(exp, i);
                 String extracted = exp.substring(i, indices[1] + 1);
                 exp = exp.replace(symbol + "" + extracted, symbol + "(0" + extracted + ")");
             }
@@ -295,23 +308,6 @@ public class Compiler {
                 return true;
         }
         return false;
-    }
-
-    private static String handleCalcPriority(String exp) {
-        for (int i = 0; i < exp.length() - 2; i++) {
-            if (exp.charAt(i) == '<') {
-                int q = findMatchingIndex(exp, i, '>');
-                if (exp.charAt(i + 1) == '(' && findMatchingIndex(exp, i + 1, ')') == q - 1)
-                    continue;
-                String l = exp.substring(0, i + 1);
-                String middle = exp.substring(i + 1, q);
-                if (VARS.contains(middle))
-                    continue;
-                middle = '(' + middle + ')';
-                exp = l + middle + exp.substring(q);
-            }
-        }
-        return exp;
     }
 
     /**
@@ -334,7 +330,7 @@ public class Compiler {
         return -1;
     }
 
-    private static String handleParentheticalNotation(String exp) {
+    private static String formatParenthesis(String exp) {
         String non_operators = ")>" + LETTERS;
         for (int i = 1; i < exp.length(); i++) {
             char cur = exp.charAt(i);

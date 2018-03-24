@@ -160,7 +160,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             BinaryOperation binOp = (BinaryOperation) getOperand();
             switch (operation.getName()) {
                 case "ln":
-                    if (binOp.is("^") && binOp.getLeft().equals(Constants.getConstant("e"))) {
+                    if (binOp.is("^") && binOp.getLeft().equals(Constants.get("e"))) {
                         return binOp.getRight();
                     }
             }
@@ -249,14 +249,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         switch (operation.getName()) {
             case "tan": // domain: x != pi/2 + n*pi
             case "sec":
-                o = Operation.div(this.getOperand(), Operation.div(Constants.getConstant("pi"), RawValue.TWO)).simplify();
+                o = Operation.div(this.getOperand(), Operation.div(Constants.get("pi"), RawValue.TWO)).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger()) {
                     return Math.abs(((RawValue) o).longValue() % 2) == 1;
                 }
                 break;
             case "cot": // domain: x != n*pi
             case "csc":
-                o = Operation.div(this.getOperand(), Constants.getConstant("pi")).simplify();
+                o = Operation.div(this.getOperand(), Constants.get("pi")).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger())
                     return true;
 
@@ -273,8 +273,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation.getName();
     }
 
-    public Operable setOperand(Operable operable) {
-        return super.setOperand(operable, 0);
+    public void setOperand(Operable operable) {
+        super.setOperand(operable, 0);
     }
 
     public String toString() {
@@ -299,10 +299,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     private static class UnaryOperator implements Evaluable, Nameable {
-        private static ArrayList<Function> reservedFunctions;
+        private static ArrayList<Function> functions;
 
         static {
-            reservedFunctions = new ArrayList<>();
+            functions = new ArrayList<>();
             define("cos", Math::cos);
             define("sin", Math::sin);
             define("log", Math::log10);
@@ -332,14 +332,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         private Function unaryOperation;
 
         UnaryOperator(String name) {
-            for (Function function : reservedFunctions) {
+            for (Function function : functions) {
                 if (function.getName().equals(name))
                     unaryOperation = function;
             }
         }
 
         private static Function extract(String name) {
-            for (Function function : reservedFunctions) {
+            for (Function function : functions) {
                 if (function.getName().equals(name))
                     return function;
             }
@@ -347,16 +347,16 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         }
 
         private static void define(String name, Evaluable evaluable) {
-            for (int i = 0; i < reservedFunctions.size(); i++) {
-                Function function = reservedFunctions.get(i);
+            for (int i = 0; i < functions.size(); i++) {
+                Function function = functions.get(i);
                 if (function.getName().equals(name))
-                    reservedFunctions.remove(i);
+                    functions.remove(i);
             }
-            reservedFunctions.add(new Function(name, evaluable));
+            functions.add(new Function(name, evaluable));
         }
 
         static ArrayList<Function> list() {
-            return reservedFunctions;
+            return functions;
         }
 
         @Override

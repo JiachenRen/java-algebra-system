@@ -3,7 +3,10 @@ package tests.cas;
 import jmc.Function;
 import jmc.cas.Compiler;
 import jmc.cas.Operable;
-import jmc.cas.components.*;
+import jmc.cas.components.Constants;
+import jmc.cas.components.Fraction;
+import jmc.cas.components.RawValue;
+import jmc.cas.components.Variable;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.Operation;
 
@@ -129,9 +132,9 @@ public class CasComprehensiveTest {
 
 
         // Constants
-        l(Constants.E, Constants.PI, Constants.π);
-        l(Constants.E.equals(Constants.E), Constants.π.equals(Constants.PI));
-        l(Constants.getConstant("e").val());
+        l(Constants.E, Constants.PI);
+        l(Constants.E.equals(Constants.E));
+        l(Constants.get("e").val());
         l(Constants.valueOf(Constants.E.getName()));
 
 

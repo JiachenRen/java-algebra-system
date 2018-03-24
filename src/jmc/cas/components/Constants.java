@@ -15,14 +15,12 @@ public class Constants {
         define("e", () -> Math.E);
         define("pi", () -> Math.PI);
         define("∞", () -> Double.POSITIVE_INFINITY);
-        define("rand", Math::random);
-        define("π", () -> Math.PI);
+        define("random", Math::random);
     }
 
     private static ArrayList<Constant> constants;
-    public static final Constant E = getConstant("e");
-    public static final Constant PI = getConstant("pi");
-    public static final Constant π = getConstant("π");
+    public static final Constant E = get("e");
+    public static final Constant PI = get("pi");
 
     public static boolean contains(String symbol) {
         for (Constant constant : constants) {
@@ -61,7 +59,7 @@ public class Constants {
         return constants;
     }
 
-    public static Constant getConstant(String name) {
+    public static Constant get(String name) {
         for (Constant constant : constants) {
             if (constant.getName().equals(name))
                 return constant;

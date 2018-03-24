@@ -94,14 +94,14 @@ public class BinaryOperation extends Operation {
         return BinaryOperator.extract(operation).priority;
     }
 
-    public static String binaryOperations() {
-        return binaryOperations(0) + binaryOperations(1) + binaryOperations(2) + binaryOperations(3);
+    public static String operators() {
+        return operators(0) + operators(1) + operators(2) + operators(3);
     }
 
     /**
      * @return a complete list of binary operations (with corresponding priority)
      */
-    public static String binaryOperations(int priority) {
+    public static String operators(int priority) {
         return BinaryOperator.listAsString(priority);
     }
 

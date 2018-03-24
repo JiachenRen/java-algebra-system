@@ -16,7 +16,7 @@ public class BinaryOperationTest {
         l(binOp.getRight(), binOp.getLeft());
         binOp.setRight(RawValue.ONE);
         BinaryOperation.define("&", 3, (a, b) -> a + b);
-        l(BinaryOperation.binaryOperations(), BinaryOperation.binaryOperations(3));
+        l(BinaryOperation.operators(), BinaryOperation.operators(3));
         l(BinaryOperation.getPriority("&"), BinaryOperation.getPriority("+"));
         l(new BinaryOperation(RawValue.ZERO, "*", RawValue.ONE).getPriority());
         l(new BinaryOperation(RawValue.ZERO, "*", RawValue.ONE).flattened());
