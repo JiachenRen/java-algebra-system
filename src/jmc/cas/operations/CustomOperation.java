@@ -17,7 +17,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
     private static ArrayList<Manipulation> manipulations = new ArrayList<>();
     private Manipulation manipulation;
 
-    static { //TODO: automatically link CAS operations with Operable methods using reflect.
+    static {
         define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, NUMBER), (operands -> {
@@ -33,7 +33,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         define("replace", new Signature(ANY, ANY, ANY), operands -> operands.get(0).replace(operands.get(1), operands.get(2)));
         define("beautify", new Signature(ANY), operands -> operands.get(0).beautify());
         define("val", new Signature(ANY), operands -> new RawValue(operands.get(0).val()));
-        define("eval", new Signature(ANY, NUMBER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //TODO: Argument type Number
+        define("eval", new Signature(ANY, NUMBER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val())));
 
         define("define", new Signature(LITERAL, NUMBER), operands -> {
             String constant = ((Literal) operands.get(0)).get();
@@ -132,7 +132,9 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
 
 
     public String toString() {
-        Optional<String> args = getOperands().stream().map(Operable::toString).reduce((a, b) -> a + "," + b);
+        Optional<String> args = getOperands().stream()
+                .map(Operable::toString)
+                .reduce((a, b) -> a + "," + b);
         return getName() + "(" + (args.orElse("")) + ")";
     }
 

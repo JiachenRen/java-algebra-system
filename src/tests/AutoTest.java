@@ -1,6 +1,7 @@
 package tests;
 
 import jmc.cas.Compiler;
+import jmc.cas.JMCException;
 import jmc.cas.Operable;
 import jmc.cas.operations.BinaryOperation;
 import jmc.utils.Utils;
@@ -26,14 +27,7 @@ public class AutoTest {
 
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates(
-                "additional/",
-                "exponential/",
-                "simplification/",
-                "expansion/",
-                "nodes/",
-                "beautify/",
-                "complexity/",
-                "simplest/"
+                args
         );
 
         String tests[] = new String[]{
@@ -155,7 +149,7 @@ public class AutoTest {
     private static void updateCandidates(String... subdirectories) {
         ArrayList<ArrayList<String>> pool = new ArrayList<>();
         String baseDir = "/tests/files/", ext = ".txt";
-        String[] types = new String[]{"bin_ops", "u_ops", "irr_num"};
+        String[] types = new String[]{"bin_ops", "u_ops", "irr_num", "u_der"};
         for (String type : types) {
             pool.add(getLines(Utils.read(baseDir + type + ext)));
         }
@@ -179,8 +173,12 @@ public class AutoTest {
     private static boolean contains(ArrayList<String> lines, String s) {
         for (String line : lines) {
             String original = getOriginal(line);
-            if (Compiler.compile(original).equals(Compiler.compile(getOriginal(s)))) {
-                return true;
+            try {
+                if (Compiler.compile(original).equals(Compiler.compile(getOriginal(s)))) {
+                    return true;
+                }
+            } catch (JMCException e) {
+                return false;
             }
         }
         return false;
@@ -194,9 +192,7 @@ public class AutoTest {
         return l.contains("->") ? l.substring(l.indexOf("->") + 2) : "";
     }
 
-    private static void test(String fileName, boolean testValue, String... methods) throws Exception {
-        ArrayList<String> lines = getLines(Utils.read(fileName));
-
+    public static void test(ArrayList<String> lines, boolean testValue, String... methods) throws Exception {
         ArrayList<Operable> ops = (ArrayList<Operable>) lines.stream()
                 .map(l -> Compiler.compile(getOriginal(l)))
                 .collect(Collectors.toList());
@@ -260,7 +256,11 @@ public class AutoTest {
 
             lines.set(i, line + "-> " + now);
         }
+    }
 
+    private static void test(String fileName, boolean testValue, String... methods) throws Exception {
+        ArrayList<String> lines = getLines(Utils.read(fileName));
+        test(lines, testValue, methods);
         writeLines(fileName, lines);
     }
 
