@@ -49,10 +49,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
 
             // unregister existing manipulations with the same signature.
             ArrayList<Manipulation> overridden = unregister(name, signature);
-            String s = "Overridden: [" + overridden.stream()
-                    .map(Manipulation::toString)
-                    .reduce((a, b) -> a + ", " + b)
-                    .orElse("") + "]";
+            String s = "Overridden: " + toString(overridden);
             Literal msg = new Literal(overridden.size() == 0 ? "Done." : s);
             define(name, signature, feed -> {
                 ArrayList<Operable> args = arguments.unwrap();
@@ -66,8 +63,23 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
             return msg;
         });
 
-
+        define("remove", Signature.ANY, operands -> {
+            ArrayList<Manipulation> removed = new ArrayList<>();
+            operands.forEach(o -> {
+                if (!(o instanceof Literal)) throw new JMCException("illegal argument " + o);
+                removed.addAll(unregister(((Literal) o).get(), Signature.ANY));
+            });
+            return new Literal("Removed: " + toString(removed));
+        });
     }
+
+    private static String toString(ArrayList<Manipulation> manipulations) {
+        return "[" + manipulations.stream()
+                .map(Manipulation::toString)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("") + "]";
+    }
+
 
     public static ArrayList<Manipulation> unregister(String name, Signature signature) {
         ArrayList<Manipulation> unregistered = new ArrayList<>();

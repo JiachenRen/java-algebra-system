@@ -15,7 +15,7 @@ import static tests.TestPrint.l;
  * Created by Jiachen on 3/17/18.
  * Composite Operation Test
  */
-public class CompositeOperationTest {
+public class CustomOperationTest {
     public static void main(String args[]) {
         l(Compiler.compile("a+log(3+a)+4"));
         CustomOperation co = (CustomOperation) Compiler.compile("sum(4+7+5,5+x,log(7+cos(x)),x)");
