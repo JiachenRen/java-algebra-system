@@ -29,6 +29,8 @@ public class Compiler {
         if (exp.contains(">") || exp.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
         if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + exp + "\"");
+        if (numOccurrence(exp, '{') != numOccurrence(exp, '}'))
+            throw new JMCException("'{}' mismatch in " + "\"" + exp + "\"");
         if (numOccurrence(exp, '\'') % 2 != 0) throw new JMCException("'' mismatch in " + "\"" + exp + "\"");
         exp = formatList(exp); // this has to happen before formatOperation()
         exp = formatOperations(exp.replace("(-", "(0-"));

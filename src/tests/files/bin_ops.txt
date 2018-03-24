@@ -86,3 +86,4 @@ x^(a+b)
 2*ln(x)+2*1+1
 'jiachen'*'a'
 'jiachen'*'is'^2/'a'^'genius'/'a'
+{{3+4+x+x,x^2/x},x}

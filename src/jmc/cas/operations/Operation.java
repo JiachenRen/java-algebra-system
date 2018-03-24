@@ -135,7 +135,6 @@ public abstract class Operation extends Operable implements Nameable {
     public Operable simplify() {
         operands = operands.stream()
                 .map(Operable::simplify)
-//                .map(Operable::expand) // ??
                 .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }

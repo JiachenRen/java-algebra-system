@@ -4,6 +4,7 @@ import jmc.cas.Operable;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jiachen on 3/20/18.
@@ -39,7 +40,7 @@ public class List extends Operable {
 
     @Override
     public Operable copy() {
-        return null;
+        return this;
     }
 
     /**
@@ -102,6 +103,9 @@ public class List extends Operable {
      */
     @Override
     public Operable simplify() {
+        operables = operables.stream()
+                .map(Operable::simplify)
+                .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
 
@@ -118,7 +122,7 @@ public class List extends Operable {
      */
     @Override
     public Operable beautify() {
-        return null;
+        return this;
     }
 
     /**
@@ -129,17 +133,17 @@ public class List extends Operable {
      */
     @Override
     public Operable explicitNegativeForm() {
-        return null;
+        return this;
     }
 
     @Override
     public Operable toAdditionOnly() {
-        return null;
+        return this;
     }
 
     @Override
     public Operable toExponentialForm() {
-        return null;
+        return this;
     }
 
     /**
@@ -150,7 +154,7 @@ public class List extends Operable {
      */
     @Override
     public Operable firstDerivative(Variable v) {
-        return null;
+        return this;
     }
 
     /**
@@ -161,7 +165,7 @@ public class List extends Operable {
      */
     @Override
     public Operable expand() {
-        return null;
+        return this;
     }
 
     /**
@@ -171,7 +175,7 @@ public class List extends Operable {
      */
     @Override
     public Operable replace(Operable o, Operable r) {
-        return null;
+        return this;
     }
 
     @Override
