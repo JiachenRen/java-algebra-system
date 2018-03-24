@@ -4,7 +4,7 @@ package jmc.cas;
 import jmc.Function;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.CompositeOperation;
-import jmc.cas.operations.RegisteredManipulation;
+import jmc.cas.operations.Manipulation;
 import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public interface Assets {
                 .map(Function::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
         names.addAll(CompositeOperation.registeredManipulations().stream()
-                .map(RegisteredManipulation::getName)
+                .map(Manipulation::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
         names.add("list");
         return names;

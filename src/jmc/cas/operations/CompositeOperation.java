@@ -14,8 +14,8 @@ import static jmc.cas.operations.Argument.*;
  * Composite Operation
  */
 public class CompositeOperation extends Operation implements BinLeafNode, Nameable {
-    private static ArrayList<RegisteredManipulation> registeredManipulations = new ArrayList<>();
-    private RegisteredManipulation manipulation;
+    private static ArrayList<Manipulation> manipulations = new ArrayList<>();
+    private Manipulation manipulation;
 
     static { //TODO: automatically link CAS operations with Operable methods using reflect.
         define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
@@ -32,7 +32,7 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         define("eval", new Signature(ANY, DECIMAL), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //TODO: Argument type Number
         define("eval", new Signature(ANY, INTEGER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //method overloading
 
-        Manipulation constClosure = operands -> {
+        Manipulable constClosure = operands -> {
             String constant = ((Literal) operands.get(0)).get();
             Constants.define(constant, () -> operands.get(1).val());
             return Constants.get(constant);
@@ -68,16 +68,16 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         this.manipulation = resolveManipulation(name, Signature.resolve(operands));
     }
 
-    private static RegisteredManipulation resolveManipulation(String name, Signature signature) {
-        ArrayList<RegisteredManipulation> candidates = registeredManipulations.stream()
+    private static Manipulation resolveManipulation(String name, Signature signature) {
+        ArrayList<Manipulation> candidates = manipulations.stream()
                 .filter(o -> o.getName().equals(name))
                 .collect(Collectors.toCollection(ArrayList::new));
-        for (RegisteredManipulation manipulation : candidates) { //prioritize explicit signatures
+        for (Manipulation manipulation : candidates) { //prioritize explicit signatures
             if (manipulation.getSignature().equals(signature)) {
                 return manipulation;
             }
         }
-        for (RegisteredManipulation manipulation : candidates) {
+        for (Manipulation manipulation : candidates) {
             if (manipulation.getSignature().equals(Signature.ANY)) {
                 return manipulation;
             }
@@ -85,16 +85,16 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         throw new JMCException("cannot resolve operation \"" + name + "\" with signature " + signature);
     }
 
-    public static ArrayList<RegisteredManipulation> registeredManipulations() {
-        return registeredManipulations;
+    public static ArrayList<Manipulation> registeredManipulations() {
+        return manipulations;
     }
 
-    public static void define(String name, Signature signature, Manipulation manipulation) {
-        registeredManipulations.add(new RegisteredManipulation(name, signature, manipulation));
+    public static void define(String name, Signature signature, Manipulable manipulable) {
+        manipulations.add(new Manipulation(name, signature, manipulable));
     }
 
-    public static void register(RegisteredManipulation registeredManipulation) {
-        registeredManipulations.add(registeredManipulation);
+    public static void register(Manipulation manipulation) {
+        manipulations.add(manipulation);
     }
 
 
