@@ -3,7 +3,7 @@ package jmc.cas;
 
 import jmc.Function;
 import jmc.cas.operations.BinaryOperation;
-import jmc.cas.operations.CompositeOperation;
+import jmc.cas.operations.CustomOperation;
 import jmc.cas.operations.Manipulation;
 import jmc.cas.operations.UnaryOperation;
 
@@ -51,7 +51,7 @@ public interface Assets {
         names.addAll(UnaryOperation.registeredOperations().stream()
                 .map(Function::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
-        names.addAll(CompositeOperation.registeredManipulations().stream()
+        names.addAll(CustomOperation.registeredManipulations().stream()
                 .map(Manipulation::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
         names.add("list");

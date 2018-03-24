@@ -222,7 +222,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 break;
         }
         if (bigKahuna != null) return smallKahuna.mult(bigKahuna);
-        return new CompositeOperation(Calculus.DERIVATIVE, this.copy());
+        return new CustomOperation(Calculus.DERIVATIVE, this.copy());
     }
 
     public boolean isUndefined() {

@@ -2,7 +2,7 @@ package jmc.cas;
 
 import jmc.cas.components.*;
 import jmc.cas.operations.BinaryOperation;
-import jmc.cas.operations.CompositeOperation;
+import jmc.cas.operations.CustomOperation;
 import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;
@@ -194,12 +194,12 @@ public class Compiler {
                 } else list = toList(operand);
                 pending.add(new List(list));
             } else if (isList(operand)) {
-                pending.add(new CompositeOperation(operationName, toList(operand)));
+                pending.add(new CustomOperation(operationName, toList(operand)));
             } else {
                 ensureValidity(operand);
                 if (UnaryOperation.isDefined(operationName)) {
                     pending.add(new UnaryOperation(operand, operationName));
-                } else pending.add(new CompositeOperation(operationName, operand));
+                } else pending.add(new CustomOperation(operationName, operand));
             }
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
             log(lightBlue("unary:\t") + colorMathSymbols(segment));

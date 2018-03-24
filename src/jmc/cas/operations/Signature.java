@@ -3,6 +3,7 @@ package jmc.cas.operations;
 import jmc.cas.Operable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,8 +16,13 @@ public class Signature {
     public static final Signature ANY = new Signature();
     private Argument[] args;
 
-    Signature(Argument... args) {
+    public Signature(Argument... args) {
         this.args = args;
+    }
+
+    public Signature(int numArgs) {
+        args = new Argument[numArgs];
+        Arrays.fill(args, Argument.ANY);
     }
 
     private Signature(ArrayList<Argument> args) {
@@ -24,6 +30,7 @@ public class Signature {
     }
 
     public boolean equals(Signature other) {
+        if (other.args.length == 0 || args.length == 0) return true; // special case
         if (other.args.length != this.args.length) return false;
         for (int i = 0; i < args.length; i++) {
             if (!args[i].equals(other.args[i]))

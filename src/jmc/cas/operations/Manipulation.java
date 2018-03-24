@@ -14,7 +14,7 @@ public class Manipulation implements Nameable, Manipulable {
     private Manipulable manipulable;
     private Signature signature;
 
-    Manipulation(String name, Signature signature, Manipulable manipulable) {
+    public Manipulation(String name, Signature signature, Manipulable manipulable) {
         this.manipulable = manipulable;
         this.signature = signature;
         this.name = name;
@@ -30,6 +30,14 @@ public class Manipulation implements Nameable, Manipulable {
 
     public boolean equals(Manipulation other) {
         return other.getName().equals(getName()) && other.signature.equals(signature);
+    }
+
+    public boolean equals(String name, Signature signature) {
+        return name.equals(getName()) && getSignature().equals(signature);
+    }
+
+    public String toString() {
+        return getName() + "(" + signature.toString() + ")";
     }
 
     public String getName() {

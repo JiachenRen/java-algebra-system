@@ -9,8 +9,7 @@ import jmc.cas.components.*;
  * Argument type
  */
 public enum Argument {
-    DECIMAL,
-    INTEGER,
+    NUMBER,
     VARIABLE,
     ANY,
     OPERATION,
@@ -21,7 +20,7 @@ public enum Argument {
 
     public static Argument resolve(Operable o) {
         if (!o.isNaN()) {
-            return RawValue.isInteger(o.val()) ? INTEGER : DECIMAL;
+            return NUMBER;
         } else if (o instanceof Literal) { // be careful, Literal is a subclass of Variable.
             return LITERAL;
         } else if (o instanceof Variable) {

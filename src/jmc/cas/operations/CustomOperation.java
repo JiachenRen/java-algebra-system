@@ -11,16 +11,20 @@ import static jmc.cas.operations.Argument.*;
 
 /**
  * Created by Jiachen on 3/17/18.
- * Composite Operation
+ * Custom Operation
  */
-public class CompositeOperation extends Operation implements BinLeafNode, Nameable {
+public class CustomOperation extends Operation implements BinLeafNode, Nameable {
     private static ArrayList<Manipulation> manipulations = new ArrayList<>();
     private Manipulation manipulation;
 
     static { //TODO: automatically link CAS operations with Operable methods using reflect.
         define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
-        define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, INTEGER), (operands -> operands.get(0).derivative((Variable) operands.get(1), (int) operands.get(2).val())));
+        define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, NUMBER), (operands -> {
+            double i = operands.get(2).val();
+            if (!RawValue.isInteger(i)) throw new JMCException("order of derivative must be an integer");
+            return operands.get(0).derivative((Variable) operands.get(1), (int) i);
+        }));
         define("simplify", new Signature(ANY), operands -> operands.get(0).simplify());
         define("simplest", new Signature(ANY), operands -> operands.get(0).simplest());
         define("expand", new Signature(ANY), operands -> operands.get(0).expand());
@@ -29,41 +33,58 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         define("replace", new Signature(ANY, ANY, ANY), operands -> operands.get(0).replace(operands.get(1), operands.get(2)));
         define("beautify", new Signature(ANY), operands -> operands.get(0).beautify());
         define("val", new Signature(ANY), operands -> new RawValue(operands.get(0).val()));
-        define("eval", new Signature(ANY, DECIMAL), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //TODO: Argument type Number
-        define("eval", new Signature(ANY, INTEGER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //method overloading
+        define("eval", new Signature(ANY, NUMBER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val()))); //TODO: Argument type Number
 
-        Manipulable constClosure = operands -> {
+        define("define", new Signature(LITERAL, NUMBER), operands -> {
             String constant = ((Literal) operands.get(0)).get();
             Constants.define(constant, () -> operands.get(1).val());
             return Constants.get(constant);
-        };
-
-        define("define", new Signature(LITERAL, INTEGER), constClosure);
-        define("define", new Signature(LITERAL, DECIMAL), constClosure);
+        });
 
         define("define", new Signature(LITERAL, LIST, ANY), operands -> {
             String name = ((Literal) operands.get(0)).get();
             List arguments = ((List) operands.get(1));
-            final Operable operable = operands.get(2);
-            define(name, Signature.ANY, feed -> {
-                ArrayList<Operable> unwrap = arguments.unwrap();
-                Operable captured = operable.copy();
-                for (int i = 0; i < unwrap.size(); i++) {
-                    Operable arg = unwrap.get(i);
-                    captured = captured.replace(arg, feed.get(i));
+            final Operable operation = operands.get(2);
+            Signature signature = new Signature(arguments.size());
+
+            // unregister existing manipulations with the same signature.
+            ArrayList<Manipulation> overridden = unregister(name, signature);
+            String s = "Overridden: [" + overridden.stream()
+                    .map(Manipulation::toString)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("") + "]";
+            Literal msg = new Literal(overridden.size() == 0 ? "Done." : s);
+            define(name, signature, feed -> {
+                ArrayList<Operable> args = arguments.unwrap();
+                Operable tmp = operation.copy();
+                for (int i = 0; i < args.size(); i++) {
+                    Operable arg = args.get(i);
+                    tmp = tmp.replace(arg, feed.get(i));
                 }
-                return captured.simplify();
+                return tmp.simplify();
             });
-            return new Literal("Done.");
+            return msg;
         });
+
+
+    }
+
+    public static ArrayList<Manipulation> unregister(String name, Signature signature) {
+        ArrayList<Manipulation> unregistered = new ArrayList<>();
+        for (int i = manipulations.size() - 1; i >= 0; i--) {
+            Manipulation manipulation = manipulations.get(i);
+            if (manipulation.equals(name, signature))
+                unregistered.add(manipulations.remove(i));
+        }
+        return unregistered;
     }
 
 
-    public CompositeOperation(String name, Operable... operands) {
+    public CustomOperation(String name, Operable... operands) {
         this(name, wrap(operands));
     }
 
-    public CompositeOperation(String name, ArrayList<Operable> operands) {
+    public CustomOperation(String name, ArrayList<Operable> operands) {
         super(operands);
         this.manipulation = resolveManipulation(name, Signature.resolve(operands));
     }
@@ -130,16 +151,16 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
         return this.simplify().firstDerivative(v);
     }
 
-    public CompositeOperation copy() {
-        return new CompositeOperation(getName(), getOperands().stream()
+    public CustomOperation copy() {
+        return new CustomOperation(getName(), getOperands().stream()
                 .map(Operable::copy)
                 .collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public boolean equals(Operable o) {
         if (!super.equals(o)) return false;
-        if (o instanceof CompositeOperation) {
-            CompositeOperation co = ((CompositeOperation) o);
+        if (o instanceof CustomOperation) {
+            CustomOperation co = ((CustomOperation) o);
             return co.getName().equals(getName());
         }
         return false;

@@ -387,7 +387,7 @@ public class BinaryOperation extends Operation {
 
         }
         //the derivative cannot be calculated, return symbolic representation instead
-        return new CompositeOperation(Calculus.DERIVATIVE, this.copy(), v);
+        return new CustomOperation(Calculus.DERIVATIVE, this.copy(), v);
     }
 
     public boolean isUndefined() {
