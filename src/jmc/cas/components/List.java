@@ -17,6 +17,10 @@ public class List extends Operable {
         this.operables = operables;
     }
 
+    public ArrayList<Operable> unwrap() {
+        return operables;
+    }
+
     @Override
     public boolean equals(Operable other) {
         if (!(other instanceof List)) return false;
@@ -83,7 +87,7 @@ public class List extends Operable {
      */
     @Override
     public double val() {
-        return 0;
+        return Double.NaN;
     }
 
     /**
@@ -185,6 +189,6 @@ public class List extends Operable {
 
     @Override
     public double eval(double x) {
-        return 0;
+        return Double.NaN;
     }
 }

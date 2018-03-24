@@ -1,10 +1,7 @@
 package jmc.cas.operations;
 
 import jmc.cas.*;
-import jmc.cas.components.Constants;
-import jmc.cas.components.Literal;
-import jmc.cas.components.RawValue;
-import jmc.cas.components.Variable;
+import jmc.cas.components.*;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -43,6 +40,21 @@ public class CompositeOperation extends Operation implements BinLeafNode, Nameab
 
         define("define", new Signature(LITERAL, INTEGER), constClosure);
         define("define", new Signature(LITERAL, DECIMAL), constClosure);
+
+        define("define", new Signature(LITERAL, LIST, ANY), operands -> {
+            String name = ((Literal) operands.get(0)).get();
+            List arguments = ((List) operands.get(1));
+            final Operable[] operable = {operands.get(2)};
+            define(name, Signature.ANY, feed -> {
+                ArrayList<Operable> unwrap = arguments.unwrap();
+                for (int i = 0; i < unwrap.size(); i++) {
+                    Operable arg = unwrap.get(i);
+                    operable[0] = operable[0].replace(arg, feed.get(i));
+                }
+                return operable[0].simplify();
+            });
+            return new Literal("Done.");
+        });
     }
 
 
