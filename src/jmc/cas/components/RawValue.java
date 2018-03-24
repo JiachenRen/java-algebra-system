@@ -33,6 +33,16 @@ public class RawValue extends LeafNode {
         return new RawValue(n).isInteger();
     }
 
+    public static boolean isNumeric(String str) {
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            Double.parseDouble(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
     public boolean isInteger() {
         return (n % 1) == 0;
     }

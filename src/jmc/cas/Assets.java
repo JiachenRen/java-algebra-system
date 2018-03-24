@@ -31,6 +31,21 @@ public interface Assets {
         return symbols().contains(Character.toString(c));
     }
 
+    static boolean isValidVarName(String s) {
+        if (s.isEmpty()) {
+            return false;
+        }
+        if (!Character.isJavaIdentifierStart(s.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < s.length(); i++) {
+            if (!Character.isJavaIdentifierPart(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     static ArrayList<String> reservedNames() {
         ArrayList<String> names = new ArrayList<>();
         names.addAll(UnaryOperation.registeredOperations().stream()

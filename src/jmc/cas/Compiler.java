@@ -29,11 +29,12 @@ public class Compiler {
         if (exp.contains(">") || exp.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
         if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
             throw new JMCException("'()' mismatch in " + "\"" + exp + "\"");
+        if (exp.contains("&") || exp.contains("#")) throw new JMCException("syntax: remove illegal character(s) &, #");
         if (numOccurrence(exp, '{') != numOccurrence(exp, '}'))
             throw new JMCException("'{}' mismatch in " + "\"" + exp + "\"");
         if (numOccurrence(exp, '\'') % 2 != 0) throw new JMCException("'' mismatch in " + "\"" + exp + "\"");
         exp = formatList(exp); // this has to happen before formatOperation()
-        exp = formatOperations(exp.replace("(-", "(0-"));
+        exp = formatOperations(exp.replace("(-", "(0-").replace(",-", ",0-"));
         exp = formatCoefficients(exp);
         exp = formatParenthesis(exp);
         exp = formatLiteral(exp);
@@ -264,13 +265,9 @@ public class Compiler {
                 if (numOccurrence(operand, '\'') != 2)
                     throw new JMCException("syntax error due to ' in \"" + operand + "\"");
                 else operands.add(new Literal(operand.substring(1, operand.length() - 1)));
-            } else if (VARS.contains(operand.toLowerCase().substring(0, 1))) {
-                operands.add(new Variable(operand.toLowerCase()));
-            } else try {
-                operands.add(new RawValue(Double.valueOf(operand)));
-            } catch (NumberFormatException e) {
-                throw new JMCException("undefined operand/operation in \"" + operand + "\"");
-            }
+            } else if (RawValue.isNumeric(operand)) operands.add(new RawValue(Double.valueOf(operand)));
+            else if (isValidVarName(operand)) operands.add(new Variable(operand.toLowerCase()));
+            else throw new JMCException("unresolved symbol \"" + operand + "\"");
         }
         return operands;
     }
