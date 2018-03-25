@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  */
 public abstract class Operation extends Operable implements Nameable {
     private ArrayList<Operable> operands;
+    private boolean isOrdered = false;
 
     public Operation(ArrayList<Operable> operands) {
         this.operands = operands;
@@ -102,6 +103,7 @@ public abstract class Operation extends Operable implements Nameable {
 
     public Operation setOperands(ArrayList<Operable> operands) {
         this.operands = operands;
+        isOrdered = false;
         return this;
     }
 
@@ -114,6 +116,7 @@ public abstract class Operation extends Operable implements Nameable {
      */
     public Operation setOperand(Operable operand, int idx) {
         operands.set(idx, operand);
+        isOrdered = false;
         return this;
     }
 
@@ -245,5 +248,27 @@ public abstract class Operation extends Operable implements Nameable {
                 return false;
         }
         return true;
+    }
+
+    void setOrdered(boolean b) {
+        isOrdered = b;
+    }
+
+    boolean isOrdered() {
+        return isOrdered;
+    }
+
+    /**
+     * orders the expression according to lexicographic order. This saves some computational resource when trying to decide
+     * whether a node within the binary tree the the canonical form of another.
+     * e.g. c*b*3*a would be reordered to something like 3*a*c*b
+     */
+    public void order() {
+        operands.forEach(o -> {
+            o.order();
+            if (o instanceof Operation)
+                ((Operation) o).isOrdered = true;
+        });
+        isOrdered = true;
     }
 }

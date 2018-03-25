@@ -269,12 +269,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return getOperand(0);
     }
 
-    public String getName() {
-        return operation.getName();
-    }
-
     public void setOperand(Operable operable) {
         super.setOperand(operable, 0);
+    }
+
+    public String getName() {
+        return operation.getName();
     }
 
     public String toString() {

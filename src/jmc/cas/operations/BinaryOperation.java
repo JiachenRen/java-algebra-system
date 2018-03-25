@@ -8,7 +8,9 @@ import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -28,56 +30,6 @@ public class BinaryOperation extends Operation {
         super(wrap(leftHand, rightHand));
         this.operator = operator;
         omitParenthesis = true;
-        simplifyParenthesis();
-    }
-
-    /**
-     * in ((a+b)+c), the parenthesis around (a+b) is not necessary.
-     */
-    private BinaryOperation simplifyParenthesis() {
-        processParentheticalNotation(getLeft(), false);
-        processParentheticalNotation(getRight(), true);
-        return this;
-    }
-
-    /**
-     * Remove unnecessary parenthesis
-     *
-     * @since May 19th, 2017
-     */
-    private void processParentheticalNotation(Operable operable, boolean isRightHand) {
-        if (operable instanceof BinaryOperation) {
-            BinaryOperation op = ((BinaryOperation) operable);
-            if (op.getPriority() < this.getPriority()) {
-                op.setOmitParenthesis(true);
-            } else if (op.getPriority() == this.getPriority()) {
-                if (op.operator.equals(operator) && op.is("^"))
-                    op.setOmitParenthesis(false);
-                else op.setOmitParenthesis(op.operator.equals(operator) || !isRightHand);
-            } else {
-                op.setOmitParenthesis(false);
-            }
-        }
-    }
-
-    public Operable getLeft() {
-        return getOperand(0);
-    }
-
-    public Operable getRight() {
-        return getOperand(1);
-    }
-
-    public int getPriority() {
-        return operator.priority;
-    }
-
-    public void setOmitParenthesis(boolean temp) {
-        omitParenthesis = temp;
-    }
-
-    public void setRight(Operable operable) {
-        setOperand(operable, 1);
         simplifyParenthesis();
     }
 
@@ -157,6 +109,76 @@ public class BinaryOperation extends Operation {
         return 0;
     }
 
+    /**
+     * in ((a+b)+c), the parenthesis around (a+b) is not necessary.
+     */
+    private BinaryOperation simplifyParenthesis() {
+        processParentheticalNotation(getLeft(), false);
+        processParentheticalNotation(getRight(), true);
+        return this;
+    }
+
+    /**
+     * Remove unnecessary parenthesis
+     *
+     * @since May 19th, 2017
+     */
+    private void processParentheticalNotation(Operable operable, boolean isRightHand) {
+        if (operable instanceof BinaryOperation) {
+            BinaryOperation op = ((BinaryOperation) operable);
+            if (op.getPriority() < this.getPriority()) {
+                op.setOmitParenthesis(true);
+            } else if (op.getPriority() == this.getPriority()) {
+                if (op.operator.equals(operator) && op.is("^"))
+                    op.setOmitParenthesis(false);
+                else op.setOmitParenthesis(op.operator.equals(operator) || !isRightHand);
+            } else {
+                op.setOmitParenthesis(false);
+            }
+        }
+    }
+
+    @Override
+    public void order() {
+        if (is("*") || is("+")) {
+            ArrayList<Operable> flattened = flattened();
+            flattened.forEach(Operable::order);
+            flattened = flattened.stream().sorted(Comparator.comparing(Operable::toString))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            BinaryOperation ordered = (BinaryOperation) reconstructBinTree(flattened);
+            setLeft(ordered.getLeft());
+            setRight(ordered.getRight());
+        }
+        setOrdered(true);
+    }
+
+    @Override
+    public Operation setOperand(Operable operand, int i) {
+        super.setOperand(operand, i);
+        return this;
+    }
+
+    public Operable getLeft() {
+        return getOperand(0);
+    }
+
+    public Operable getRight() {
+        return getOperand(1);
+    }
+
+    public void setRight(Operable operable) {
+        setOperand(operable, 1);
+        simplifyParenthesis();
+    }
+
+    public int getPriority() {
+        return operator.priority;
+    }
+
+    public void setOmitParenthesis(boolean temp) {
+        omitParenthesis = temp;
+    }
+
     public double eval(double x) {
         double leftVal = getLeft().eval(x);
         double rightVal = getRight().eval(x);
@@ -194,7 +216,6 @@ public class BinaryOperation extends Operation {
      */
     public Operable simplify() {
         if (isCommutable()) return simplifyCommutative();
-
         super.simplify();
 
         if (!operator.isStandard())
@@ -1025,8 +1046,53 @@ public class BinaryOperation extends Operation {
 
     public Operable setLeft(Operable operable) {
         super.setOperand(operable, 0);
-        this.simplifyParenthesis();
+        simplifyParenthesis();
         return this;
+    }
+
+    @Override
+    public Operable expand() {
+        this.toAdditionOnly().toExponentialForm();
+        super.expand();
+        return expandBase();
+    }
+
+    public boolean isCommutative() {
+        return "+-*/".contains(operator.name);
+    }
+
+//    @Override
+//    public boolean equals(Operable other) {
+//        if (!(other instanceof BinaryOperation)) return false;
+//        BinaryOperation binOp = (BinaryOperation) other;
+//        if (this.isCommutative() && binOp.isCommutative() && this.getPriority() == binOp.getPriority()) {
+//            ArrayList<Operable> pool1 = this.flattened();
+//            ArrayList<Operable> pool2 = binOp.flattened();
+//            if (pool1.size() != pool2.size()) return false;
+//            return pool1.stream().map(o -> Operable.remove(pool2, o)).reduce((a, b) -> a && b).get();
+//        } else if (operator.equals(binOp.operator)) {
+//            return binOp.getLeft().equals(getLeft()) && binOp.getRight().equals(getRight());
+//        }
+//        return false;
+//    }
+
+    @Override
+    public boolean equals(Operable other) {
+        if (!(other instanceof BinaryOperation)) return false;
+        BinaryOperation binOp = (BinaryOperation) other;
+        if (operator.equals(binOp.operator)) {
+            if (!binOp.isOrdered()) binOp.order();
+            if (!isOrdered()) order();
+            return binOp.getLeft().equals(getLeft()) && binOp.getRight().equals(getRight());
+        }
+        return false;
+    }
+
+    @Override
+    public Operable replace(Operable o, Operable r) {
+        Operable clone = super.replace(o, r);
+        if (clone instanceof BinaryOperation) ((BinaryOperation) clone).simplifyParenthesis();
+        return clone;
     }
 
     /**
@@ -1111,40 +1177,6 @@ public class BinaryOperation extends Operation {
             return name;
         }
 
-    }
-
-
-    @Override
-    public Operable expand() {
-        this.toAdditionOnly().toExponentialForm();
-        super.expand();
-        return expandBase();
-    }
-
-    public boolean isCommutative() {
-        return "+-*/".contains(operator.name);
-    }
-
-    @Override
-    public boolean equals(Operable other) {
-        if (!(other instanceof BinaryOperation)) return false;
-        BinaryOperation binOp = (BinaryOperation) other;
-        if (this.isCommutative() && binOp.isCommutative() && this.getPriority() == binOp.getPriority()) {
-            ArrayList<Operable> pool1 = this.flattened();
-            ArrayList<Operable> pool2 = binOp.flattened();
-            if (pool1.size() != pool2.size()) return false;
-            return pool1.stream().map(o -> Operable.remove(pool2, o)).reduce((a, b) -> a && b).get();
-        } else if (operator.equals(binOp.operator)) {
-            return binOp.getLeft().equals(getLeft()) && binOp.getRight().equals(getRight());
-        }
-        return false;
-    }
-
-    @Override
-    public Operable replace(Operable o, Operable r) {
-        Operable clone = super.replace(o, r);
-        if (clone instanceof BinaryOperation) ((BinaryOperation) clone).simplifyParenthesis();
-        return clone;
     }
 
 }

@@ -48,6 +48,16 @@ public class List extends Operable {
     }
 
     /**
+     * orders the expression according to lexicographic order. This saves some computational resource when trying to decide
+     * whether a node within the binary tree the the canonical form of another.
+     * e.g. c*b*3*a would be reordered to something like 3*a*c*b
+     */
+    @Override
+    public void order() {
+        //TODO: implement
+    }
+
+    /**
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
      * returns -1 if not found.
      *

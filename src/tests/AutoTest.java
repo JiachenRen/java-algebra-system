@@ -21,13 +21,14 @@ import static tests.TestPrint.l;
  */
 @SuppressWarnings("unused")
 public class AutoTest {
+    public static boolean WRITE = true;
 
     public static void main(String args[]) throws Exception {
         configureCAS();
 
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates(
-                args
+//                args
         );
 
         String tests[] = new String[]{
@@ -192,7 +193,8 @@ public class AutoTest {
         return l.contains("->") ? l.substring(l.indexOf("->") + 2) : "";
     }
 
-    public static void test(ArrayList<String> lines, boolean testValue, String... methods) throws Exception {
+    private static void test(String fileName, boolean testValue, String... methods) throws Exception {
+        ArrayList<String> lines = getLines(Utils.read(fileName));
         ArrayList<Operable> ops = (ArrayList<Operable>) lines.stream()
                 .map(l -> Compiler.compile(getOriginal(l)))
                 .collect(Collectors.toList());
@@ -256,12 +258,7 @@ public class AutoTest {
 
             lines.set(i, line + "-> " + now);
         }
-    }
-
-    private static void test(String fileName, boolean testValue, String... methods) throws Exception {
-        ArrayList<String> lines = getLines(Utils.read(fileName));
-        test(lines, testValue, methods);
-        writeLines(fileName, lines);
+        if (WRITE) writeLines(fileName, lines);
     }
 
     private static void writeLines(String fileName, ArrayList<String> lines) {

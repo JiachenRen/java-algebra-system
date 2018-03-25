@@ -80,6 +80,13 @@ public abstract class Operable implements Evaluable {
     }
 
     /**
+     * orders the expression according to lexicographic order. This saves some computational resource when trying to decide
+     * whether a node within the binary tree the the canonical form of another.
+     * e.g. c*b*3*a would be reordered to something like 3*a*c*b
+     */
+    public abstract void order();
+
+    /**
      * @return number of variables in the expression represented by self.
      */
     public int numVars() {

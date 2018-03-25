@@ -45,4 +45,10 @@ public abstract class LeafNode extends Operable implements BinLeafNode {
 
     public abstract boolean isUndefined();
 
+    /**
+     * LeafNode, nothing could be done for reordering.
+     */
+    public void order() {
+    }
+
 }
