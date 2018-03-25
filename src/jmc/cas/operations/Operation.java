@@ -250,6 +250,7 @@ public abstract class Operation extends Operable implements Nameable {
         return true;
     }
 
+    @SuppressWarnings("SameParameterValue")
     void setOrdered(boolean b) {
         isOrdered = b;
     }

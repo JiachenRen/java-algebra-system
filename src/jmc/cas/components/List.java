@@ -1,6 +1,9 @@
 package jmc.cas.components;
 
+import jmc.cas.JMCException;
 import jmc.cas.Operable;
+import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -44,6 +47,64 @@ public class List extends Operable {
 
     public int size() {
         return operables.size();
+    }
+
+    /**
+     * perform binary operation with another list that has matching dimension.
+     * NOTE: modifies self
+     *
+     * @param binOp binary operation to be performed
+     * @param other another list with matching dimension, i.e. size == size
+     * @return two lists merged with binary operation
+     */
+    public List binOp(BinaryOperation binOp, List other) {
+        if (size() != other.size()) throw new JMCException("list dimension mismatch");
+        ArrayList<Operable> unwrap = unwrap();
+        for (int i = 0; i < unwrap.size(); i++) {
+            Operable operable = unwrap.get(i);
+            set(i, new BinaryOperation(operable, binOp.getName(), other.get(i)));
+        }
+        return this;
+    }
+
+    /**
+     * perform binary operation with another operable element.
+     * NOTE: modifies self
+     *
+     * @param binOp   binary operation to be performed
+     * @param other   an operable instance
+     * @param forward if this is 'a' in a/b, then set [forward] to true; otherwise false
+     * @return self with all of the elements performed binOp with [other]
+     */
+    public List binOp(BinaryOperation binOp, Operable other, boolean forward) {
+        ArrayList<Operable> unwrap = unwrap();
+        for (int i = 0; i < unwrap.size(); i++) {
+            Operable operable = unwrap.get(i);
+            BinaryOperation op = forward ? new BinaryOperation(operable, binOp.getName(), other)
+                    : new BinaryOperation(other, binOp.getName(), operable);
+            set(i, op);
+        }
+        return this;
+    }
+
+    /**
+     * perform unary operation on each element in the list
+     *
+     * @param uOp UnaryOperation to be performed for each element in the list
+     * @return self
+     */
+    public List uOp(UnaryOperation uOp) {
+        operables = operables.stream().map(o -> new UnaryOperation(o, uOp.getFunction()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        return this;
+    }
+
+    public void set(int i, Operable o) {
+        operables.set(i, o);
+    }
+
+    public void set(ArrayList<Operable> operables) {
+        this.operables = operables;
     }
 
     @Override

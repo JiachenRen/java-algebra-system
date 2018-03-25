@@ -4,6 +4,7 @@ package jmc.cas.operations;
 import jmc.MathContext;
 import jmc.cas.*;
 import jmc.cas.components.Fraction;
+import jmc.cas.components.List;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
@@ -225,6 +226,19 @@ public class BinaryOperation extends Operation {
         if (isCommutable())
             return simplifyCommutative();
         super.simplify();
+
+        // delegate simplification to List wherever possible
+        // this is after super.simplify to prevent redundant work?
+        if (getLeft() instanceof List && getRight() instanceof List) {
+            List left = ((List) getLeft());
+            List right = ((List) getRight());
+            return left.binOp(this, right).simplify();
+        } else if (getLeft() instanceof List) {
+            return ((List) getLeft()).binOp(this, getRight(), true).simplify();
+        } else if (getRight() instanceof List) {
+            return ((List) getRight()).binOp(this, getLeft(), false).simplify();
+        }
+
 
         if (!operator.isStandard())
             return this; // nothing could be done with non-standard operations

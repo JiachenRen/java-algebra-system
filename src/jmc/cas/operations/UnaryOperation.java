@@ -5,6 +5,7 @@ import jmc.MathContext;
 import jmc.cas.*;
 import jmc.cas.Compiler;
 import jmc.cas.components.Constants;
+import jmc.cas.components.List;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
@@ -92,6 +93,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     @Override
     public Operable simplify() {
         super.simplify();
+
+        if (getOperand() instanceof List) {
+            return ((List) getOperand()).uOp(this).simplify();
+        }
 
         if (this.isUndefined()) return RawValue.UNDEF;
 
@@ -306,6 +311,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
     public double val() {
         return operation.eval(getOperand().val());
+    }
+
+    public Function getFunction() {
+        return operation;
     }
 
     private static class UnaryOperator implements Evaluable, Nameable {
