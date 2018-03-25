@@ -8,9 +8,7 @@ import jmc.cas.components.List;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static jmc.cas.Mode.*;
@@ -677,6 +675,7 @@ public class BinaryOperation extends Operation {
                                     return Operation.exp(uop.getOperand(), new RawValue(n)).simplify();
                                 }
                             }
+                            break;
                         case "ln": // (e^a)^ln(b) = b^a
                             Operable k = new UnaryOperation(getLeft(), "ln").simplify();
                             if (k instanceof RawValue) {
@@ -700,6 +699,7 @@ public class BinaryOperation extends Operation {
                                 BinaryOperation right = new BinaryOperation(binOp.getRight(), "^", r);
                                 return new BinaryOperation(left, "*", right).simplify();
                             }
+                            break;
                         case "^": // (a^b^c) = a^(b*c)
                             BinaryOperation exp = new BinaryOperation(binOp.getRight(), "*", o);
                             return new BinaryOperation(binOp.getLeft(), "^", exp).simplify();
@@ -1150,10 +1150,10 @@ public class BinaryOperation extends Operation {
     }
 
     public static class BinaryOperator implements BinEvaluable, Nameable {
-        private static ArrayList<BinaryOperator> registeredBinOps;
+        private static Map<String, BinaryOperator> registeredBinOps;
 
         static {
-            registeredBinOps = new ArrayList<>();
+            registeredBinOps = new HashMap<>();
             define("+", 3, (a, b) -> a + b);
             define("-", 3, (a, b) -> a - b);
             define("*", 2, (a, b) -> a * b);
@@ -1175,17 +1175,13 @@ public class BinaryOperation extends Operation {
         }
 
         private static void define(String name, int priority, BinEvaluable evaluable) {
-            for (int i = 0; i < registeredBinOps.size(); i++) {
-                BinaryOperator function = registeredBinOps.get(i);
-                if (function.name.equals(name))
-                    registeredBinOps.remove(i);
-            }
-            registeredBinOps.add(new BinaryOperator(name, priority, evaluable));
+            registeredBinOps.remove(name);
+            registeredBinOps.put(name, new BinaryOperator(name, priority, evaluable));
         }
 
         private static String listAsString(int priority) {
             StringBuilder incrementer = new StringBuilder();
-            for (BinaryOperator operation : registeredBinOps) {
+            for (BinaryOperator operation : registeredBinOps.values()) {
                 if (operation.priority == priority)
                     incrementer.append(operation.name);
             }
@@ -1193,10 +1189,9 @@ public class BinaryOperation extends Operation {
         }
 
         private static BinaryOperator extract(String name) {
-            for (BinaryOperator binaryOperation : registeredBinOps)
-                if (binaryOperation.name.equals(name))
-                    return binaryOperation;
-            throw new RuntimeException("undefined binary operator \"" + name + "\"");
+            BinaryOperator bin = registeredBinOps.get(name);
+            if (bin == null) throw new RuntimeException("undefined binary operator \"" + name + "\"");
+            return bin;
         }
 
         @SuppressWarnings("BooleanMethodIsAlwaysInverted")

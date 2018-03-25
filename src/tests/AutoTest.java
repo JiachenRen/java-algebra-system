@@ -29,7 +29,7 @@ public class AutoTest {
 
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates(
-//                args
+                args
         );
 
         String tests[] = new String[]{

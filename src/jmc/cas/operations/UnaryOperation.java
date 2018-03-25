@@ -11,6 +11,9 @@ import jmc.cas.components.Variable;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.*;
 import static jmc.MathContext.*;
@@ -56,9 +59,9 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * List of built-in operations:
      * -> cos, acos(cos^-1), sin, asin, tan, atan, sec, csc, cot, log, int, abs, ln, cosh, sinh, tanh, !(factorial)
      *
-     * @return an ArrayList containing all of the defined unary operations.
+     * @return a Collection containing all of the defined unary operations.
      */
-    public static ArrayList<Function> registeredOperations() {
+    public static Collection<Function> registeredOperations() {
         return UnaryOperator.list();
     }
 
@@ -318,10 +321,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     private static class UnaryOperator implements Evaluable, Nameable {
-        private static ArrayList<Function> functions;
+        private static Map<String, Function> functions;
 
         static {
-            functions = new ArrayList<>();
+            functions = new HashMap<>();
             define("cos", Math::cos);
             define("sin", Math::sin);
             define("log", Math::log10);
@@ -351,31 +354,22 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         private Function unaryOperation;
 
         UnaryOperator(String name) {
-            for (Function function : functions) {
-                if (function.getName().equals(name))
-                    unaryOperation = function;
-            }
+            unaryOperation = functions.get(name);
         }
 
         private static Function extract(String name) {
-            for (Function function : functions) {
-                if (function.getName().equals(name))
-                    return function;
-            }
+            Function function = functions.get(name);
+            if (function != null) return function;
             throw new RuntimeException("undefined unary operation: " + "\"" + name + "\"");
         }
 
         private static void define(String name, Evaluable evaluable) {
-            for (int i = 0; i < functions.size(); i++) {
-                Function function = functions.get(i);
-                if (function.getName().equals(name))
-                    functions.remove(i);
-            }
-            functions.add(new Function(name, evaluable));
+            functions.remove(name);
+            functions.put(name, new Function(name, evaluable));
         }
 
-        static ArrayList<Function> list() {
-            return functions;
+        static Collection<Function> list() {
+            return functions.values();
         }
 
         @Override
