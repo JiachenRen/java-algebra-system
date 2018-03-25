@@ -385,15 +385,14 @@ public class Compiler {
     }
 
     private static String formatParenthesis(String exp) {
-        String non_operators = ")>" + LETTERS;
-        for (int i = 1; i < exp.length(); i++) {
-            char cur = exp.charAt(i);
-            if (cur == '(') {
-                String prev = Character.toString(exp.charAt(i - 1));
-                if (DIGITS.contains(prev) || non_operators.contains(prev)) {
-                    exp = exp.replace(prev + "" + cur, prev + "*" + cur);
-                }
-            }
+        String candidates = LETTERS + DIGITS;
+        for (char c : candidates.toCharArray()) {
+            exp = exp.replace(">" + c, ">" + "*" + c); // for forms like log<&0>x
+            exp = exp.replace(")" + c, ")*" + c);
+        }
+        candidates += ")>";
+        for (char c : candidates.toCharArray()) {
+            exp = exp.replace(c + "(", c + "*(");
         }
         return exp;
     }
