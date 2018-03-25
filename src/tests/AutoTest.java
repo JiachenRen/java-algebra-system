@@ -21,7 +21,7 @@ import static tests.TestPrint.l;
  */
 @SuppressWarnings("unused")
 public class AutoTest {
-    public static boolean WRITE = false;
+    public static boolean WRITE = true;
 
     public static void main(String args[]) throws Exception {
         configureCAS();

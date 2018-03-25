@@ -906,9 +906,9 @@ public class BinaryOperation extends Operation {
         ArrayList<Operable> pool = new ArrayList<>();
         if (operator.priority == 1 || !operator.isStandard())
             return pool; //if the operator is ^, then no commutative property applies.
-        BinaryOperation clone = this.copy().toAdditionOnly().toExponentialForm();
-        clone.flat(pool, clone.getLeft());
-        clone.flat(pool, clone.getRight());
+        this.toAdditionOnly().toExponentialForm();
+        flat(pool, getLeft());
+        flat(pool, getRight());
         return pool;
     }
 
