@@ -61,6 +61,16 @@ public class Literal extends Variable {
         return content;
     }
 
+    @Override
+    public double val() {
+        return Double.NaN;
+    }
+
+    @Override
+    public Literal simplify() {
+        return this;
+    }
+
     @Deprecated
     public String getName() {
         return content;

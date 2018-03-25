@@ -30,6 +30,12 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         define("simplify", new Signature(ANY), operands -> operands.get(0).simplify());
         define("simplest", new Signature(ANY), operands -> operands.get(0).simplest());
         define("expand", new Signature(ANY), operands -> operands.get(0).expand());
+        define("mod", new Signature(ANY, ANY), operands -> {
+            double a = operands.get(0).val();
+            double b = operands.get(1).val();
+            if (Double.isNaN(a) || Double.isNaN(b)) return new CustomOperation("mod", operands);
+            return new RawValue(a % b); //NOTE: never return a new CompositeOperation! Causes StackOverflow
+        });
         define("num_nodes", new Signature(ANY), operands -> new RawValue(operands.get(0).numNodes()));
         define("num_vars", new Signature(ANY), operands -> new RawValue(operands.get(0).numVars()));
         define("complexity", new Signature(ANY), operands -> new RawValue(operands.get(0).complexity()));
@@ -64,6 +70,52 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
                 return tmp.simplify();
             });
             return msg;
+        });
+
+        define("binary", new Signature(LITERAL, NUMBER, OPERATION), operands -> {
+            String operator = ((Literal) operands.get(0)).get();
+            RawValue priority = ((RawValue) operands.get(1));
+            Operable operation = operands.get(2);
+            ArrayList<Operable> variables = operation.extractVariables().stream()
+                    .map(o -> (Operable) o)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            if (variables.size() != 2 || !Operable.contains(variables, new Variable("a"))
+                    || !Operable.contains(variables, new Variable("b"))) {
+                throw new JMCException("definition of binary operation should use only contain 2 variables, [a,b]");
+            }
+            if (!priority.isInteger()) throw new JMCException("priority must be an integer");
+            if (operator.length() > 1) throw new JMCException("binary operator can only be a single character");
+            if (Assets.isSymbol(operator.charAt(0)) || Assets.isValidVarName(operator))
+                throw new JMCException("reserved symbol '" + operator + "', choose a different one");
+            BinaryOperation.define(operator, (int) priority.val(), (a, b) -> {
+                Operable tmp = operation.copy();
+                return tmp.replace(new Variable("a"), new RawValue(a))
+                        .replace(new Variable("b"), new RawValue(b))
+                        .val();
+            });
+            return new Literal("a" + operator + "b = " + operation);
+        });
+
+        define("store", new Signature(LITERAL, ANY), operands -> {
+            Variable v = ((Variable) operands.get(0));
+            Operable o = operands.get(1);
+            Variable.store(o, v.getName());
+            return o;
+        });
+
+        define("del_var", Signature.ANY, operands -> {
+            ArrayList<String> deleted = new ArrayList<>();
+            operands.forEach(o -> {
+                if (!(o instanceof Literal))
+                    throw new JMCException("illegal argument [" + o + "]; argument must be literal");
+                deleted.add(o.toString().replace("'", "") + ":" +
+                        Optional.ofNullable(Variable.del(((Literal) o).get()))
+                                .orElse(RawValue.UNDEF)
+                                .toString());
+            });
+            return new Literal("[" + deleted.stream()
+                    .reduce((a, b) -> a + "," + b)
+                    .orElse("") + "]");
         });
 
         define("del", Signature.ANY, operands -> {
@@ -142,7 +194,9 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
     }
 
     public double val() {
-        return manipulation.manipulate(getOperands()).val();
+        Operable operable = manipulation.manipulate(getOperands());
+        if (operable.equals(this)) return Double.NaN;
+        return operable.val();
     }
 
     public String getName() {
@@ -162,7 +216,9 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         if (manipulation.getSignature().equals(new Signature(ANY)) && getOperand(0) instanceof List) {
             return ((List) getOperand(0)).customOp(this).simplify();
         }
-        return manipulation.manipulate(getOperands()).simplify(); //TODO: might cause StackOverflow
+        Operable manipulated = manipulation.manipulate(getOperands());
+        if (manipulated.equals(this)) return this;
+        return manipulated.simplify();
     }
 
     public Operable exec() {

@@ -3,13 +3,17 @@ package jmc.cas.components;
 import jmc.cas.*;
 import jmc.utils.ColorFormatter;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * Created by Jiachen on 16/05/2017.
  * Variable class
  */
 public class Variable extends LeafNode implements Nameable {
     private String name;
-    private Operable stored;
+    private static Map<String, Operable> storedVars = new HashMap<>();
 
     public Variable(String name) {
         if (name.equals("")) throw new JMCException("variable name cannot be empty");
@@ -21,7 +25,7 @@ public class Variable extends LeafNode implements Nameable {
     }
 
     public boolean equals(Operable other) {
-        return other instanceof Variable && ((Variable) other).getName().equals(this.name);
+        return other instanceof Variable && ((Variable) other).getName().equals(name);
     }
 
     public String getName() {
@@ -40,10 +44,14 @@ public class Variable extends LeafNode implements Nameable {
      * Since a variable is not an arbitrary number, val() should return NaN.
      * If a value is stored in the variable, return the value.
      *
-     * @return NaN
+     * @return NaN or value of the definition
      */
     public double val() {
-        return stored == null ? Double.NaN : stored.val();
+        return get().orElse(RawValue.UNDEF).val();
+    }
+
+    private Optional<Operable> get() {
+        return get(this.name);
     }
 
     public boolean isUndefined() {
@@ -51,20 +59,35 @@ public class Variable extends LeafNode implements Nameable {
     }
 
     public Operable simplify() {
-        return this.stored == null ? this : stored;
+        return get().orElse(this);
     }
 
     /**
      * Assign the variable with an Operable
      *
-     * @param o the Operable to be assigned to this variable.
+     * @param var the name of the variable
+     * @param o   the Operable to be assigned to the variable name .
      */
-    public void store(Operable o) {
-        this.stored = o;
+    public static void store(Operable o, String var) {
+        storedVars.put(var, o);
     }
 
-    public void del() {
-        this.stored = null;
+    /**
+     * @param var variable name
+     * @return Optional type of var's definition
+     */
+    public static Optional<Operable> get(String var) {
+        return Optional.ofNullable(storedVars.get(var));
+    }
+
+    /**
+     * deletes the variable from stored variables
+     *
+     * @param var the name of the variable
+     * @return definition of var
+     */
+    public static Operable del(String var) {
+        return storedVars.remove(var);
     }
 
     /**
@@ -90,9 +113,7 @@ public class Variable extends LeafNode implements Nameable {
      * @return new Variable instance that is identical to self.
      */
     public Variable copy() {
-        Variable v = new Variable(name);
-        v.store(stored);
-        return v;
+        return new Variable(name);
     }
 
     public Operable explicitNegativeForm() {

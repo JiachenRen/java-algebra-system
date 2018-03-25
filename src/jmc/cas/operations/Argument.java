@@ -19,7 +19,7 @@ public enum Argument {
     LITERAL;
 
     public static Argument resolve(Operable o) {
-        if (!o.isNaN()) {
+        if (!o.isNaN() || o instanceof RawValue) {
             return NUMBER;
         } else if (o instanceof Literal) { // be careful, Literal is a subclass of Variable.
             return LITERAL;

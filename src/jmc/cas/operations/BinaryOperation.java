@@ -239,7 +239,8 @@ public class BinaryOperation extends Operation {
 
 
         if (!operator.isStandard())
-            return this; // nothing could be done with non-standard operations
+            // nothing could be done with non-standard operations, except when it reduces to a RawValue.
+            return Double.isNaN(val()) ? this : new RawValue(val());
         if (isUndefined()) return RawValue.UNDEF;
 
         if (getLeft() instanceof RawValue && getRight() instanceof RawValue) {

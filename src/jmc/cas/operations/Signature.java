@@ -30,7 +30,7 @@ public class Signature {
     }
 
     public boolean equals(Signature other) {
-        if (other.args.length == 0 || args.length == 0) return true; // special case
+        if (args.length == 0 && other.args.length == 0) return true; // special case
         if (other.args.length != this.args.length) return false;
         for (int i = 0; i < args.length; i++) {
             if (!args[i].equals(other.args[i]))

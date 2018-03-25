@@ -7,8 +7,10 @@ import jmc.cas.components.Constants;
 import jmc.cas.components.Fraction;
 import jmc.cas.components.RawValue;
 import jmc.cas.components.Variable;
+import jmc.cas.operations.Argument;
 import jmc.cas.operations.BinaryOperation;
 import jmc.cas.operations.Operation;
+import jmc.cas.operations.Signature;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -150,11 +152,13 @@ public class CasComprehensiveTest {
         l(o.replace(new Variable("x"), new Variable("k")));
 
         Variable v = new Variable("v");
-        v.store(Compiler.compile("x*a+b"));
+        Variable.store(Compiler.compile("x*a+b"),"v");
         l(v);
         l(v.copy().simplify());
-        v.del();
+        Variable.del("v");
         l(v);
+
+        l(new Signature(Argument.VARIABLE,Argument.ANY).equals(new Signature(Argument.LITERAL,Argument.ANY)));
     }
 
 }
