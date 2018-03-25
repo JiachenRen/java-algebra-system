@@ -1,9 +1,7 @@
 package jmc.cas.components;
 
-import jmc.cas.JMCException;
-import jmc.cas.LeafNode;
-import jmc.cas.Nameable;
-import jmc.cas.Operable;
+import jmc.cas.*;
+import jmc.utils.ColorFormatter;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -57,6 +55,14 @@ public class Variable extends LeafNode implements Nameable {
     public Operable firstDerivative(Variable v) {
         if (v.equals(this)) return RawValue.ONE;
         return RawValue.ZERO;
+    }
+
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        return ColorFormatter.color(this.toString(), Mode.VARIABLE_COLOR);
     }
 
     /**

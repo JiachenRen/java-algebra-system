@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static jmc.cas.Mode.*;
 import static jmc.cas.operations.Argument.*;
+import static jmc.utils.ColorFormatter.color;
 
 /**
  * Created by Jiachen on 3/17/18.
@@ -158,6 +160,17 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
 
     public Operable exec() {
         return manipulation.manipulate(getOperands());
+    }
+
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        Optional<String> args = getOperands().stream()
+                .map(Operable::coloredString)
+                .reduce((a, b) -> a + color(",", COMMA_COLOR) + b);
+        return color(getName(), CUSTOM_OP_COLOR) + color("(", PARENTHESIS_COLOR) + (args.orElse("")) + color(")", PARENTHESIS_COLOR);
     }
 
     @Override

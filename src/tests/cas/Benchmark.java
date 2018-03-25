@@ -22,8 +22,9 @@ public class Benchmark {
             TestPrint.DISABLED = true;
             AutoTest.main(args);
             l(operable.copy().simplify());
-            l(Compiler.compile("(a+c+b+d+f+e+g+i+h+j)*(a+e+c+f+h+j+b+d+g+i)").simplify());
             TestPrint.DISABLED = false;
+            l(Compiler.compile("(a+c+b-d+f+e+g+i+h+j)*(a+e+c+f+h+j+b-d+g+i)").simplify());
+            l(Compiler.compile("(a+c+b+d+f+e+g+i+h+j)*(a+e+c+f+h+j+b+d+g+i)").expand().simplify());
             l(Compiler.compile("derivative(ln(x)*x*cos(x),x,10)").simplify().eval(6));
         }
         l("Done... finished within " + timer);

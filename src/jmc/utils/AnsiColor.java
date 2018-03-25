@@ -20,6 +20,7 @@ public enum AnsiColor {
     LIGHT_RED("[1;31m"),
     LIGHT_PURPLE("[1;35m"),
     YELLOW("[1;33m"),
+    BOLD_BLACK("[1m"),
     WHITE("[1;37m");
     private String raw;
 

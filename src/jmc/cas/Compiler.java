@@ -55,7 +55,6 @@ public class Compiler {
         if (operable instanceof BinaryOperation) ((BinaryOperation) operable).setOmitParenthesis(true);
         String colored = colorMathSymbols(operable.toString());
         log(lightRed("output:\t") + colored);
-        operable.order();
         return operable;
     }
 

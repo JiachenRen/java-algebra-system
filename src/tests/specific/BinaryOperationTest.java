@@ -29,6 +29,7 @@ public class BinaryOperationTest {
         l(Operation.div(17, 4).setOperand(binOp.getOperand(1), 1).setOperands(binOp.getOperands()));
         l(Operation.div(3, 4).setLeft(new RawValue(5)));
         l(((BinaryOperation) Compiler.compile("a+b")).isCommutative());
+        l(Compiler.compile("a*c*d-1*-1"));
     }
 
     private static void l(Object... objects) {

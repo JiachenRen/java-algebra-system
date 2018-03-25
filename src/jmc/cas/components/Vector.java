@@ -148,6 +148,14 @@ public class Vector extends Operable {
     }
 
     /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        return null;
+    }
+
+    /**
      * @param o the operable to be replaced
      * @param r the operable to take o's place
      * @return the original operable with o replaced by r.

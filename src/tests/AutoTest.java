@@ -21,10 +21,11 @@ import static tests.TestPrint.l;
  */
 @SuppressWarnings("unused")
 public class AutoTest {
-    public static boolean WRITE = true;
+    public static boolean WRITE = false;
 
     public static void main(String args[]) throws Exception {
         configureCAS();
+        Compiler.compile("((-1)*ln(x)+a)*(4+x)*cos(a)+(c+x)*sin(a)");
 
         l(boldBlack("Updating expression library... this takes a while..."));
         updateCandidates(
@@ -150,7 +151,7 @@ public class AutoTest {
     private static void updateCandidates(String... subdirectories) {
         ArrayList<ArrayList<String>> pool = new ArrayList<>();
         String baseDir = "/tests/files/", ext = ".txt";
-        String[] types = new String[]{"bin_ops", "u_ops", "irr_num", "u_der"};
+        String[] types = new String[]{"bin_ops", "u_ops", "irr_num"};
         for (String type : types) {
             pool.add(getLines(Utils.read(baseDir + type + ext)));
         }

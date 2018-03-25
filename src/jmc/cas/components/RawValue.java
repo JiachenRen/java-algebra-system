@@ -4,6 +4,7 @@ import jmc.cas.LeafNode;
 import jmc.cas.Mode;
 import jmc.cas.Operable;
 import jmc.cas.operations.BinaryOperation;
+import jmc.utils.ColorFormatter;
 
 import java.text.DecimalFormat;
 
@@ -114,6 +115,14 @@ public class RawValue extends LeafNode {
     public Operable firstDerivative(Variable v) {
         if (isUndefined()) return RawValue.UNDEF;
         return RawValue.ZERO;
+    }
+
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        return ColorFormatter.color(this.toString(), Mode.NUMBER_COLOR);
     }
 
     public boolean equals(Operable other) {

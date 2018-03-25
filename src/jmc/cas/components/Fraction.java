@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 import static jmc.MathContext.getFactors;
 import static jmc.MathContext.getUniqueFactors;
+import static jmc.cas.Mode.FRACTION_COLOR;
+import static jmc.cas.Mode.PARENTHESIS_COLOR;
+import static jmc.utils.ColorFormatter.color;
 
 /**
  * Created by Jiachen on 3/2/18.
@@ -255,6 +258,14 @@ public class Fraction extends RawValue {
 
     public String toString() {
         return "(" + numerator + "/" + denominator + ")";
+    }
+
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        return color("(", PARENTHESIS_COLOR) + color(numerator + "/" + denominator, FRACTION_COLOR) + color(")", PARENTHESIS_COLOR);
     }
 
     @Override

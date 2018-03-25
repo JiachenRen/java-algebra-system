@@ -12,6 +12,9 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static jmc.cas.Mode.*;
+import static jmc.utils.ColorFormatter.color;
+
 /**
  * Created by Jiachen on 16/05/2017.
  * added the ability to expand parenthesis and constant expressions. Accomplished May 20th.
@@ -107,6 +110,10 @@ public class BinaryOperation extends Operation {
             }
         }
         return 0;
+    }
+
+    private static boolean needsParenthesis(Operable o) {
+        return o instanceof RawValue && o.val() < 0;
     }
 
     /**
@@ -215,7 +222,8 @@ public class BinaryOperation extends Operation {
      * @return the simplified version of self
      */
     public Operable simplify() {
-        if (isCommutable()) return simplifyCommutative();
+        if (isCommutable())
+            return simplifyCommutative();
         super.simplify();
 
         if (!operator.isStandard())
@@ -274,7 +282,8 @@ public class BinaryOperation extends Operation {
             if (simplified != null) return simplified;
         }
 
-        if (isCommutable()) return simplifyCommutative();
+        if (isCommutable())
+            return simplifyCommutative();
 
         return simplifyParenthesis();
     }
@@ -473,7 +482,7 @@ public class BinaryOperation extends Operation {
      * @return simplified r1 [BinaryOperator] r2
      */
     private Operable simplify(RawValue r1, RawValue r2) {
-        if (!Mode.FRACTION) return new RawValue(val());
+        if (!FRACTION) return new RawValue(val());
         if (getLeft() instanceof Fraction && isCommutative()) {
             Fraction f = (Fraction) getLeft().copy();
             RawValue r = (RawValue) getRight().copy();
@@ -621,11 +630,11 @@ public class BinaryOperation extends Operation {
     }
 
     public String toString() {
-        boolean k = getLeft() instanceof RawValue && getLeft().val() < 0;
-        boolean q = getRight() instanceof RawValue && getRight().val() < 0;
+        boolean k = needsParenthesis(getLeft());
+        boolean q = needsParenthesis(getRight());
         String left = k ? "(" + getLeft().toString() + ")" : getLeft().toString();
         String right = q ? "(" + getRight().toString() + ")" : getRight().toString();
-        String temp = left + operator.name + right;
+        String temp = left + (Mode.COMPACT ? "" : " ") + operator.name + (Mode.COMPACT ? "" : " ") + right;
         return omitParenthesis ? temp : "(" + temp + ")";
     }
 
@@ -1057,6 +1066,20 @@ public class BinaryOperation extends Operation {
         return expandBase();
     }
 
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        String left = getLeft().coloredString();
+        String right = getRight().coloredString();
+        left = needsParenthesis(getLeft()) ? coloredParenthesis(left) : left;
+        right = needsParenthesis(getRight()) ? coloredParenthesis(right) : right;
+        String tmp = left + (Mode.COMPACT ? "" : " ") + color(operator.name, BIN_OP_COLOR) + (Mode.COMPACT ? "" : " ") + right;
+        tmp = omitParenthesis ? tmp : coloredParenthesis(tmp);
+        return tmp;
+    }
+
     public boolean isCommutative() {
         return "+-*/".contains(operator.name);
     }
@@ -1123,7 +1146,7 @@ public class BinaryOperation extends Operation {
             define("/", 2, (a, b) -> a / b);
             define("^", 1, Math::pow);
             define(",", -1, (a, b) -> Double.NaN);
-            if (Mode.DEBUG) System.out.println("# reserved binary operations declared");
+            if (DEBUG) System.out.println("# reserved binary operations declared");
         }
 
         private BinEvaluable binEvaluable;

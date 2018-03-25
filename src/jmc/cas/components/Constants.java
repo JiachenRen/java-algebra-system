@@ -1,7 +1,9 @@
 package jmc.cas.components;
 
 import jmc.cas.JMCException;
+import jmc.cas.Mode;
 import jmc.cas.Operable;
+import jmc.utils.ColorFormatter;
 
 import java.util.ArrayList;
 
@@ -92,6 +94,11 @@ public class Constants {
         public boolean equals(Operable other) {
             return other instanceof Constant && (((Constant) other).getName().equals(getName())
                     || other.val() == this.val());
+        }
+
+        @Override
+        public String coloredString() {
+            return ColorFormatter.color(toString(), Mode.CONSTANT_COLOR);
         }
 
         @Override

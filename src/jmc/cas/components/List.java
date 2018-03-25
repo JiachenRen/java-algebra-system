@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static jmc.cas.Mode.COMMA_COLOR;
+import static jmc.cas.Mode.CURLY_BRACKET_COLOR;
+import static jmc.utils.ColorFormatter.color;
+
 /**
  * Created by Jiachen on 3/20/18.
  * Wrapper for ArrayList -> the order of the operable matters
@@ -73,6 +77,14 @@ public class List extends Operable {
     public String toString() {
         Optional<String> args = operables.stream().map(Operable::toString).reduce((a, b) -> a + "," + b);
         return "{" + (args.orElse("")) + "}";
+    }
+
+    @Override
+    public String coloredString() {
+        Optional<String> args = operables.stream()
+                .map(Operable::coloredString)
+                .reduce((a, b) -> a + color(",", COMMA_COLOR) + b);
+        return color("{", CURLY_BRACKET_COLOR) + (args.orElse("")) + color("}", CURLY_BRACKET_COLOR);
     }
 
     /**

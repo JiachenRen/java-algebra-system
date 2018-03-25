@@ -1,6 +1,5 @@
 import jmc.cas.Compiler;
 import jmc.cas.JMCException;
-import jmc.cas.Mode;
 
 import java.util.Scanner;
 
@@ -22,7 +21,7 @@ public class CasCmdline {
             String input = scanner.nextLine();
             if (input.equals("exit")) return;
             try {
-                l(boldBlack("\t= ") + lightGreen(Compiler.compile(input).simplify()) + "\n");
+                l(boldBlack("\t= ") + Compiler.compile(input).simplify().coloredString() + "\n");
             } catch (JMCException e) {
                 l(lightBlue("\t> ") + lightRed(e.getMessage()) + "\n");
             }

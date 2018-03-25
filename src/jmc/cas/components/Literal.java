@@ -1,6 +1,8 @@
 package jmc.cas.components;
 
+import jmc.cas.Mode;
 import jmc.cas.Operable;
+import jmc.utils.ColorFormatter;
 
 /**
  * Created by Jiachen on 3/23/18.
@@ -48,6 +50,11 @@ public class Literal extends Variable {
     @Override
     public double eval(double x) {
         return Double.NaN;
+    }
+
+    @Override
+    public String coloredString() {
+        return ColorFormatter.color(this.toString(), Mode.LITERAL_COLOR);
     }
 
     public String get() {

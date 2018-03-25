@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import static java.lang.Math.*;
 import static jmc.MathContext.*;
+import static jmc.cas.Mode.*;
+import static jmc.utils.ColorFormatter.color;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -225,6 +227,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return new CustomOperation(Calculus.DERIVATIVE, this.copy());
     }
 
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    @Override
+    public String coloredString() {
+        return color(getName(), U_OP_COLOR) + color("(", PARENTHESIS_COLOR) + getOperand().coloredString() + color(")", PARENTHESIS_COLOR);
+    }
+
     public boolean isUndefined() {
         if (super.isUndefined()) return true;
         if (getOperand().val() != Double.NaN) {
@@ -326,7 +336,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 }
                 return Double.NaN;
             });
-            if (Mode.DEBUG) System.out.println("# reserved unary operations declared");
+            if (DEBUG) System.out.println("# reserved unary operations declared");
         }
 
         private Function unaryOperation;

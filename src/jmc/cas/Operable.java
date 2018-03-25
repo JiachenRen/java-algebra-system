@@ -9,6 +9,9 @@ import jmc.cas.operations.Operation;
 
 import java.util.ArrayList;
 
+import static jmc.cas.Mode.PARENTHESIS_COLOR;
+import static jmc.utils.ColorFormatter.color;
+
 /**
  * Created by Jiachen on 03/05/2017.
  * Operable
@@ -55,10 +58,6 @@ public abstract class Operable implements Evaluable {
         return terms;
     }
 
-    public abstract boolean equals(Operable other);
-
-    public abstract Operable copy();
-
     public static boolean contains(ArrayList<Operable> operables, Operable target) {
         for (Operable operable : operables) {
             if (operable.equals(target))
@@ -74,6 +73,14 @@ public abstract class Operable implements Evaluable {
         }
         return false;
     }
+
+    public static String coloredParenthesis(String s) {
+        return color("(", PARENTHESIS_COLOR) + s + color(")", PARENTHESIS_COLOR);
+    }
+
+    public abstract boolean equals(Operable other);
+
+    public abstract Operable copy();
 
     public boolean isMultiVar() {
         return numVars() > 1;
@@ -241,6 +248,11 @@ public abstract class Operable implements Evaluable {
      * @return expanded expression of type Operable
      */
     public abstract Operable expand();
+
+    /**
+     * @return string representation of the operable coded with Ansi color codes.
+     */
+    public abstract String coloredString();
 
     /**
      * @param o the operable to be replaced
