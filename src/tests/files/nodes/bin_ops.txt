@@ -76,3 +76,11 @@ ln(3)+ln(4)                                      -> 5
 ln(x^2)                                          -> 4
 x^a*x^b+x^(a+b)                                  -> 13
 x^a*x^b                                          -> 7
+1*ln(10)-ln(3)                                   -> 7
+(x+4)*(a-ln(x))*cos(a)+sin(a)*(x+c)              -> 18
+(a+b+c)*(c+a+b)                                  -> 11
+2*ln(x)+2*1+1                                    -> 10
+'jiachen'*'a'                                    -> 3
+'jiachen'*'is'^2/'a'^'genius'/'a'                -> 11
+{{3+4+x+x,x^2/x},x}                              -> 0
+(a*b)^x                                          -> 5
