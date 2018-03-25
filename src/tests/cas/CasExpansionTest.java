@@ -1,7 +1,7 @@
 package tests.cas;
 
-import jmc.cas.Compiler;
-import jmc.cas.Operable;
+import jas.core.Compiler;
+import jas.core.Operable;
 
 import java.util.ArrayList;
 

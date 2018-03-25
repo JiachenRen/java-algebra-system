@@ -1,13 +1,13 @@
 package tests.specific;
 
-import jmc.MathContext;
-import jmc.cas.Operable;
-import jmc.cas.components.RawValue;
+import jas.MathContext;
+import jas.core.Operable;
+import jas.core.components.RawValue;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 import static tests.TestPrint.l;
 
 public class MathContextTest {

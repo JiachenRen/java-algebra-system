@@ -1,13 +1,13 @@
 package tests.specific;
 
-import jmc.cas.Compiler;
-import jmc.cas.components.Constants;
-import jmc.cas.components.RawValue;
-import jmc.cas.components.Variable;
-import jmc.cas.operations.Argument;
-import jmc.cas.operations.CustomOperation;
-import jmc.cas.operations.Manipulation;
-import jmc.cas.operations.Signature;
+import jas.core.Compiler;
+import jas.core.components.Constants;
+import jas.core.components.RawValue;
+import jas.core.components.Variable;
+import jas.core.operations.Argument;
+import jas.core.operations.CustomOperation;
+import jas.core.operations.Manipulation;
+import jas.core.operations.Signature;
 
 import static tests.TestPrint.l;
 

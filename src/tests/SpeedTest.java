@@ -1,7 +1,7 @@
 package tests;
 
-import jmc.Function;
-import jmc.cas.Compiler;
+import jas.Function;
+import jas.core.Compiler;
 
 /**
  * Created by Jiachen on 04/05/2017.

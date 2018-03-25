@@ -1,17 +1,17 @@
 package tests.specific;
 
-import jmc.cas.Compiler;
-import jmc.cas.Operable;
-import jmc.cas.components.RawValue;
-import jmc.cas.components.Variable;
-import jmc.cas.operations.UnaryOperation;
+import jas.core.Compiler;
+import jas.core.Operable;
+import jas.core.components.RawValue;
+import jas.core.components.Variable;
+import jas.core.operations.UnaryOperation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import static jmc.utils.ColorFormatter.boldBlack;
-import static jmc.utils.ColorFormatter.lightGreen;
+import static jas.utils.ColorFormatter.boldBlack;
+import static jas.utils.ColorFormatter.lightGreen;
 import static tests.TestPrint.*;
 
 /**

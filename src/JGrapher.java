@@ -1,13 +1,13 @@
-import jmc.cas.Compiler;
-import jmc.cas.components.Constants;
-import jmc.cas.Operable;
-import jmc.cas.components.Variable;
-import jmc.cas.operations.BinaryOperation;
-import jmc.cas.operations.UnaryOperation;
-import jmc.extras.Element;
-import jmc.graph.Graph;
-import jmc.graph.GraphFunction;
-import jmc.graph.SuppliedVar;
+import jas.core.Compiler;
+import jas.core.components.Constants;
+import jas.core.Operable;
+import jas.core.components.Variable;
+import jas.core.operations.BinaryOperation;
+import jas.core.operations.UnaryOperation;
+import jas.extras.Element;
+import jas.graph.Graph;
+import jas.graph.GraphFunction;
+import jas.graph.SuppliedVar;
 
 import jui.*;
 import jui.bundles.ColorSelector;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 
 
 /**

@@ -1,7 +1,7 @@
 package tests.specific;
 
-import jmc.cas.Compiler;
-import jmc.cas.components.Literal;
+import jas.core.Compiler;
+import jas.core.components.Literal;
 
 import static tests.TestPrint.*;
 

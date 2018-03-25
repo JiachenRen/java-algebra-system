@@ -1,16 +1,16 @@
 package tests.cas;
 
-import jmc.cas.Compiler;
-import jmc.cas.components.Constants;
-import jmc.cas.Operable;
-import jmc.cas.operations.BinaryOperation;
-import jmc.cas.operations.UnaryOperation;
+import jas.core.Compiler;
+import jas.core.components.Constants;
+import jas.core.Operable;
+import jas.core.operations.BinaryOperation;
+import jas.core.operations.UnaryOperation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 import static tests.TestPrint.l;
 
 /**

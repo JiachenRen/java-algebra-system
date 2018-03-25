@@ -1,6 +1,6 @@
 package tests.specific;
 
-import jmc.cas.components.RawValue;
+import jas.core.components.RawValue;
 
 import static tests.TestPrint.l;
 

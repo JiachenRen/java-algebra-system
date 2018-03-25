@@ -1,23 +1,23 @@
 package tests.cas;
 
-import jmc.Function;
-import jmc.cas.Compiler;
-import jmc.cas.Operable;
-import jmc.cas.components.Constants;
-import jmc.cas.components.Fraction;
-import jmc.cas.components.RawValue;
-import jmc.cas.components.Variable;
-import jmc.cas.operations.Argument;
-import jmc.cas.operations.BinaryOperation;
-import jmc.cas.operations.Operation;
-import jmc.cas.operations.Signature;
+import jas.Function;
+import jas.core.Compiler;
+import jas.core.Operable;
+import jas.core.components.Constants;
+import jas.core.components.Fraction;
+import jas.core.components.RawValue;
+import jas.core.components.Variable;
+import jas.core.operations.Argument;
+import jas.core.operations.BinaryOperation;
+import jas.core.operations.Operation;
+import jas.core.operations.Signature;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 import static tests.TestPrint.l;
 
 /**

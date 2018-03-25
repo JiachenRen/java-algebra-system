@@ -1,9 +1,9 @@
-import jmc.cas.Compiler;
-import jmc.cas.JMCException;
+import jas.core.Compiler;
+import jas.core.JMCException;
 
 import java.util.Scanner;
 
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 import static tests.TestPrint.l;
 import static tests.TestPrint.p;
 

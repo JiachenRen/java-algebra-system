@@ -1,16 +1,16 @@
 package tests.specific;
 
-import jmc.MathContext;
-import jmc.cas.Compiler;
-import jmc.cas.components.Fraction;
-import jmc.cas.Operable;
+import jas.MathContext;
+import jas.core.Compiler;
+import jas.core.components.Fraction;
+import jas.core.Operable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
 import static tests.TestPrint.l;
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 
 /**
  * Created by Jiachen on 3/6/18.

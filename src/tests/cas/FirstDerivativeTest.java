@@ -1,6 +1,6 @@
 package tests.cas;
 
-import static jmc.cas.Compiler.compile;
+import static jas.core.Compiler.compile;
 import static tests.TestPrint.l;
 
 /**

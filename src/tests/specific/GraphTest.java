@@ -1,8 +1,8 @@
 package tests.specific;
 
-import jmc.cas.Compiler;
-import jmc.graph.GraphFunction;
-import jmc.graph.Graph;
+import jas.core.Compiler;
+import jas.graph.GraphFunction;
+import jas.graph.Graph;
 import jui.JNode;
 import processing.core.PApplet;
 

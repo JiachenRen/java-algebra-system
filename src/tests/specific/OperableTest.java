@@ -1,9 +1,9 @@
 package tests.specific;
 
-import jmc.cas.Compiler;
-import jmc.cas.Operable;
-import jmc.cas.operations.Operation;
-import jmc.cas.components.Variable;
+import jas.core.Compiler;
+import jas.core.Operable;
+import jas.core.operations.Operation;
+import jas.core.components.Variable;
 
 import java.util.ArrayList;
 import java.util.Collections;

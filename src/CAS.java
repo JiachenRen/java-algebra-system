@@ -6,10 +6,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jmc.cas.*;
-import jmc.cas.Compiler;
-import jmc.cas.Operable;
-import jmc.cas.operations.Operation;
+import jas.core.*;
+import jas.core.Compiler;
+import jas.core.Operable;
+import jas.core.operations.Operation;
 
 import java.util.NoSuchElementException;
 

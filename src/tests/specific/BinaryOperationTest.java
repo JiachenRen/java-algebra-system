@@ -1,9 +1,9 @@
 package tests.specific;
 
-import jmc.cas.Compiler;
-import jmc.cas.components.RawValue;
-import jmc.cas.operations.BinaryOperation;
-import jmc.cas.operations.Operation;
+import jas.core.Compiler;
+import jas.core.components.RawValue;
+import jas.core.operations.BinaryOperation;
+import jas.core.operations.Operation;
 import tests.TestPrint;
 
 /**

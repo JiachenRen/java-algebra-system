@@ -1,10 +1,10 @@
 package tests;
 
-import jmc.cas.Compiler;
-import jmc.cas.JMCException;
-import jmc.cas.Operable;
-import jmc.cas.operations.BinaryOperation;
-import jmc.utils.Utils;
+import jas.core.Compiler;
+import jas.core.JMCException;
+import jas.core.Operable;
+import jas.core.operations.BinaryOperation;
+import jas.utils.Utils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static jmc.utils.ColorFormatter.*;
+import static jas.utils.ColorFormatter.*;
 import static tests.TestPrint.l;
 
 /**

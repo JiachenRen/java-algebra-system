@@ -1,9 +1,9 @@
 package tests.cas;
 
-import jmc.cas.Compiler;
-import jmc.cas.Mode;
-import jmc.cas.Operable;
-import jmc.utils.Timer;
+import jas.core.Compiler;
+import jas.core.Mode;
+import jas.core.Operable;
+import jas.utils.Timer;
 import tests.AutoTest;
 import tests.TestPrint;
 
