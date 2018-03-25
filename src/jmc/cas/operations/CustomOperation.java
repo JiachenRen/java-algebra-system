@@ -40,6 +40,12 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         define("num_vars", new Signature(ANY), operands -> new RawValue(operands.get(0).numVars()));
         define("complexity", new Signature(ANY), operands -> new RawValue(operands.get(0).complexity()));
         define("replace", new Signature(ANY, ANY, ANY), operands -> operands.get(0).replace(operands.get(1), operands.get(2)));
+        define("random", new Signature(NUMBER), operands -> new RawValue(Math.random() * operands.get(0).val()));
+        define("random", new Signature(NUMBER, NUMBER), operands -> {
+            double a = operands.get(0).val();
+            double b = operands.get(1).val();
+            return new RawValue((b - a) * Math.random() + a);
+        });
         define("beautify", new Signature(ANY), operands -> operands.get(0).beautify());
         define("val", new Signature(ANY), operands -> new RawValue(operands.get(0).val()));
         define("eval", new Signature(ANY, NUMBER), operands -> new RawValue(operands.get(0).eval(operands.get(1).val())));
