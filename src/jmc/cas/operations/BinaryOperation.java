@@ -1076,6 +1076,12 @@ public class BinaryOperation extends Operation {
 //        return false;
 //    }
 
+    /**
+     * over 20% improvement in speed over the other version!
+     *
+     * @param other another Operable
+     * @return whether the two instances are canonical forms of each other
+     */
     @Override
     public boolean equals(Operable other) {
         if (!(other instanceof BinaryOperation)) return false;
