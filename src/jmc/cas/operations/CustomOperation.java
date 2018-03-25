@@ -66,13 +66,13 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
             return msg;
         });
 
-        define("remove", Signature.ANY, operands -> {
+        define("del", Signature.ANY, operands -> {
             ArrayList<Manipulation> removed = new ArrayList<>();
             operands.forEach(o -> {
                 if (!(o instanceof Literal)) throw new JMCException("illegal argument " + o);
                 removed.addAll(unregister(((Literal) o).get(), Signature.ANY));
             });
-            return new Literal("Removed: " + toString(removed));
+            return new Literal("Deleted: " + toString(removed));
         });
     }
 
@@ -156,6 +156,12 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
     @Override
     public Operable simplify() {
         super.simplify();
+        /* special case: when f(x) is defined as f(ANY), the default behavior is to distribute the custom operation
+        to each element in the List accordingly, such that define('f',{x},x^2+2x+1), f({a,b}) = {a^2+2a+1,b^2+2b+1}
+         */
+        if (manipulation.getSignature().equals(new Signature(ANY)) && getOperand(0) instanceof List) {
+            return ((List) getOperand(0)).customOp(this).simplify();
+        }
         return manipulation.manipulate(getOperands()).simplify(); //TODO: might cause StackOverflow
     }
 

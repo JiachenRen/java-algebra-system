@@ -3,6 +3,7 @@ package jmc.cas.components;
 import jmc.cas.JMCException;
 import jmc.cas.Operable;
 import jmc.cas.operations.BinaryOperation;
+import jmc.cas.operations.CustomOperation;
 import jmc.cas.operations.UnaryOperation;
 
 import java.util.ArrayList;
@@ -95,6 +96,18 @@ public class List extends Operable {
      */
     public List uOp(UnaryOperation uOp) {
         operables = operables.stream().map(o -> new UnaryOperation(o, uOp.getFunction()))
+                .collect(Collectors.toCollection(ArrayList::new));
+        return this;
+    }
+
+    /**
+     * perform custom operation on each element in the list
+     *
+     * @param customOp a custom operation taking in only one argument with signature ANY
+     * @return self
+     */
+    public List customOp(CustomOperation customOp) {
+        operables = operables.stream().map(o -> new CustomOperation(customOp.getName(), o))
                 .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
