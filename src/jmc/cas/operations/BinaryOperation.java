@@ -907,15 +907,15 @@ public class BinaryOperation extends Operation {
      * @param operable the binary tree to be flattened
      */
     private void flat(ArrayList<Operable> pool, Operable operable) {
-        if (operable instanceof BinLeafNode) {
-            pool.add(operable);
-        } else if (operable instanceof BinaryOperation) {
+        if (operable instanceof BinaryOperation) {
             BinaryOperation binOp = ((BinaryOperation) operable);
             if (binOp.getPriority() == this.getPriority()) {
                 pool.addAll(binOp.flattened());
             } else {
                 pool.add(binOp);
             }
+        } else {
+            pool.add(operable);
         }
     }
 

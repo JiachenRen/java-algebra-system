@@ -14,8 +14,8 @@ public class Mode {
     public static String BIN_OP_COLOR = BLACK.toString();
     public static String CUSTOM_OP_COLOR = GREEN.toString();
     public static String CONSTANT_COLOR = LIGHT_CYAN.toString();
-    public static String CURLY_BRACKET_COLOR = BROWN.toString();
-    public static String COMMA_COLOR = YELLOW.toString();
+    public static String CURLY_BRACKET_COLOR = LIGHT_PURPLE.toString();
+    public static String COMMA_COLOR = LIGHT_PURPLE.toString();
     public static String PARENTHESIS_COLOR = LIGHT_RED.toString();
     public static String LITERAL_COLOR = LIGHT_GREEN.toString();
     public static String NUMBER_COLOR = GREEN.toString();
