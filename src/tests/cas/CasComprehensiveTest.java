@@ -36,7 +36,7 @@ public class CasComprehensiveTest {
         l(Compiler.colorMathSymbols(operation.toString()));
 
         //plug in test
-        operation = (Operation) Compiler.compile("ln<log<x^(2*e^2+x)>>^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
+        operation = (Operation) Compiler.compile("ln(log(x^(2*e^2+x)))^(1/5)/(x^3+2*x+9)^(1/3*e*x)");
         operation.replace(new Variable("x"), Compiler.compile("h"));
         l(operation);
 
@@ -149,6 +149,12 @@ public class CasComprehensiveTest {
         l(o);
         l(o.replace(new Variable("x"), new Variable("k")));
 
+        Variable v = new Variable("v");
+        v.store(Compiler.compile("x*a+b"));
+        l(v);
+        l(v.copy().simplify());
+        v.del();
+        l(v);
     }
 
 }

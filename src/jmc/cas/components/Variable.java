@@ -9,6 +9,7 @@ import jmc.utils.ColorFormatter;
  */
 public class Variable extends LeafNode implements Nameable {
     private String name;
+    private Operable stored;
 
     public Variable(String name) {
         if (name.equals("")) throw new JMCException("variable name cannot be empty");
@@ -37,11 +38,12 @@ public class Variable extends LeafNode implements Nameable {
 
     /**
      * Since a variable is not an arbitrary number, val() should return NaN.
+     * If a value is stored in the variable, return the value.
      *
      * @return NaN
      */
     public double val() {
-        return Double.NaN;
+        return stored == null ? Double.NaN : stored.val();
     }
 
     public boolean isUndefined() {
@@ -49,9 +51,26 @@ public class Variable extends LeafNode implements Nameable {
     }
 
     public Operable simplify() {
-        return this;
+        return this.stored == null ? this : stored;
     }
 
+    /**
+     * Assign the variable with an Operable
+     *
+     * @param o the Operable to be assigned to this variable.
+     */
+    public void store(Operable o) {
+        this.stored = o;
+    }
+
+    public void del() {
+        this.stored = null;
+    }
+
+    /**
+     * @param v the variable in which the first derivative is taken with respect to.
+     * @return if v == this, 1, otherwise 0; rule of derivative applies.
+     */
     public Operable firstDerivative(Variable v) {
         if (v.equals(this)) return RawValue.ONE;
         return RawValue.ZERO;
@@ -71,18 +90,17 @@ public class Variable extends LeafNode implements Nameable {
      * @return new Variable instance that is identical to self.
      */
     public Variable copy() {
-        return new Variable(name);
+        Variable v = new Variable(name);
+        v.store(stored);
+        return v;
     }
-
 
     public Operable explicitNegativeForm() {
         return this.copy();
     }
 
-
     public int complexity() {
         return 3;
     }
-
 
 }
