@@ -7,8 +7,7 @@ import jas.core.operations.BinaryOperation;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import static jas.MathContext.getFactors;
-import static jas.MathContext.getUniqueFactors;
+import static jas.MathContext.*;
 import static jas.core.Mode.FRACTION_COLOR;
 import static jas.core.Mode.PARENTHESIS_COLOR;
 import static jas.utils.ColorFormatter.color;
@@ -80,7 +79,7 @@ public class Fraction extends RawValue {
      * @param n number within the root, n^(1/r)
      * @return irrational form Fraction or BinaryOperation
      */
-    public static Operable extractRoot(int n, int r) {
+    public static Operable extractRoot(long n, long r) {
         if (n == 0) return null;
         else if (n == 1 || n == -1) {
             BinaryOperation in = new BinaryOperation(RawValue.ONE, "^", RawValue.ZERO);
@@ -94,19 +93,13 @@ public class Fraction extends RawValue {
         }
         ArrayList<Long> factors = getFactors(n);
         ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
-        int[] num = new int[uniqueFactors.size()];
-        int max = uniqueFactors.get(uniqueFactors.size() - 1).intValue();
-        int[] map = new int[max + 1];
-        for (int i = 0; i < uniqueFactors.size(); i++) {
-            map[uniqueFactors.get(i).intValue()] = i;
-        }
-        factors.forEach(f -> num[map[f.intValue()]] += 1);
+        int[] num = numOccurrences(uniqueFactors, factors);
         int ext = isNegative ? -1 : 1, n1 = 1;
         for (int i = 0; i < num.length; i++) {
-            int k = num[i] / r;
+            long k = num[i] / r;
             long u = uniqueFactors.get(i);
             ext *= Math.pow(u, k);
-            int q = num[i] - r * k;
+            long q = num[i] - r * k;
             n1 *= Math.pow(u, q);
         }
 
@@ -171,8 +164,8 @@ public class Fraction extends RawValue {
             Fraction f = ((Fraction) o);
             this.exp(f.numerator);
             this.reduce();
-            Operable o1 = extractRoot((int) this.numerator, (int) f.denominator);
-            Operable o2 = extractRoot((int) this.denominator, (int) f.denominator);
+            Operable o1 = extractRoot(this.numerator, f.denominator);
+            Operable o2 = extractRoot(this.denominator, f.denominator);
             if (o1 == null || o1.isUndefined() || o2 == null || o2.isUndefined()) return RawValue.UNDEF;
             BinaryOperation nu = (BinaryOperation) o1;
             BinaryOperation de = (BinaryOperation) o2;

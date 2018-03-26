@@ -159,6 +159,7 @@ public class CasComprehensiveTest {
         l(v);
 
         l(new Signature(Argument.VARIABLE,Argument.ANY).equals(new Signature(Argument.LITERAL,Argument.ANY)));
+        l(Long.MAX_VALUE);
     }
 
 }

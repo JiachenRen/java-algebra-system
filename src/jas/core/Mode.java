@@ -11,7 +11,7 @@ public class Mode {
     public static boolean FRACTION = true;
     public static boolean COMPACT = true;
     public static String U_OP_COLOR = LIGHT_BLUE.toString();
-    public static String BIN_OP_COLOR = BLACK.toString();
+    public static String BIN_OP_COLOR = "[0m";
     public static String CUSTOM_OP_COLOR = LIGHT_PURPLE.toString();
     public static String CONSTANT_COLOR = LIGHT_CYAN.toString();
     public static String CURLY_BRACKET_COLOR = LIGHT_PURPLE.toString();

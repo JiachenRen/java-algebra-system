@@ -559,7 +559,7 @@ public class BinaryOperation extends Operation {
             if (r2 instanceof Fraction) {
                 double v2 = r2.val();
                 if (v2 > 1) {
-                    int t = (int) r2.val();
+                    long t = (long) r2.val();
                     Operation o1 = Operation.exp(r1, new RawValue(t));
                     Operation o2 = Operation.exp(r1, Operation.sub(r2, new RawValue(t)));
                     return Operation.mult(o1, o2).simplify();
