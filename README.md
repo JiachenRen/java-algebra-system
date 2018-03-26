@@ -20,7 +20,7 @@ As of now, the CAS will attempt to convert any decimal numbers to fractions when
   * Implicit differentiation
   * n<sup>th</sup> derivative
 
-**Note: the following section demonstrates the power of the JMC computer algebra system, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
+**Note: the following section demonstrates the power of JAS, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
 
 ## Meet... CAS
 This is as powerful and accurate as it gets... I've put my life into making this system...
@@ -68,7 +68,7 @@ Call to `add.simplify()` will subsequently invoke `mult.simplify()`, which takes
 ```java
 System.out.println(add.copy().simplify()); // produces "2*a^2"
 ```
-Fortunately, you don't have to create mathematical expressions using JMC by creating algebraic operations one at a time. That would be extremely painful, slow, and buggy. The JMC library does all the hard parts for you! The expression `a*a+a^2` from the example above could also be created by using the `compile(String exp)` of the `Compiler` class.
+Fortunately, you don't have to create mathematical expressions using JAS by creating algebraic operations one at a time. That would be extremely painful, slow, and buggy. The JAS library does all the hard parts for you! The expression `a*a+a^2` from the example above could also be created by using the `compile(String exp)` of the `Compiler` class.
 ```java
 Operable op = Compiler.compile("a*a+a^2"); // constructs the binary operation tree.
 System.out.println(op.copy().simplify(); // prints "2*a^2"
@@ -140,7 +140,7 @@ tan(pi/2+pi*n)|   -> | undef      |   |     log(-#)     |   -> | undef      |   
 
 
 ### Extensibility
-The JMC framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `BinaryOperation` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JMC computer algebra system.
+The JAS framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `BinaryOperation` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JAS.
 #### Binary Operation
 BinaryOperation has a private nested class `BinaryOperator` that is invisible outside of the `jas.core` package. It conforms to interface `BinEvaluable`, which specifies only one method `double eval(double a, double b)`. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
 ```java
@@ -152,7 +152,7 @@ System.out.println(Compiler.compile("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0
 ```
 
 #### Composite Operation
-This operation type is what truly grants JMC computer algebra system's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JMC -- `derivative(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
+This operation type is what truly grants Java Algebra System's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JAS -- `derivative(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
 ```java
 Compiler.compile("derivative(derivative(cos(x),x),x)") //returns an operable defined as -cos(x), which is the second derivative of cos(x)
 ```
@@ -167,9 +167,9 @@ The first argument is the name of the unary operation, like `log`, `cos`, etc. T
 Compiler.compile("digits(x)^2").eval(1234) // returns 16 since there are 4 digits in 1234 and 4^2 = 16.
 ```
 #### Constants
-Aside from declaring custom binary/unary operations, you can also define constants. Constants in JMC behave differently from what you would expect, however, and here's how it works. All of the constants are managed under the `Constants` class, which contains 2 subclasses, `Constant` and `ComputedConst` with `Constant` being a nested class that is a subclass of `Variable` and `ComputedConst` being a nested interface. The `ComputedConst` interface declares a single method `double compute()` and is utilized by `Constant` to compute a value. Here is how it works in practice:
+Aside from declaring custom binary/unary operations, you can also define constants. Constants in JAS behave differently from what you would expect, however, and here's how it works. All of the constants are managed under the `Constants` class, which contains 2 subclasses, `Constant` and `ComputedConst` with `Constant` being a nested class that is a subclass of `Variable` and `ComputedConst` being a nested interface. The `ComputedConst` interface declares a single method `double compute()` and is utilized by `Constant` to compute a value. Here is how it works in practice:
 ```java
-Constants.define("π", () -> Math.PI); // a constant having the value π. ("pi" is the default name for π in JMC)
+Constants.define("π", () -> Math.PI); // a constant having the value π. ("pi" is the default name for π in JAS)
 Constants.define("seed", Math::random); // a "dynamic constant" that returns a random value between 0 and 1 when evaluated
 System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
 System.out.println(Compiler.compile("seed*2-1").val()) // prints a random number between -1 and 1.
