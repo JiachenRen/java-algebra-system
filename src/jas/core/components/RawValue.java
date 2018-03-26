@@ -6,6 +6,8 @@ import jas.core.Operable;
 import jas.core.operations.BinaryOperation;
 import jas.utils.ColorFormatter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 
 /**
@@ -57,7 +59,7 @@ public class RawValue extends LeafNode {
     }
 
     public RawValue inverse() {
-        if (isInteger()) return new Fraction(1, longValue());
+        if (isInteger()) return new Fraction(BigInteger.ONE, toBigInteger());
         else return Fraction.convertToFraction(doubleValue(), Fraction.TOLERANCE).inverse();
     }
 
@@ -79,6 +81,10 @@ public class RawValue extends LeafNode {
             return "undef";
         } else if (doubleValue() == 0) return "0"; // fix a bug where 0.negate().toString() returns "-0"
         return format(doubleValue());
+    }
+
+    public BigInteger toBigInteger() {
+        return BigDecimal.valueOf(doubleValue()).toBigIntegerExact();
     }
 
     private String format(double d) {

@@ -10,15 +10,16 @@ import jas.core.components.RawValue;
 import jas.core.components.Variable;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.Math.*;
 import static jas.MathContext.*;
 import static jas.core.Mode.*;
 import static jas.utils.ColorFormatter.color;
+import static java.lang.Math.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -152,12 +153,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 switch (operation.getName()) {
                     case "ln": // ln(a^3) = 3ln(a), where a is a^3 is an integer
                     case "log":
-                        ArrayList<Long> factors = getFactors(r.longValue());
+                        ArrayList<BigInteger> factors = factor(r.toBigInteger());
                         if (factors.size() > 1) {
-                            ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
+                            ArrayList<BigInteger> uniqueFactors = getUniqueFactors(factors);
                             int[] num = numOccurrences(uniqueFactors, factors);
                             if (allTheSame(num)) {
-                                RawValue r1 = new RawValue(MathContext.mult(uniqueFactors));
+                                RawValue r1 = new RawValue(MathContext.mult(uniqueFactors).doubleValue());
                                 if (!r1.equals(r)) // do not return 1*ln(10), or it would cause StackOverflow error!
                                     return Operation.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
                                 else return this;

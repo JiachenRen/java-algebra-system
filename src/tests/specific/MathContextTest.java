@@ -19,7 +19,7 @@ public class MathContextTest {
 //        l(MathContext.factorial(new BigInteger("300")));
         for (int i = 0; i < 10000; i++) {
             int finalI = i;
-            MathContext.toBaseExponentPairs(i).stream()
+            MathContext.toBaseExponentPairs(new BigInteger(Integer.toString(i))).stream()
                     .map(pair -> new RawValue(pair[0]).exp(pair[1]))
                     .reduce(Operable::mult)
                     .ifPresent(o -> l(boldBlack(finalI + " -> ")

@@ -8,6 +8,7 @@ import jas.core.components.List;
 import jas.core.components.RawValue;
 import jas.core.components.Variable;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -532,7 +533,7 @@ public class BinaryOperation extends Operation {
                     r1Negative = true;
                     r1 = r1.negate();
                 }
-                ArrayList<int[]> pairs = MathContext.toBaseExponentPairs(r1.longValue());
+                ArrayList<int[]> pairs = MathContext.toBaseExponentPairs(r1.toBigInteger());
                 Optional<BinaryOperation> reduced = pairs.stream()
                         .filter(p -> p[1] > 1)
                         .map(p -> Operation.exp(p[0], Operation.mult(p[1], r2)))
@@ -1040,10 +1041,10 @@ public class BinaryOperation extends Operation {
         } else {
             if (o instanceof Fraction) {
                 Fraction f = (Fraction) o;
-                if (f.getNumerator() != 1)
-                    numerators.add(new RawValue(f.getNumerator()));
-                if (f.getDenominator() != 1)
-                    denominators.add(new RawValue(f.getDenominator()));
+                if (!f.getNumerator().equals(BigInteger.ONE))
+                    numerators.add(new RawValue(f.getNumerator().doubleValue()));
+                if (!f.getDenominator().equals(BigInteger.ONE))
+                    denominators.add(new RawValue(f.getDenominator().doubleValue()));
             } else if (o.val() != 1) {
                 numerators.add(o);
             }

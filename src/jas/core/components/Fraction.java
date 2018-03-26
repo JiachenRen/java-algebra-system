@@ -19,43 +19,38 @@ import static jas.utils.ColorFormatter.color;
 public class Fraction extends RawValue {
     public static double TOLERANCE = 5E-7;
     public static Fraction UNDEF = new Fraction(0, 0);
-    private long numerator;
-    private long denominator;
+    private BigInteger numerator;
+    private BigInteger denominator;
 
-    public Fraction(long numerator, long denominator) {
-        super(denominator == 0 ? Double.NaN : numerator / denominator);
+    public Fraction(BigInteger numerator, BigInteger denominator) {
+        super(Double.NaN);
         this.numerator = numerator;
         this.denominator = denominator;
         this.reduce();
     }
 
+    public Fraction(long numerator, long denominator) {
+        this(new BigInteger(Long.toString(numerator)), new BigInteger(Long.toString(denominator)));
+    }
+
     public RawValue reduce() {
         if (isUndefined()) return RawValue.UNDEF;
-        long gcd = gcd();
-        this.numerator /= gcd;
-        this.denominator /= gcd;
-        if (denominator == 1) {
-            return new RawValue(numerator);
-        } else if (numerator == 0) {
+        BigInteger gcd = gcd();
+        setNumerator(numerator.divide(gcd));
+        setDenominator(this.denominator.divide(gcd));
+        if (denominator.equals(BigInteger.ONE)) {
+            return new RawValue(numerator.doubleValue());
+        } else if (numerator.equals(BigInteger.ZERO)) {
             return new RawValue(0);
-        } else if (numerator < 0 && denominator < 0) {
-            this.numerator *= -1;
-            this.denominator *= -1;
+        } else if (numerator.compareTo(BigInteger.ZERO) < 0 && denominator.compareTo(BigInteger.ZERO) < 0) {
+            setNumerator(this.numerator.multiply(BigInteger.ONE.negate()));
+            setDenominator(this.denominator.multiply(BigInteger.ONE.negate()));
         }
         return this;
     }
 
-    private long gcd() {
-        return gcd(numerator, denominator);
-    }
-
-    /**
-     * @param a first number
-     * @param b second number
-     * @return greatest common divisor
-     */
-    private static long gcd(long a, long b) {
-        return MathContext.gcd(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
+    private BigInteger gcd() {
+        return MathContext.gcd(numerator.abs(), denominator.abs());
     }
 
     public static RawValue convertToFraction(double val) {
@@ -79,37 +74,33 @@ public class Fraction extends RawValue {
      * @param n number within the root, n^(1/r)
      * @return irrational form Fraction or BinaryOperation
      */
-    public static Operable extractRoot(long n, long r) {
-        if (n == 0) return null;
-        else if (n == 1 || n == -1) {
+    public static Operable extractRoot(BigInteger n, BigInteger r) {
+        if (n.equals(BigInteger.ZERO)) return null;
+        else if (n.abs().equals(BigInteger.ONE)) {
             BinaryOperation in = new BinaryOperation(RawValue.ONE, "^", RawValue.ZERO);
-            return new BinaryOperation(new RawValue(n), "*", in);
-        } else if (r == 0) throw new IllegalArgumentException("root cannot be negative");
+            return new BinaryOperation(new RawValue(n.doubleValue()), "*", in);
+        } else if (r.equals(BigInteger.ZERO)) throw new IllegalArgumentException("root cannot be negative");
         boolean isNegative = false;
-        if (n < 0) {
-            if (r % 2 == 0) return RawValue.UNDEF;
+        if (n.compareTo(BigInteger.ZERO) < 0) {
+            if (r.mod(BigInteger.valueOf(2)).equals(BigInteger.ZERO)) return RawValue.UNDEF;
             isNegative = true;
-            n *= -1;
+            n = n.multiply(BigInteger.ONE.negate());
         }
-        ArrayList<Long> factors = getFactors(n);
-        ArrayList<Long> uniqueFactors = getUniqueFactors(factors);
+        ArrayList<BigInteger> factors = factor(n);
+        ArrayList<BigInteger> uniqueFactors = getUniqueFactors(factors);
         int[] num = numOccurrences(uniqueFactors, factors);
-        int ext = isNegative ? -1 : 1, n1 = 1;
+        long ext = isNegative ? -1 : 1, n1 = 1;
         for (int i = 0; i < num.length; i++) {
-            long k = num[i] / r;
-            long u = uniqueFactors.get(i);
-            ext *= Math.pow(u, k);
-            long q = num[i] - r * k;
-            n1 *= Math.pow(u, q);
+            long k = num[i] / r.intValueExact();
+            BigInteger u = uniqueFactors.get(i);
+            ext *= Math.pow(u.longValueExact(), k);
+            long q = num[i] - r.longValueExact() * k;
+            n1 *= Math.pow(u.longValueExact(), q);
         }
 
-        BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r));
+        BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r.doubleValue()));
         BinaryOperation irr = new BinaryOperation(new RawValue(n1), "^", exp);
         return new BinaryOperation(new RawValue(ext), "*", irr);
-    }
-
-    private static long lcm(long a, long b) {
-        return MathContext.lcm(new BigInteger(Long.toString(Math.abs(a))), new BigInteger(Long.toString(Math.abs(b)))).longValue();
     }
 
     /**
@@ -123,7 +114,7 @@ public class Fraction extends RawValue {
         if (val < 0) {
             RawValue raw = convertToFraction(-val);
             if (raw instanceof Fraction)
-                ((Fraction) raw).numerator *= -1;
+                ((Fraction) raw).mult(RawValue.ONE.negate());
             return raw;
         }
         //TODO: there should be a maximum TOLERANCE for inputs like 0.1403508772
@@ -146,15 +137,15 @@ public class Fraction extends RawValue {
     public RawValue add(RawValue o) {
         if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (!(o instanceof Fraction)) {
-            if (o.isInteger()) o = new Fraction(o.longValue(), 1);
+            if (o.isInteger()) o = new Fraction(o.toBigInteger(), BigInteger.ONE);
             else o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
         } else o = o.copy();
         Fraction f = (Fraction) o;
 
-        long lcm = lcm(denominator, f.denominator);
-        this.simult(lcm / denominator);
-        f.simult(lcm / f.denominator);
-        this.numerator += f.numerator;
+        BigInteger lcm = lcm(denominator, f.denominator);
+        this.simult(lcm.divide(denominator));
+        f.simult(lcm.divide(f.denominator));
+        setNumerator(this.numerator.add(f.numerator));
         return this.reduce();
     }
 
@@ -162,7 +153,7 @@ public class Fraction extends RawValue {
         if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (o instanceof Fraction) {
             Fraction f = ((Fraction) o);
-            this.exp(f.numerator);
+            this.exp(f.numerator.intValueExact());
             this.reduce();
             Operable o1 = extractRoot(this.numerator, f.denominator);
             Operable o2 = extractRoot(this.denominator, f.denominator);
@@ -186,13 +177,13 @@ public class Fraction extends RawValue {
         }
     }
 
-    public RawValue exp(long i) {
+    public RawValue exp(int i) {
         if (i < 0) {
             i *= -1;
             this.inverse();
         }
-        this.numerator = (long) Math.pow(this.numerator, i);
-        this.denominator = (long) Math.pow(this.denominator, i);
+        this.numerator = this.numerator.pow(i);
+        this.denominator = this.denominator.pow(i);
         return this.reduce();
     }
 
@@ -203,11 +194,11 @@ public class Fraction extends RawValue {
     public RawValue mult(RawValue o) {
         if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (o instanceof Fraction) {
-            numerator *= ((Fraction) o).numerator;
-            denominator *= ((Fraction) o).denominator;
+            setNumerator(numerator.divide(((Fraction) o).numerator));
+            setDenominator(denominator.divide(((Fraction) o).denominator));
             return this.reduce();
         } else if (o.isInteger()) {
-            numerator *= o.longValue();
+            setNumerator(numerator.multiply(o.toBigInteger()));
             return this.reduce();
         } else {
             o = Fraction.convertToFraction(o.doubleValue(), TOLERANCE);
@@ -219,9 +210,9 @@ public class Fraction extends RawValue {
         return mult(o.inverse());
     }
 
-    private void simult(long n) {
-        denominator *= n;
-        numerator *= n;
+    private void simult(BigInteger n) {
+        setDenominator(denominator.multiply(n));
+        setNumerator(numerator.multiply(n));
     }
 
     @Override
@@ -232,13 +223,13 @@ public class Fraction extends RawValue {
     @Override
     public double doubleValue() {
         if (isUndefined()) return Double.NaN;
-        return (double) numerator / (double) denominator;
+        return numerator.divide(denominator).doubleValue();
     }
 
     @Override
     public Fraction inverse() {
         if (isUndefined()) return Fraction.UNDEF;
-        long tmp = denominator;
+        BigInteger tmp = denominator;
         denominator = numerator;
         numerator = tmp;
         return this;
@@ -246,7 +237,7 @@ public class Fraction extends RawValue {
 
     @Override
     public boolean isZero() {
-        return !isUndefined() && denominator == 0;
+        return !isUndefined() && denominator.equals(BigInteger.ZERO);
     }
 
     public String toString() {
@@ -263,12 +254,12 @@ public class Fraction extends RawValue {
 
     @Override
     public boolean isPositive() {
-        return !isUndefined() && numerator / denominator > 0;
+        return !isUndefined() && numerator.divide(denominator).compareTo(BigInteger.ZERO) > 0;
     }
 
     @Override
     public boolean isUndefined() {
-        return super.isUndefined() || denominator == 0;
+        return denominator.equals(BigInteger.ZERO);
     }
 
     public Fraction copy() {
@@ -282,7 +273,7 @@ public class Fraction extends RawValue {
 
     public Fraction negate() {
         Fraction clone = this.copy();
-        clone.numerator *= -1;
+        clone.setNumerator(clone.numerator.multiply(BigInteger.ONE.negate()));
         clone.reduce();
         return clone;
     }
@@ -291,20 +282,20 @@ public class Fraction extends RawValue {
         return this;
     }
 
-    public long getNumerator() {
+    public BigInteger getNumerator() {
         return numerator;
     }
 
-    public Fraction setNumerator(long n) {
+    public Fraction setNumerator(BigInteger n) {
         this.numerator = n;
         return this;
     }
 
-    public long getDenominator() {
+    public BigInteger getDenominator() {
         return denominator;
     }
 
-    public Fraction setDenominator(long n) {
+    public Fraction setDenominator(BigInteger n) {
         this.denominator = n;
         return this;
     }
