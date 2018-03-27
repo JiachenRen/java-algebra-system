@@ -22,17 +22,17 @@ JAS is a multivariate computer algebra system built using Java. JAS handles the 
 This is as powerful and accurate as it gets... I've put my life into making this system...
 ```java
 Node o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
-o.copy().expand();
+o.expand();
 // 3*x*cos(a)+(-1)*x*x*cos(a)+3*4*cos(a)+(-1)*x*4*cos(a)+ln(x)^2*sin(a)+c*sin(a)
-o.copy().expand().simplify();
+o.simplify();
 // (-1)*x^2*cos(a)+12*cos(a)+cos(a)*x*(-1)+ln(x)^2*sin(a)+c*sin(a)
-o.copy().expand().simplify().beautify();
+o.beautify();
 // 12*cos(a)-cos(a)*x^2-x*cos(a)+ln(x)^2*sin(a)+c*sin(a)
-o.copy().firstDerivative();
+o.firstDerivative();
 // ((1+0)*(3-x)+(0-1)*(x+4))*cos(a)+0*(-1)*sin(a)*(x+4)*(3-x)+0*cos(a)*(ln(x)^2+c)+(2*ln(x)^(2-1)*1*(1/x)+0)*sin(a)
-o.copy().firstDerivative().simplify();
+o.firstDerivative().simplify();
 // (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
-o.copy().firstDerivative().expand().simplify().beautify();
+o.firstDerivative().expand().simplify().beautify();
 // x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
 ```
 
