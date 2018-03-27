@@ -1,9 +1,9 @@
-# Java Algebra System
+# Java Algebra System (JAS)
 A math library with powerful CAS that is capable of performing algebraic simplifications, manipulations, and some calculus. (A Grapher is also included)
 ## What's new
 Epic update to JGrapher - introducing multi-variable graphing capability! Type in `x^a*cos(b*x)` and see what happens along the way! Play around with the sliders. Press `[TAB]` to hide/unhide function input. Significant improvements to the CAS, though not as powerful, it is no longer considered experimental with bugs now gone and inheritance optimized. Completely original & intuitive way of performing algebra manipulations by an ORIGINAL composite tree structure that proved to be immensely powerful and ingenious.
 ## Computer Algebra System (CAS)
-Powerful and bug-free multi-variable computer algebra system. Right now it handles simplification of many forms and convertion of output expression to a more human readable form. 
+JAS is a multivariate computer algebra system built using Java. Right now it handles simplification of many forms and convertion of output expression to a more human readable form. 
 
 ### What can it do?
 As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
