@@ -19,7 +19,7 @@ JAS is a multivariate computer algebra system built using Java. JAS handles the 
 
 **Note: the following section demonstrates the power of JAS, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
 
-## Meet... CAS
+## Meet... JAS
 This is as powerful and accurate as it gets... I've put my life into making this system...
 ```java
 Node o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
