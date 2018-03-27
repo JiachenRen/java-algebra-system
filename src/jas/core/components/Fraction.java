@@ -1,6 +1,7 @@
 package jas.core.components;
 
 import jas.MathContext;
+import jas.core.Mutating;
 import jas.core.Node;
 import jas.core.operations.Binary;
 
@@ -281,6 +282,7 @@ public class Fraction extends RawValue {
         return clone;
     }
 
+    @Mutating
     public Node beautify() {
         return this;
     }

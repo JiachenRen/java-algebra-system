@@ -160,6 +160,11 @@ public class CasComprehensiveTest {
 
         l(new Signature(Argument.VARIABLE,Argument.ANY).equals(new Signature(Argument.LITERAL,Argument.ANY)));
         l(Long.MAX_VALUE);
+        Node n = Compiler.compile("derivative(cos(x)sin(x),x,10)");
+        l(n);
+        n.exec();
+        n.simplify();
+        l(n);
     }
 
 }

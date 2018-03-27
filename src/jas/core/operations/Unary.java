@@ -95,6 +95,7 @@ public class Unary extends Operation implements BinLeafNode {
      *
      * @return a new Node instance that is the simplified version of self.
      */
+    @Mutating
     @Override
     public Node simplify() {
         super.simplify();

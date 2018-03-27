@@ -146,6 +146,7 @@ public class Binary extends Operation {
         }
     }
 
+    @Mutating
     @Override
     public void order() {
         if (is("*") || is("+")) {
@@ -222,6 +223,7 @@ public class Binary extends Operation {
      *
      * @return the simplified version of self
      */
+    @Mutating
     public Node simplify() {
         if (isCommutable())
             return simplifyCommutative();
@@ -311,6 +313,7 @@ public class Binary extends Operation {
      *
      * @return beautified version of the original
      */
+    @Mutating
     @Override
     public Node beautify() {
         if (getRight() instanceof RawValue && is("*")) {
@@ -367,6 +370,7 @@ public class Binary extends Operation {
         setRight(tmp);
     }
 
+    @Mutating
     public Binary toAdditionOnly() {
         super.toAdditionOnly();
         if (operator.name.equals("-")) {
@@ -387,6 +391,7 @@ public class Binary extends Operation {
      * basic CAS capabilities. Implementation began: May 19th.
      * NOTE: modifies self.
      */
+    @Mutating
     @Override
     public Binary toExponentialForm() {
         super.toExponentialForm();
@@ -1077,6 +1082,7 @@ public class Binary extends Operation {
         return this;
     }
 
+    @Mutating
     @Override
     public Node expand() {
         this.toAdditionOnly().toExponentialForm();

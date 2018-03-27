@@ -1,5 +1,6 @@
 package jas.core.components;
 
+import jas.core.Mutating;
 import jas.core.Node;
 
 /**
@@ -21,6 +22,7 @@ public class Vector extends Node {
      * whether a node within the binary tree the the canonical form of another.
      * e.g. c*b*3*a would be reordered to something like 3*a*c*b
      */
+    @Mutating
     @Override
     public void order() {
         //TODO: implement
@@ -83,6 +85,7 @@ public class Vector extends Node {
      *
      * @return simplified expression
      */
+    @Mutating
     @Override
     public Node simplify() {
         return null;
@@ -99,6 +102,7 @@ public class Vector extends Node {
      *
      * @return beautified version of the original
      */
+    @Mutating
     @Override
     public Node beautify() {
         return null;
@@ -115,11 +119,13 @@ public class Vector extends Node {
         return null;
     }
 
+    @Mutating
     @Override
     public Node toAdditionOnly() {
         return null;
     }
 
+    @Mutating
     @Override
     public Node toExponentialForm() {
         return null;
@@ -142,6 +148,7 @@ public class Vector extends Node {
      *
      * @return expanded expression of type Node
      */
+    @Mutating
     @Override
     public Node expand() {
         return null;

@@ -1,6 +1,7 @@
 package jas.core.operations;
 
 import jas.core.JASException;
+import jas.core.Mutating;
 import jas.core.Nameable;
 import jas.core.Node;
 import jas.core.components.Fraction;
@@ -135,6 +136,7 @@ public abstract class Operation extends Node implements Nameable {
      *
      * @return modified self.
      */
+    @Mutating
     public Node simplify() {
         operands = operands.stream()
                 .map(Node::simplify)
@@ -150,6 +152,7 @@ public abstract class Operation extends Node implements Nameable {
      *
      * @return beautified version of the original
      */
+    @Mutating
     public Node beautify() {
         operands = operands.stream()
                 .map(Node::beautify)
@@ -163,6 +166,7 @@ public abstract class Operation extends Node implements Nameable {
      *
      * @return a new Node instance that is the addition only form of self.
      */
+    @Mutating
     public Operation toAdditionOnly() {
         operands.forEach(Node::toAdditionOnly);
         return this;
@@ -182,6 +186,7 @@ public abstract class Operation extends Node implements Nameable {
      *
      * @return exponential form of self
      */
+    @Mutating
     public Node toExponentialForm() {
         operands.forEach(Node::toExponentialForm);
         return this;
@@ -206,6 +211,7 @@ public abstract class Operation extends Node implements Nameable {
         return minDepth + 1;
     }
 
+    @Mutating
     public Node expand() {
         operands = operands.stream()
                 .map(Node::expand)
@@ -264,6 +270,7 @@ public abstract class Operation extends Node implements Nameable {
      * whether a node within the binary tree the the canonical form of another.
      * e.g. c*b*3*a would be reordered to something like 3*a*c*b
      */
+    @Mutating
     public void order() {
         operands.forEach(o -> {
             o.order();

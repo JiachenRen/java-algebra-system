@@ -91,6 +91,7 @@ public abstract class Node implements Evaluable {
      * whether a node within the binary tree the the canonical form of another.
      * e.g. c*b*3*a would be reordered to something like 3*a*c*b
      */
+    @Mutating
     public abstract void order();
 
     /**
@@ -172,6 +173,7 @@ public abstract class Node implements Evaluable {
      *
      * @return simplified expression
      */
+    @Mutating
     public abstract Node simplify();
 
     /**
@@ -200,6 +202,7 @@ public abstract class Node implements Evaluable {
      *
      * @return beautified version of the original
      */
+    @Mutating
     public abstract Node beautify();
 
     /**
@@ -210,8 +213,10 @@ public abstract class Node implements Evaluable {
      */
     public abstract Node explicitNegativeForm();
 
+    @Mutating
     public abstract Node toAdditionOnly();
 
+    @Mutating
     public abstract Node toExponentialForm();
 
     /**
@@ -247,6 +252,7 @@ public abstract class Node implements Evaluable {
      *
      * @return expanded expression of type Node
      */
+    @Mutating
     public abstract Node expand();
 
     /**

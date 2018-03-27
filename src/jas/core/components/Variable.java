@@ -58,6 +58,7 @@ public class Variable extends LeafNode implements Nameable {
         return false;
     }
 
+    @Mutating
     public Node simplify() {
         return get().orElse(this);
     }

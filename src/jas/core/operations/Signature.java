@@ -20,7 +20,7 @@ public class Signature {
         this.args = args;
     }
 
-    public Signature(int numArgs) {
+    Signature(int numArgs) {
         args = new Argument[numArgs];
         Arrays.fill(args, Argument.ANY);
     }

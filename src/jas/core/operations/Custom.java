@@ -213,6 +213,7 @@ public class Custom extends Operation implements BinLeafNode, Nameable {
         return manipulation.manipulate(getOperands()).eval(x);
     }
 
+    @Mutating
     @Override
     public Node simplify() {
         super.simplify();

@@ -21,20 +21,24 @@ public abstract class LeafNode extends Node implements BinLeafNode {
 
     public abstract int complexity();
 
+    @Mutating
     public Node beautify() {
         return this;
     }
 
     public abstract Node explicitNegativeForm();
 
+    @Mutating
     public Node toAdditionOnly() {
         return this;
     }
 
+    @Mutating
     public Node toExponentialForm() {
         return this;
     }
 
+    @Mutating
     public Node expand() {
         return this;
     }
@@ -48,6 +52,7 @@ public abstract class LeafNode extends Node implements BinLeafNode {
     /**
      * LeafNode, nothing could be done for reordering.
      */
+    @Mutating
     public void order() {
     }
 

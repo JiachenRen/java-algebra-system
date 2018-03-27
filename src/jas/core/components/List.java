@@ -1,6 +1,7 @@
 package jas.core.components;
 
 import jas.core.JASException;
+import jas.core.Mutating;
 import jas.core.Node;
 import jas.core.operations.Binary;
 import jas.core.operations.Custom;
@@ -130,6 +131,7 @@ public class List extends Node {
      * whether a node within the binary tree the the canonical form of another.
      * e.g. c*b*3*a would be reordered to something like 3*a*c*b
      */
+    @Mutating
     @Override
     public void order() {
         //TODO: implement
@@ -201,6 +203,7 @@ public class List extends Node {
      *
      * @return simplified expression
      */
+    @Mutating
     @Override
     public Node simplify() {
         nodes = nodes.stream()
@@ -220,6 +223,7 @@ public class List extends Node {
      *
      * @return beautified version of the original
      */
+    @Mutating
     @Override
     public Node beautify() {
         return this;
@@ -236,11 +240,13 @@ public class List extends Node {
         return this;
     }
 
+    @Mutating
     @Override
     public Node toAdditionOnly() {
         return this;
     }
 
+    @Mutating
     @Override
     public Node toExponentialForm() {
         return this;
@@ -263,6 +269,7 @@ public class List extends Node {
      *
      * @return expanded expression of type Node
      */
+    @Mutating
     @Override
     public Node expand() {
         return this;

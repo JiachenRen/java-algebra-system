@@ -1,6 +1,7 @@
 package jas.core.components;
 
 import jas.core.Mode;
+import jas.core.Mutating;
 import jas.core.Node;
 import jas.utils.ColorFormatter;
 
@@ -66,6 +67,7 @@ public class Literal extends Variable {
         return Double.NaN;
     }
 
+    @Mutating
     @Override
     public Literal simplify() {
         return this;

@@ -2,6 +2,7 @@ package jas.core.components;
 
 import jas.core.LeafNode;
 import jas.core.Mode;
+import jas.core.Mutating;
 import jas.core.Node;
 import jas.core.operations.Binary;
 import jas.utils.ColorFormatter;
@@ -140,6 +141,7 @@ public class RawValue extends LeafNode {
                 == this.doubleValue();
     }
 
+    @Mutating
     public Node simplify() {
         return this;
     }
