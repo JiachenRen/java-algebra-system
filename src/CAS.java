@@ -67,7 +67,7 @@ public class CAS extends Application {
                 controller.complexityAfter.setText(String.valueOf(node.complexity()));
                 controller.nodesAfter.setText(String.valueOf(node.numNodes()));
                 controller.errMsg.setText("\"\"");
-            } catch (JMCException e) {
+            } catch (JASException e) {
                 controller.error(e.getMessage());
             }
         });

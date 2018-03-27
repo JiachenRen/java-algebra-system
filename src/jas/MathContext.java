@@ -1,11 +1,10 @@
 package jas;
 
-import jas.core.JMCException;
+import jas.core.JASException;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -172,7 +171,7 @@ public class MathContext {
 
     public static ArrayList<int[]> toBaseExponentPairs(BigInteger n) {
         ArrayList<int[]> pairs = new ArrayList<>();
-        if (n.compareTo(BigInteger.ZERO) < 0) throw new JMCException("input must be positive");
+        if (n.compareTo(BigInteger.ZERO) < 0) throw new JASException("input must be positive");
         else if (n.equals(BigInteger.ZERO) || n.equals(BigInteger.ONE)) return pairs;
         ArrayList<BigInteger> factors = factor(n);
         ArrayList<BigInteger> uFactors = getUniqueFactors(factors);

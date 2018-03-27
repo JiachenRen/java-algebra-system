@@ -24,7 +24,7 @@ public class Custom extends Operation implements BinLeafNode, Nameable {
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, NUMBER), (operands -> {
             double i = operands.get(2).val();
-            if (!RawValue.isInteger(i)) throw new JMCException("order of derivative must be an integer");
+            if (!RawValue.isInteger(i)) throw new JASException("order of derivative must be an integer");
             return operands.get(0).derivative((Variable) operands.get(1), (int) i);
         }));
         define("simplify", new Signature(ANY), operands -> operands.get(0).simplify());
@@ -87,12 +87,12 @@ public class Custom extends Operation implements BinLeafNode, Nameable {
                     .collect(Collectors.toCollection(ArrayList::new));
             if (variables.size() != 2 || !Node.contains(variables, new Variable("a"))
                     || !Node.contains(variables, new Variable("b"))) {
-                throw new JMCException("definition of binary operation should use only contain 2 variables, [a,b]");
+                throw new JASException("definition of binary operation should use only contain 2 variables, [a,b]");
             }
-            if (!priority.isInteger()) throw new JMCException("priority must be an integer");
-            if (operator.length() > 1) throw new JMCException("binary operator can only be a single character");
+            if (!priority.isInteger()) throw new JASException("priority must be an integer");
+            if (operator.length() > 1) throw new JASException("binary operator can only be a single character");
             if (Assets.isSymbol(operator.charAt(0)) || Assets.isValidVarName(operator))
-                throw new JMCException("reserved symbol '" + operator + "', choose a different one");
+                throw new JASException("reserved symbol '" + operator + "', choose a different one");
             Binary.define(operator, (int) priority.val(), (a, b) -> {
                 Node tmp = operation.copy();
                 return tmp.replace(new Variable("a"), new RawValue(a))
@@ -113,7 +113,7 @@ public class Custom extends Operation implements BinLeafNode, Nameable {
             ArrayList<String> deleted = new ArrayList<>();
             operands.forEach(o -> {
                 if (!(o instanceof Literal))
-                    throw new JMCException("illegal argument [" + o + "]; argument must be literal");
+                    throw new JASException("illegal argument [" + o + "]; argument must be literal");
                 deleted.add(o.toString().replace("'", "") + ":" +
                         Optional.ofNullable(Variable.del(((Literal) o).get()))
                                 .orElse(RawValue.UNDEF)
@@ -127,7 +127,7 @@ public class Custom extends Operation implements BinLeafNode, Nameable {
         define("del", Signature.ANY, operands -> {
             ArrayList<Manipulation> removed = new ArrayList<>();
             operands.forEach(o -> {
-                if (!(o instanceof Literal)) throw new JMCException("illegal argument " + o);
+                if (!(o instanceof Literal)) throw new JASException("illegal argument " + o);
                 removed.addAll(unregister(((Literal) o).get(), Signature.ANY));
             });
             return new Literal("Deleted: " + toString(removed));
@@ -176,7 +176,7 @@ public class Custom extends Operation implements BinLeafNode, Nameable {
                 return manipulation;
             }
         }
-        throw new JMCException("cannot resolve operation \"" + name + "\" with signature " + signature);
+        throw new JASException("cannot resolve operation \"" + name + "\" with signature " + signature);
     }
 
     public static ArrayList<Manipulation> registeredManipulations() {

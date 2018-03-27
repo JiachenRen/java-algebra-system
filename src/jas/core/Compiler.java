@@ -25,14 +25,14 @@ public class Compiler {
      */
     public static Node compile(String exp) {
         if (exp.toLowerCase().contains("undef")) return RawValue.UNDEF;
-        if ((exp = exp.replace(" ", "")).equals("")) throw new JMCException("cannot compile an empty string");
-        if (exp.contains(">") || exp.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
+        if ((exp = exp.replace(" ", "")).equals("")) throw new JASException("cannot compile an empty string");
+        if (exp.contains(">") || exp.contains("<")) throw new JASException("angle brackets '<>' no longer supported");
         if (numOccurrence(exp, '(') != numOccurrence(exp, ')'))
-            throw new JMCException("'()' mismatch in " + "\"" + exp + "\"");
-        if (exp.contains("&") || exp.contains("#")) throw new JMCException("syntax: remove illegal character(s) &, #");
+            throw new JASException("'()' mismatch in " + "\"" + exp + "\"");
+        if (exp.contains("&") || exp.contains("#")) throw new JASException("syntax: remove illegal character(s) &, #");
         if (numOccurrence(exp, '{') != numOccurrence(exp, '}'))
-            throw new JMCException("'{}' mismatch in " + "\"" + exp + "\"");
-        if (numOccurrence(exp, '\'') % 2 != 0) throw new JMCException("'' mismatch in " + "\"" + exp + "\"");
+            throw new JASException("'{}' mismatch in " + "\"" + exp + "\"");
+        if (numOccurrence(exp, '\'') % 2 != 0) throw new JASException("'' mismatch in " + "\"" + exp + "\"");
         exp = formatList(exp); // this has to happen before formatOperation()
         exp = formatOperations(exp.replace("(-", "(0-").replace(",-", ",0-"));
         exp = formatCoefficients(exp);
@@ -263,11 +263,11 @@ public class Compiler {
                 operands.add(Constants.get(operand));
             } else if (operand.charAt(0) == '\'') {
                 if (numOccurrence(operand, '\'') != 2)
-                    throw new JMCException("syntax error due to ' in \"" + operand + "\"");
+                    throw new JASException("syntax error due to ' in \"" + operand + "\"");
                 else operands.add(new Literal(operand.substring(1, operand.length() - 1)));
             } else if (RawValue.isNumeric(operand)) operands.add(new RawValue(Double.valueOf(operand)));
             else if (isValidVarName(operand)) operands.add(new Variable(operand.toLowerCase()));
-            else throw new JMCException("unresolved symbol \"" + operand + "\"");
+            else throw new JASException("unresolved symbol \"" + operand + "\"");
         }
         return operands;
     }
@@ -278,7 +278,7 @@ public class Compiler {
 
     private static void ensureValidity(Node node) {
         if (node.equals(RawValue.UNDEF))
-            throw new JMCException("missing operand(s)");
+            throw new JASException("missing operand(s)");
     }
 
 

@@ -1,6 +1,6 @@
 package jas.core.operations;
 
-import jas.core.JMCException;
+import jas.core.JASException;
 import jas.core.Node;
 import jas.core.components.*;
 
@@ -34,7 +34,7 @@ public enum Argument {
         } else if (o instanceof Vector) {
             return VECTOR;
         }
-        throw new JMCException("cannot resolve argument type \"" + o + "\"");
+        throw new JASException("cannot resolve argument type \"" + o + "\"");
     }
 
     public boolean equals(Argument other) {

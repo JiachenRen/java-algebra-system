@@ -1,6 +1,6 @@
 package jas.core.components;
 
-import jas.core.JMCException;
+import jas.core.JASException;
 import jas.core.Mode;
 import jas.core.Node;
 import jas.utils.ColorFormatter;
@@ -66,7 +66,7 @@ public class Constants {
             if (constant.getName().equals(name))
                 return constant;
         }
-        throw new JMCException("constant + \"" + name + "\" does not exist");
+        throw new JASException("constant + \"" + name + "\" does not exist");
     }
 
     public interface ComputedConst {

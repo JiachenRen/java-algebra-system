@@ -16,7 +16,7 @@ public class Variable extends LeafNode implements Nameable {
     private static Map<String, Node> storedVars = new HashMap<>();
 
     public Variable(String name) {
-        if (name.equals("")) throw new JMCException("variable name cannot be empty");
+        if (name.equals("")) throw new JASException("variable name cannot be empty");
         this.name = name;
     }
 

@@ -1,7 +1,7 @@
 package tests;
 
 import jas.core.Compiler;
-import jas.core.JMCException;
+import jas.core.JASException;
 import jas.core.Node;
 import jas.core.operations.Binary;
 import jas.utils.Utils;
@@ -179,7 +179,7 @@ public class AutoTest {
                 if (Compiler.compile(original).equals(Compiler.compile(getOriginal(s)))) {
                     return true;
                 }
-            } catch (JMCException e) {
+            } catch (JASException e) {
                 return false;
             }
         }

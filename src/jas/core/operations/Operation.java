@@ -1,6 +1,6 @@
 package jas.core.operations;
 
-import jas.core.JMCException;
+import jas.core.JASException;
 import jas.core.Nameable;
 import jas.core.Node;
 import jas.core.components.Fraction;
@@ -191,7 +191,7 @@ public abstract class Operation extends Node implements Nameable {
         Optional<Integer> nodes = operands.stream()
                 .map(Node::numNodes)
                 .reduce((a, b) -> a + b);
-        if (!nodes.isPresent()) throw new JMCException("empty nodes");
+        if (!nodes.isPresent()) throw new JASException("empty nodes");
         return 1 + nodes.get();
     }
 

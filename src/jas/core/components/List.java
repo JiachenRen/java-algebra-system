@@ -1,6 +1,6 @@
 package jas.core.components;
 
-import jas.core.JMCException;
+import jas.core.JASException;
 import jas.core.Node;
 import jas.core.operations.Binary;
 import jas.core.operations.Custom;
@@ -59,7 +59,7 @@ public class List extends Node {
      * @return two lists merged with binary operation
      */
     public List binOp(Binary binOp, List other) {
-        if (size() != other.size()) throw new JMCException("list dimension mismatch");
+        if (size() != other.size()) throw new JASException("list dimension mismatch");
         ArrayList<Node> unwrap = unwrap();
         for (int i = 0; i < unwrap.size(); i++) {
             Node node = unwrap.get(i);

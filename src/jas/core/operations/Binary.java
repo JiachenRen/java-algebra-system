@@ -889,7 +889,7 @@ public class Binary extends Operation {
      * @return reconstructed Binary tree.
      */
     private Node reconstructBinTree(ArrayList<Node> flattened) {
-        if (flattened.size() == 0) throw new JMCException("internal error");
+        if (flattened.size() == 0) throw new JASException("internal error");
         else if (flattened.size() == 1) return flattened.get(0);
         String op = getPriority() == 2 ? "*" : "+";
         Binary root = new Binary(flattened.remove(0), op, flattened.remove(0));
@@ -994,7 +994,7 @@ public class Binary extends Operation {
     private Node reconstruct(ArrayList<Node> nodes) {
         try {
             return reconstructBinTree(nodes);
-        } catch (JMCException e) {
+        } catch (JASException e) {
             return null;
         }
     }

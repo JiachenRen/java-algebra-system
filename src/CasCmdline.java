@@ -1,5 +1,5 @@
 import jas.core.Compiler;
-import jas.core.JMCException;
+import jas.core.JASException;
 
 import java.util.Scanner;
 
@@ -22,7 +22,7 @@ public class CasCmdline {
             if (input.equals("exit")) return;
             try {
                 l(boldBlack("\t= ") + Compiler.compile(input).simplify().coloredString() + "\n");
-            } catch (JMCException e) {
+            } catch (JASException e) {
                 l(lightBlue("\t> ") + lightRed(e.getMessage()) + "\n");
             }
         }
