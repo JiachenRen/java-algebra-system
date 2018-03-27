@@ -2,10 +2,10 @@ package jas.core;
 
 
 import jas.Function;
-import jas.core.operations.BinaryOperation;
-import jas.core.operations.CustomOperation;
+import jas.core.operations.Binary;
+import jas.core.operations.Custom;
 import jas.core.operations.Manipulation;
-import jas.core.operations.UnaryOperation;
+import jas.core.operations.Unary;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ public interface Assets {
     String LETTERS = "abcdefghijklmnopqrstuvwxyz";
 
     static String operators() {
-        return BinaryOperation.operators();
+        return Binary.operators();
     }
 
     static String symbols() {
@@ -48,10 +48,10 @@ public interface Assets {
 
     static ArrayList<String> reservedNames() {
         ArrayList<String> names = new ArrayList<>();
-        names.addAll(UnaryOperation.registeredOperations().stream()
+        names.addAll(Unary.registeredOperations().stream()
                 .map(Function::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
-        names.addAll(CustomOperation.registeredManipulations().stream()
+        names.addAll(Custom.registeredManipulations().stream()
                 .map(Manipulation::getName)
                 .collect(Collectors.toCollection(ArrayList::new)));
         names.add("list");

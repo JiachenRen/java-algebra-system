@@ -1,10 +1,10 @@
 package tests.cas;
 
 import jas.core.Compiler;
+import jas.core.Node;
 import jas.core.components.Constants;
-import jas.core.Operable;
-import jas.core.operations.BinaryOperation;
-import jas.core.operations.UnaryOperation;
+import jas.core.operations.Binary;
+import jas.core.operations.Unary;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,10 +56,10 @@ public class CasSimplificationTest {
     };
 
     public static void main(String args[]) {
-        BinaryOperation.define("%", 2, (a, b) -> a % b);
+        Binary.define("%", 2, (a, b) -> a % b);
         l(Compiler.compile("x % 3").eval(5));
 
-        UnaryOperation.define("digits", x -> Integer.toString((int) x).length());
+        Unary.define("digits", x -> Integer.toString((int) x).length());
         l(Compiler.compile("digits(x)^2").eval(1234));
 
         Constants.define("seed", Math::random);
@@ -67,12 +67,12 @@ public class CasSimplificationTest {
 
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
-        ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
-        operables.forEach(operable -> l(operable
+        ArrayList<Node> nodes;
+        nodes = (ArrayList<Node>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
+        nodes.forEach(node -> l(node
                 + boldBlack("\t->\t")
-                + lightGreen(operable.copy().simplify().toString())
+                + lightGreen(node.copy().simplify().toString())
                 + boldBlack("\t->\t")
-                + operable.copy().simplify().beautify()));
+                + node.copy().simplify().beautify()));
     }
 }

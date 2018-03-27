@@ -1,8 +1,8 @@
 package jas.core.components;
 
 import jas.MathContext;
-import jas.core.Operable;
-import jas.core.operations.BinaryOperation;
+import jas.core.Node;
+import jas.core.operations.Binary;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -75,13 +75,13 @@ public class Fraction extends RawValue {
      *
      * @param r root (square, cube, quad, etc)
      * @param n number within the root, n^(1/r)
-     * @return irrational form Fraction or BinaryOperation
+     * @return irrational form Fraction or Binary
      */
-    public static Operable extractRoot(BigInteger n, BigInteger r) {
+    public static Node extractRoot(BigInteger n, BigInteger r) {
         if (n.equals(BIG_ZERO)) return null;
         else if (n.abs().equals(BIG_ONE)) {
-            BinaryOperation in = new BinaryOperation(ONE, "^", ZERO);
-            return new BinaryOperation(new RawValue(n.doubleValue()), "*", in);
+            Binary in = new Binary(ONE, "^", ZERO);
+            return new Binary(new RawValue(n.doubleValue()), "*", in);
         } else if (r.equals(BIG_ZERO)) throw new IllegalArgumentException("root cannot be negative");
         boolean isNegative = false;
         if (n.compareTo(BIG_ZERO) < 0) {
@@ -101,9 +101,9 @@ public class Fraction extends RawValue {
             n1 *= Math.pow(u.longValueExact(), q);
         }
 
-        BinaryOperation exp = new BinaryOperation(new RawValue(1), "/", new RawValue(r.doubleValue()));
-        BinaryOperation irr = new BinaryOperation(new RawValue(n1), "^", exp);
-        return new BinaryOperation(new RawValue(ext), "*", irr);
+        Binary exp = new Binary(new RawValue(1), "/", new RawValue(r.doubleValue()));
+        Binary irr = new Binary(new RawValue(n1), "^", exp);
+        return new Binary(new RawValue(ext), "*", irr);
     }
 
     /**
@@ -152,24 +152,24 @@ public class Fraction extends RawValue {
         return this.reduce();
     }
 
-    public Operable exp(RawValue o) {
+    public Node exp(RawValue o) {
         if (o.isUndefined() || this.isUndefined()) return UNDEF;
         if (o instanceof Fraction) {
             Fraction f = ((Fraction) o);
             this.exp(f.numerator.intValueExact());
             this.reduce();
-            Operable o1 = extractRoot(this.numerator, f.denominator);
-            Operable o2 = extractRoot(this.denominator, f.denominator);
+            Node o1 = extractRoot(this.numerator, f.denominator);
+            Node o2 = extractRoot(this.denominator, f.denominator);
             if (o1 == null || o1.isUndefined() || o2 == null || o2.isUndefined()) return UNDEF;
-            BinaryOperation nu = (BinaryOperation) o1;
-            BinaryOperation de = (BinaryOperation) o2;
-            BinaryOperation irr = (BinaryOperation) de.getRight();
-            Operable a = new BinaryOperation(de.getLeft(), "*", irr.getLeft());
-            Operable c = new BinaryOperation(new RawValue(1), "-", irr.getRight());
-            BinaryOperation conjugate = new BinaryOperation(irr.getLeft(), "^", c);
-            Operable d = new BinaryOperation(nu.getLeft(), "/", a);
-            BinaryOperation e = new BinaryOperation(nu.getRight(), "*", conjugate);
-            return new BinaryOperation(d, "*", e).simplify();
+            Binary nu = (Binary) o1;
+            Binary de = (Binary) o2;
+            Binary irr = (Binary) de.getRight();
+            Node a = new Binary(de.getLeft(), "*", irr.getLeft());
+            Node c = new Binary(new RawValue(1), "-", irr.getRight());
+            Binary conjugate = new Binary(irr.getLeft(), "^", c);
+            Node d = new Binary(nu.getLeft(), "/", a);
+            Binary e = new Binary(nu.getRight(), "*", conjugate);
+            return new Binary(d, "*", e).simplify();
         } else if (o.isInteger()) {
             this.exp(o.toBigInteger().intValueExact());
             this.reduce();
@@ -248,7 +248,7 @@ public class Fraction extends RawValue {
     }
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     @Override
     public String coloredString() {
@@ -269,9 +269,9 @@ public class Fraction extends RawValue {
         return new Fraction(numerator, denominator);
     }
 
-    public Operable explicitNegativeForm() {
+    public Node explicitNegativeForm() {
         if (doubleValue() > 0) return this;
-        else return new BinaryOperation(ONE.negate(), "*", this.copy().negate());
+        else return new Binary(ONE.negate(), "*", this.copy().negate());
     }
 
     public Fraction negate() {
@@ -281,7 +281,7 @@ public class Fraction extends RawValue {
         return clone;
     }
 
-    public Operable beautify() {
+    public Node beautify() {
         return this;
     }
 

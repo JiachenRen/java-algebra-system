@@ -1,6 +1,6 @@
 package jas.core.operations;
 
-import jas.core.Operable;
+import jas.core.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class Signature {
         return true;
     }
 
-    static Signature resolve(ArrayList<Operable> args) {
+    static Signature resolve(ArrayList<Node> args) {
         return new Signature(args.stream()
                 .map(Argument::resolve)
                 .collect(Collectors.toCollection(ArrayList::new)));

@@ -1,7 +1,7 @@
 package jas.core.operations;
 
 import jas.core.Nameable;
-import jas.core.Operable;
+import jas.core.Node;
 
 import java.util.ArrayList;
 
@@ -20,7 +20,7 @@ public class Manipulation implements Nameable, Manipulable {
         this.name = name;
     }
 
-    public Operable manipulate(ArrayList<Operable> operands) {
+    public Node manipulate(ArrayList<Node> operands) {
         return manipulable.manipulate(operands);
     }
 

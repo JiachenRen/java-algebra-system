@@ -1,10 +1,10 @@
 package tests.specific;
 
 import jas.core.Compiler;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.RawValue;
 import jas.core.components.Variable;
-import jas.core.operations.UnaryOperation;
+import jas.core.operations.Unary;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ import static tests.TestPrint.*;
 
 /**
  * Created by Jiachen on 3/8/18.
- * UnaryOperation Test
+ * Unary Test
  */
 public class UnaryOperationTest {
     private static String ops[] = new String[]{
@@ -54,26 +54,26 @@ public class UnaryOperationTest {
 
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
-        ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
-        operables.forEach(operable -> l(operable
+        ArrayList<Node> nodes;
+        nodes = (ArrayList<Node>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
+        nodes.forEach(node -> l(node
                 + boldBlack("\t->\t")
-                + lightGreen(operable.copy().simplify().toString())
+                + lightGreen(node.copy().simplify().toString())
                 + boldBlack("\t->\t")
-                + operable.copy().simplify().beautify()));
+                + node.copy().simplify().beautify()));
 
         l(Math.cos(Math.PI / 2)); // this is why we need CAS!
         l(RawValue.isInteger(3.0));
 
         l(Compiler.compile("ln(x)").isUndefined());
 
-        UnaryOperation.registeredOperations().forEach(o -> l(o.getName()));
+        Unary.registeredOperations().forEach(o -> l(o.getName()));
 
-        UnaryOperation.define("$", "x*1000");
-        UnaryOperation uOp = new UnaryOperation(new Variable("x"), "log");
-        l(uOp.getOperand());
-        uOp.setOperand(new Variable("a"));
-        l(uOp.getOperand());
+        Unary.define("$", "x*1000");
+        Unary u = new Unary(new Variable("x"), "log");
+        l(u.getOperand());
+        u.setOperand(new Variable("a"));
+        l(u.getOperand());
         l(Compiler.compile("$(x)").eval(3));
     }
 

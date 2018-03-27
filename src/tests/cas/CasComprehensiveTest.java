@@ -2,13 +2,13 @@ package tests.cas;
 
 import jas.Function;
 import jas.core.Compiler;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.Constants;
 import jas.core.components.Fraction;
 import jas.core.components.RawValue;
 import jas.core.components.Variable;
 import jas.core.operations.Argument;
-import jas.core.operations.BinaryOperation;
+import jas.core.operations.Binary;
 import jas.core.operations.Operation;
 import jas.core.operations.Signature;
 
@@ -68,13 +68,13 @@ public class CasComprehensiveTest {
         l(f8 + " / " + f7 + " = " + f8.copy().div(f7));
 
         Operation op1 = (Operation) Compiler.compile("(3 + 4.5) * ln(5.3 + 4) / 2.7 / (x + 1) * x / 3");
-        l(((BinaryOperation) op1).flattened());
+        l(((Binary) op1).flattened());
         Operation op2 = (Operation) Compiler.compile("3 - 2x + 4x - 4 + 7pi");
-        l(((BinaryOperation) op2).flattened());
+        l(((Binary) op2).flattened());
 
         l(op1.numNodes(), op2.numNodes());
 
-        Operable c = new Constants.Constant("e", () -> Math.E);
+        Node c = new Constants.Constant("e", () -> Math.E);
         l(c);
 
         ArrayList<String> ops = new ArrayList<>();
@@ -85,9 +85,9 @@ public class CasComprehensiveTest {
                 "0^x",
                 "(ln(x)+3)*5"
         );
-        List<Operable> operables;
-        operables = ops.stream().map(Compiler::compile).collect(Collectors.toList());
-        operables.forEach(op -> {
+        List<Node> nodes;
+        nodes = ops.stream().map(Compiler::compile).collect(Collectors.toList());
+        nodes.forEach(op -> {
             l(boldBlack("original: ") + Compiler.colorMathSymbols(op.toString()));
             l(boldBlack("plug in 5 for x: ") + op.copy().replace(new Variable("x"), new RawValue(5)));
             l(boldBlack("evaluated at 5: ") + op.copy().replace(new Variable("x"), new RawValue(5)).val());
@@ -114,23 +114,23 @@ public class CasComprehensiveTest {
         l(new Fraction(3, 0).isUndefined());
         l(Fraction.UNDEF.isUndefined());
 
-        Operable operable = Compiler.compile("0^0");
-        l(operable.eval(3));
+        Node node = Compiler.compile("0^0");
+        l(node.eval(3));
 
         l(Compiler.compile("a+b*x+a+b/ln(c+e+pi)").numVars());
         l(Compiler.compile("x*3+e").isMultiVar());
-        Operable operable1 = Compiler.compile("(x+a)*-3*(x+a)").simplify();
-        l(operable1, operable1.explicitNegativeForm(), operable1);
+        Node node1 = Compiler.compile("(x+a)*-3*(x+a)").simplify();
+        l(node1, node1.explicitNegativeForm(), node1);
 
-        l(Compiler.compile("x*3+e").replace(new BinaryOperation(new Variable("x"), "*", new RawValue(3)), new Variable("a")));
+        l(Compiler.compile("x*3+e").replace(new Binary(new Variable("x"), "*", new RawValue(3)), new Variable("a")));
         l(Compiler.compile("x*3").equals(Compiler.compile("3*x")));
         l(Compiler.compile("-6*x*-7").simplify().explicitNegativeForm());
         l(Compiler.compile("-1*x").simplify().explicitNegativeForm());
 
 
-        l(BinaryOperation.expFormIdx(Compiler.compile("x^(-3/4)").simplify()));
-        l(BinaryOperation.expFormIdx(Compiler.compile("x^(-4)").simplify()));
-        l(BinaryOperation.expFormIdx(Compiler.compile("x^((-4)*x/3)").simplify()));
+        l(Binary.expFormIdx(Compiler.compile("x^(-3/4)").simplify()));
+        l(Binary.expFormIdx(Compiler.compile("x^(-4)").simplify()));
+        l(Binary.expFormIdx(Compiler.compile("x^((-4)*x/3)").simplify()));
 
 
         // Constants
@@ -146,7 +146,7 @@ public class CasComprehensiveTest {
         function.setEvaluable((x) -> x * x);
         l(function.getEvaluable().eval(3));
 
-        Operable o = Compiler.compile("(x+a)+3*4/(ln(x+7*x))");
+        Node o = Compiler.compile("(x+a)+3*4/(ln(x+7*x))");
         o.replace(new Variable("x"), new Variable("k"));
         l(o);
         l(o.replace(new Variable("x"), new Variable("k")));

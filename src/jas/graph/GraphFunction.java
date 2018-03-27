@@ -1,7 +1,7 @@
 package jas.graph;
 
 import jas.Function;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.Variable;
 
 import java.util.ArrayList;
@@ -37,39 +37,39 @@ public class GraphFunction extends Function {
     /**
      * Default anonymous constructor
      */
-    public GraphFunction(Operable operable) {
-        this("", operable);
+    public GraphFunction(Node node) {
+        this("", node);
     }
 
-    public GraphFunction(String name, Operable operable) {
-        this(name, false, operable);
+    public GraphFunction(String name, Node node) {
+        this(name, false, node);
     }
 
-    public GraphFunction(String name, boolean dynamic, Operable operable) {
-        super(name, operable);
+    public GraphFunction(String name, boolean dynamic, Node node) {
+        super(name, node);
         suppliedVars = new ArrayList<>();
         initSuppliedVars();
         setDynamic(dynamic);
     }
 
     public void initSuppliedVars() {
-        if (getOperable().isMultiVar()) {
-            ArrayList<Variable> vars = getOperable().extractVariables();
+        if (getNode().isMultiVar()) {
+            ArrayList<Variable> vars = getNode().extractVariables();
             for (Variable v : vars) {
                 if (!v.equals(independentVar)) {
                     SuppliedVar sv = new SuppliedVar(v.getName());
                     suppliedVars.add(sv);
-                    setOperable(getOperable().replace(v, sv)); //god this bug took me forever to find
+                    setNode(getNode().replace(v, sv)); //god this bug took me forever to find
                 }
             }
         }
     }
 
-    public Operable getOperable() {
-        return (Operable) getEvaluable();
+    public Node getNode() {
+        return (Node) getEvaluable();
     }
 
-    public void setOperable(Operable o) {
+    public void setNode(Node o) {
         setEvaluable(o);
     }
 
@@ -124,7 +124,7 @@ public class GraphFunction extends Function {
 
     @Override
     public double eval(double val) { // this might compromise speed
-        return getOperable().eval(val);
+        return getNode().eval(val);
     }
 
     @Override

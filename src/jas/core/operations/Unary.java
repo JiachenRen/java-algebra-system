@@ -18,21 +18,21 @@ import java.util.Map;
 
 import static jas.MathContext.*;
 import static jas.core.Mode.*;
+import static jas.core.components.RawValue.*;
 import static jas.utils.ColorFormatter.color;
 import static java.lang.Math.*;
-import static jas.core.components.RawValue.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
  * code refactored May 20th, performance enhanced with static function lib and method reference.
  * breakthrough May 20th.
  */
-public class UnaryOperation extends Operation implements BinLeafNode {
+public class Unary extends Operation implements BinLeafNode {
 
     private Function operation;
 
-    public UnaryOperation(Operable operand, String operation) {
-        this(operand, UnaryOperator.extract(operation));
+    public Unary(Node operand, String operation) {
+        this(operand, Definitions.extract(operation));
     }
 
     /**
@@ -43,18 +43,18 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @param operand   e.g. "x" in "log(x)"
      * @param operation "log" in "log(x)"
      */
-    public UnaryOperation(Operable operand, Function operation) {
+    public Unary(Node operand, Function operation) {
         super(wrap(operand));
         this.operation = operation;
     }
 
 
     public static void define(String name, String expression) {
-        UnaryOperation.define(name, Compiler.compile(expression));
+        Unary.define(name, Compiler.compile(expression));
     }
 
     public static void define(String name, Evaluable evaluable) {
-        UnaryOperator.define(name, evaluable);
+        Definitions.define(name, evaluable);
     }
 
     /**
@@ -64,7 +64,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * @return a Collection containing all of the defined unary operations.
      */
     public static Collection<Function> registeredOperations() {
-        return UnaryOperator.list();
+        return Definitions.list();
     }
 
     public static boolean isDefined(String name) {
@@ -84,8 +84,8 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     @Override
-    public UnaryOperation copy() {
-        return new UnaryOperation(getOperand().copy(), operation);
+    public Unary copy() {
+        return new Unary(getOperand().copy(), operation);
     }
 
     /**
@@ -93,10 +93,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
      * TODO: ln(a) - ln(b) should be ln(a/b)
      * log(225) should be 2log(15) -> implemented
      *
-     * @return a new Operable instance that is the simplified version of self.
+     * @return a new Node instance that is the simplified version of self.
      */
     @Override
-    public Operable simplify() {
+    public Node simplify() {
         super.simplify();
 
         if (getOperand() instanceof List) {
@@ -109,24 +109,24 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         if (isInteger(val))
             return new RawValue(val);
 
-        if (getOperand() instanceof UnaryOperation) {
-            UnaryOperation op = (UnaryOperation) getOperand();
+        if (getOperand() instanceof Unary) {
+            Unary unary = (Unary) getOperand();
             switch (this.operation.getName()) { // TODO: domain!!!
                 case "cos":
-                    switch (op.operation.getName()) {
+                    switch (unary.operation.getName()) {
                         case "acos":
-                            return op.getOperand();
+                            return unary.getOperand();
                     }
                     break;
                 case "sin":
-                    switch (op.operation.getName()) {
+                    switch (unary.operation.getName()) {
                         case "asin":
-                            return op.getOperand();
+                            return unary.getOperand();
                     }
                 case "tan":
-                    switch (op.operation.getName()) {
+                    switch (unary.operation.getName()) {
                         case "atan":
-                            return op.getOperand(); // what about tan(pi/2)?
+                            return unary.getOperand(); // what about tan(pi/2)?
                     }
             }
         } else if (getOperand() instanceof Constants.Constant) {
@@ -161,15 +161,15 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                             if (allTheSame(num)) {
                                 RawValue r1 = new RawValue(MathContext.mult(uniqueFactors).doubleValue());
                                 if (!r1.equals(r)) // do not return 1*ln(10), or it would cause StackOverflow error!
-                                    return Operation.mult(new RawValue(num[0]), new UnaryOperation(r1, operation));
+                                    return Operation.mult(new RawValue(num[0]), new Unary(r1, operation));
                                 else return this;
                             }
                         }
                 }
             }
 
-        } else if (getOperand() instanceof BinaryOperation) {
-            BinaryOperation binOp = (BinaryOperation) getOperand();
+        } else if (getOperand() instanceof Binary) {
+            Binary binOp = (Binary) getOperand();
             switch (operation.getName()) {
                 case "ln":
                     if (binOp.is("^") && binOp.getLeft().equals(Constants.get("e"))) {
@@ -183,21 +183,21 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     }
 
     @Override
-    public Operable firstDerivative(Variable v) {
-        Operable smallKahuna = getOperand().firstDerivative(v);
-        Operable bigKahuna = null;
+    public Node firstDerivative(Variable v) {
+        Node smallKahuna = getOperand().firstDerivative(v);
+        Node bigKahuna = null;
         switch (this.operation.getName()) {
             case "cos": // d/dx cos(x) = -sin(x)
-                bigKahuna = ONE.negate().mult(new UnaryOperation(getOperand(), "sin"));
+                bigKahuna = ONE.negate().mult(new Unary(getOperand(), "sin"));
                 break;
             case "sin": // d/dx sin(x) = cos(x)
-                bigKahuna = new UnaryOperation(getOperand(), "cos");
+                bigKahuna = new Unary(getOperand(), "cos");
                 break;
             case "ln": // d/dx ln(x) = 1/x
                 bigKahuna = ONE.div(getOperand());
                 break;
             case "log": // d/dx log(x) = 1/x*log(e)
-                bigKahuna = ONE.div(getOperand()).mult(new UnaryOperation(Constants.E, "log"));
+                bigKahuna = ONE.div(getOperand()).mult(new Unary(Constants.E, "log"));
                 break;
             case "acos": // d/dx arccos(x) = (-1)/(1-x^2)^(1/2)
                 bigKahuna = ONE.negate().div(ONE.sub(getOperand().sq()).sqrt());
@@ -206,39 +206,39 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 bigKahuna = ONE.div(ONE.sub(getOperand().sq()).sqrt());
                 break;
             case "tan": // d/dx tan(x) = 1/cos(x)^2
-                bigKahuna = ONE.div(new UnaryOperation(getOperand(), "cos").sq());
+                bigKahuna = ONE.div(new Unary(getOperand(), "cos").sq());
                 break;
             case "atan": // d/dx arctan(x) = 1/(x^2+1)
                 bigKahuna = ONE.div(getOperand().sq().add(1));
                 break;
             case "abs": // d/dx |x| = sign(x)
-                bigKahuna = new UnaryOperation(getOperand(), "sign");
+                bigKahuna = new Unary(getOperand(), "sign");
                 break;
             case "csc": // d/dx csc(x) = -cos(x)/sin(x)^2
-                bigKahuna = new UnaryOperation(getOperand(), "cos").mult(-1).div(new UnaryOperation(getOperand(), "sin").sq());
+                bigKahuna = new Unary(getOperand(), "cos").mult(-1).div(new Unary(getOperand(), "sin").sq());
                 break;
             case "sec": // d/dx sec(x) = sin(x)/cos(x)^2
-                bigKahuna = new UnaryOperation(getOperand(), "sin").div(new UnaryOperation(getOperand(), "cos").sq());
+                bigKahuna = new Unary(getOperand(), "sin").div(new Unary(getOperand(), "cos").sq());
                 break;
             case "cot": // d/dx cot(x) = -1/sin(x)^2
-                bigKahuna = ONE.negate().div(new UnaryOperation(getOperand(), "sin").sq());
+                bigKahuna = ONE.negate().div(new Unary(getOperand(), "sin").sq());
                 break;
             case "cosh": // d/dx cosh(x) = sinh(x)
-                bigKahuna = new UnaryOperation(getOperand(), "sinh");
+                bigKahuna = new Unary(getOperand(), "sinh");
                 break;
             case "sinh": // d/dx sinh(x) = cosh(x)
-                bigKahuna = new UnaryOperation(getOperand(), "cosh");
+                bigKahuna = new Unary(getOperand(), "cosh");
                 break;
             case "tanh": // d/dx tanh(x) = 1/cosh(x)^2
-                bigKahuna = ONE.div(new UnaryOperation(getOperand(), "cosh").sq());
+                bigKahuna = ONE.div(new Unary(getOperand(), "cosh").sq());
                 break;
         }
         if (bigKahuna != null) return smallKahuna.mult(bigKahuna);
-        return new CustomOperation(Calculus.DERIVATIVE, this.copy());
+        return new Custom(Calculus.DERIVATIVE, this.copy());
     }
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     @Override
     public String coloredString() {
@@ -265,7 +265,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             }
         }
 
-        Operable o;
+        Node o;
         switch (operation.getName()) {
             case "tan": // domain: x != pi/2 + n*pi
             case "sec":
@@ -285,12 +285,12 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return false;
     }
 
-    public Operable getOperand() {
+    public Node getOperand() {
         return getOperand(0);
     }
 
-    public void setOperand(Operable operable) {
-        super.setOperand(operable, 0);
+    public void setOperand(Node node) {
+        super.setOperand(node, 0);
     }
 
     public String getName() {
@@ -304,14 +304,14 @@ public class UnaryOperation extends Operation implements BinLeafNode {
     /**
      * Returns true if the operations (Function) e.g. "sin", "cos" are the same
      *
-     * @param other the other operable, possibly UnaryOperation or BinaryOperation
+     * @param other the other node, possibly Unary or Binary
      * @return whether or not the two instances are identical to each other.
      */
     @Override
-    public boolean equals(Operable other) {
-        return other instanceof UnaryOperation
-                && ((UnaryOperation) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
-                && this.getOperand().equals(((UnaryOperation) other).getOperand()); //delegate down
+    public boolean equals(Node other) {
+        return other instanceof Unary
+                && ((Unary) other).operation.equals(this.operation) //evaluates to false for operations "sin" and "cos"
+                && this.getOperand().equals(((Unary) other).getOperand()); //delegate down
     }
 
     public double val() {
@@ -322,7 +322,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         return operation;
     }
 
-    private static class UnaryOperator implements Evaluable, Nameable {
+    private static class Definitions implements Evaluable, Nameable {
         private static Map<String, Function> functions;
 
         static {
@@ -355,7 +355,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
 
         private Function unaryOperation;
 
-        UnaryOperator(String name) {
+        Definitions(String name) {
             unaryOperation = functions.get(name);
         }
 
@@ -379,7 +379,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             return unaryOperation.eval(x);
         }
 
-        public boolean equals(UnaryOperator other) {
+        public boolean equals(Definitions other) {
             return other.unaryOperation.getName().equals(this.unaryOperation.getName());
         }
 

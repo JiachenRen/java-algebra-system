@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jas.core.*;
 import jas.core.Compiler;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.operations.Operation;
 
 import java.util.NoSuchElementException;
@@ -33,28 +33,28 @@ public class CAS extends Application {
         expression.bind(controller.input.textProperty());
         expression.addListener((observable, oldValue, newValue) -> {
             try {
-                Operable operable = Compiler.compile(newValue);
+                Node node = Compiler.compile(newValue);
                 String addExp = "";
-                if (operable instanceof Operation) {
-                    Operation operation = (Operation) operable;
+                if (node instanceof Operation) {
+                    Operation operation = (Operation) node;
                     addExp = operation.copy().toAdditionOnly().toExponentialForm().toString();
                 }
                 controller.additionOnlyExp.setText(addExp);
 
-                int nodes1 = operable.numNodes(), complexity1 = operable.complexity();
+                int nodes1 = node.numNodes(), complexity1 = node.complexity();
                 controller.nodesBefore.setText(String.valueOf(nodes1));
                 controller.complexityBefore.setText(String.valueOf(complexity1));
 
-                operable = operable.simplify();
-                controller.simplified.setText(operable.toString()); //should conform to MVC, setText should be in controller.
+                node = node.simplify();
+                controller.simplified.setText(node.toString()); //should conform to MVC, setText should be in controller.
 
-                controller.expanded.setText(operable.copy().expand().simplify().beautify().toString());
+                controller.expanded.setText(node.copy().expand().simplify().beautify().toString());
 
-                operable = operable.beautify();
-                controller.beautified.setText(operable.toString());
+                node = node.beautify();
+                controller.beautified.setText(node.toString());
 
                 try {
-                    controller.vars.setText(operable.extractVariables()
+                    controller.vars.setText(node.extractVariables()
                             .stream().map(Nameable::getName)
                             .reduce((a, b) -> a + ", " + b).get());
                 } catch (NoSuchElementException e) {
@@ -62,10 +62,10 @@ public class CAS extends Application {
                 }
 
 
-                controller.val.setText(String.valueOf(operable.val()));
+                controller.val.setText(String.valueOf(node.val()));
 
-                controller.complexityAfter.setText(String.valueOf(operable.complexity()));
-                controller.nodesAfter.setText(String.valueOf(operable.numNodes()));
+                controller.complexityAfter.setText(String.valueOf(node.complexity()));
+                controller.nodesAfter.setText(String.valueOf(node.numNodes()));
                 controller.errMsg.setText("\"\"");
             } catch (JMCException e) {
                 controller.error(e.getMessage());

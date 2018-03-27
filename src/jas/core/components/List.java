@@ -1,10 +1,10 @@
 package jas.core.components;
 
 import jas.core.JMCException;
-import jas.core.Operable;
-import jas.core.operations.BinaryOperation;
-import jas.core.operations.CustomOperation;
-import jas.core.operations.UnaryOperation;
+import jas.core.Node;
+import jas.core.operations.Binary;
+import jas.core.operations.Custom;
+import jas.core.operations.Unary;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -16,38 +16,38 @@ import static jas.utils.ColorFormatter.color;
 
 /**
  * Created by Jiachen on 3/20/18.
- * Wrapper for ArrayList -> the order of the operable matters
+ * Wrapper for ArrayList -> the order of the node matters
  */
-public class List extends Operable {
-    private ArrayList<Operable> operables;
+public class List extends Node {
+    private ArrayList<Node> nodes;
 
-    public List(ArrayList<Operable> operables) {
-        this.operables = operables;
+    public List(ArrayList<Node> nodes) {
+        this.nodes = nodes;
     }
 
-    public ArrayList<Operable> unwrap() {
-        return operables;
+    public ArrayList<Node> unwrap() {
+        return nodes;
     }
 
     @Override
-    public boolean equals(Operable other) {
+    public boolean equals(Node other) {
         if (!(other instanceof List)) return false;
         List list = ((List) other);
         if (list.size() != size()) return false;
         for (int i = 0; i < size(); i++) {
-            Operable operable = get(i);
-            if (!operable.equals(list.get(i)))
+            Node node = get(i);
+            if (!node.equals(list.get(i)))
                 return false;
         }
         return true;
     }
 
-    public Operable get(int i) {
-        return operables.get(i);
+    public Node get(int i) {
+        return nodes.get(i);
     }
 
     public int size() {
-        return operables.size();
+        return nodes.size();
     }
 
     /**
@@ -58,31 +58,31 @@ public class List extends Operable {
      * @param other another list with matching dimension, i.e. size == size
      * @return two lists merged with binary operation
      */
-    public List binOp(BinaryOperation binOp, List other) {
+    public List binOp(Binary binOp, List other) {
         if (size() != other.size()) throw new JMCException("list dimension mismatch");
-        ArrayList<Operable> unwrap = unwrap();
+        ArrayList<Node> unwrap = unwrap();
         for (int i = 0; i < unwrap.size(); i++) {
-            Operable operable = unwrap.get(i);
-            set(i, new BinaryOperation(operable, binOp.getName(), other.get(i)));
+            Node node = unwrap.get(i);
+            set(i, new Binary(node, binOp.getName(), other.get(i)));
         }
         return this;
     }
 
     /**
-     * perform binary operation with another operable element.
+     * perform binary operation with another node element.
      * NOTE: modifies self
      *
      * @param binOp   binary operation to be performed
-     * @param other   an operable instance
+     * @param other   an node instance
      * @param forward if this is 'a' in a/b, then set [forward] to true; otherwise false
      * @return self with all of the elements performed binOp with [other]
      */
-    public List binOp(BinaryOperation binOp, Operable other, boolean forward) {
-        ArrayList<Operable> unwrap = unwrap();
+    public List binOp(Binary binOp, Node other, boolean forward) {
+        ArrayList<Node> unwrap = unwrap();
         for (int i = 0; i < unwrap.size(); i++) {
-            Operable operable = unwrap.get(i);
-            BinaryOperation op = forward ? new BinaryOperation(operable, binOp.getName(), other)
-                    : new BinaryOperation(other, binOp.getName(), operable);
+            Node node = unwrap.get(i);
+            Binary op = forward ? new Binary(node, binOp.getName(), other)
+                    : new Binary(other, binOp.getName(), node);
             set(i, op);
         }
         return this;
@@ -91,11 +91,11 @@ public class List extends Operable {
     /**
      * perform unary operation on each element in the list
      *
-     * @param uOp UnaryOperation to be performed for each element in the list
+     * @param uOp Unary to be performed for each element in the list
      * @return self
      */
-    public List uOp(UnaryOperation uOp) {
-        operables = operables.stream().map(o -> new UnaryOperation(o, uOp.getFunction()))
+    public List uOp(Unary uOp) {
+        nodes = nodes.stream().map(o -> new Unary(o, uOp.getFunction()))
                 .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
@@ -106,22 +106,22 @@ public class List extends Operable {
      * @param customOp a custom operation taking in only one argument with signature ANY
      * @return self
      */
-    public List customOp(CustomOperation customOp) {
-        operables = operables.stream().map(o -> new CustomOperation(customOp.getName(), o))
+    public List customOp(Custom customOp) {
+        nodes = nodes.stream().map(o -> new Custom(customOp.getName(), o))
                 .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
 
-    public void set(int i, Operable o) {
-        operables.set(i, o);
+    public void set(int i, Node o) {
+        nodes.set(i, o);
     }
 
-    public void set(ArrayList<Operable> operables) {
-        this.operables = operables;
+    public void set(ArrayList<Node> nodes) {
+        this.nodes = nodes;
     }
 
     @Override
-    public Operable copy() {
+    public Node copy() {
         return this;
     }
 
@@ -139,24 +139,24 @@ public class List extends Operable {
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
      * returns -1 if not found.
      *
-     * @param o the Operable instance that you are looking for.
-     * @return the level at which operable is found.
+     * @param o the Node instance that you are looking for.
+     * @return the level at which node is found.
      */
     @Override
-    public int levelOf(Operable o) {
+    public int levelOf(Node o) {
         return 0;
     }
 
     @Override
     public String toString() {
-        Optional<String> args = operables.stream().map(Operable::toString).reduce((a, b) -> a + "," + b);
+        Optional<String> args = nodes.stream().map(Node::toString).reduce((a, b) -> a + "," + b);
         return "{" + (args.orElse("")) + "}";
     }
 
     @Override
     public String coloredString() {
-        Optional<String> args = operables.stream()
-                .map(Operable::coloredString)
+        Optional<String> args = nodes.stream()
+                .map(Node::coloredString)
                 .reduce((a, b) -> a + color(",", COMMA_COLOR) + b);
         return color("{", CURLY_BRACKET_COLOR) + (args.orElse("")) + color("}", CURLY_BRACKET_COLOR);
     }
@@ -175,9 +175,9 @@ public class List extends Operable {
 
     /**
      * traverses the composite tree and evaluates every single node that represents a raw value.
-     * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
+     * e.g. if the Node represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
      * however, if variables exists in the expression, NaN is returned.
-     * e.g. if the Operable represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
+     * e.g. if the Node represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
      *
      * @return arbitrary value of the node.
      */
@@ -197,14 +197,14 @@ public class List extends Operable {
 
     /**
      * NOTE: useful for simple simplifications.
-     * Operable::simplify(Operable o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
+     * Node::simplify(Node o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
      *
      * @return simplified expression
      */
     @Override
-    public Operable simplify() {
-        operables = operables.stream()
-                .map(Operable::simplify)
+    public Node simplify() {
+        nodes = nodes.stream()
+                .map(Node::simplify)
                 .collect(Collectors.toCollection(ArrayList::new));
         return this;
     }
@@ -215,13 +215,13 @@ public class List extends Operable {
      * a*(1/3) -> a/3,
      * a+(-1)*b -> a-b
      * <p>
-     * before invoking this method, the Operable should already by at a stage where it is simplified,
+     * before invoking this method, the Node should already by at a stage where it is simplified,
      * converted to additional only and in exponential form.
      *
      * @return beautified version of the original
      */
     @Override
-    public Operable beautify() {
+    public Node beautify() {
         return this;
     }
 
@@ -229,20 +229,20 @@ public class List extends Operable {
      * (-#)*x will be converted to (-1)*#*x, where # denotes a number
      * NOTE: does not modify self.
      *
-     * @return explicit negative form of the original Operable
+     * @return explicit negative form of the original Node
      */
     @Override
-    public Operable explicitNegativeForm() {
+    public Node explicitNegativeForm() {
         return this;
     }
 
     @Override
-    public Operable toAdditionOnly() {
+    public Node toAdditionOnly() {
         return this;
     }
 
     @Override
-    public Operable toExponentialForm() {
+    public Node toExponentialForm() {
         return this;
     }
 
@@ -253,7 +253,7 @@ public class List extends Operable {
      * @return first derivative of the expression
      */
     @Override
-    public Operable firstDerivative(Variable v) {
+    public Node firstDerivative(Variable v) {
         return this;
     }
 
@@ -261,20 +261,20 @@ public class List extends Operable {
      * Expand the expression; its behavior is exactly what you would expect.
      * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
      *
-     * @return expanded expression of type Operable
+     * @return expanded expression of type Node
      */
     @Override
-    public Operable expand() {
+    public Node expand() {
         return this;
     }
 
     /**
-     * @param o the operable to be replaced
-     * @param r the operable to take o's place
-     * @return the original operable with o replaced by r.
+     * @param o the node to be replaced
+     * @param r the node to take o's place
+     * @return the original node with o replaced by r.
      */
     @Override
-    public Operable replace(Operable o, Operable r) {
+    public Node replace(Node o, Node r) {
         return this;
     }
 

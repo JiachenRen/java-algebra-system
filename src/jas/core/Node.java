@@ -4,7 +4,7 @@ package jas.core;
 import jas.core.components.Fraction;
 import jas.core.components.RawValue;
 import jas.core.components.Variable;
-import jas.core.operations.BinaryOperation;
+import jas.core.operations.Binary;
 import jas.core.operations.Operation;
 
 import java.util.ArrayList;
@@ -14,38 +14,38 @@ import static jas.utils.ColorFormatter.color;
 
 /**
  * Created by Jiachen on 03/05/2017.
- * Operable
+ * Node
  */
-public abstract class Operable implements Evaluable {
+public abstract class Node implements Evaluable {
     /**
      * invocation of commonTerms(o1 = "a*b*(c+d)*m", o2 = "f*(c+d)*m")
      * returns [(c+d), m]
      *
-     * @param o1 Operable #1
-     * @param o2 Operable #2
+     * @param o1 Node #1
+     * @param o2 Node #2
      * @return an ArrayList containing common terms of o1 and o2
      */
-    public static ArrayList<Operable> commonTerms(Operable o1, Operable o2) {
-        ArrayList<Operable> terms = new ArrayList<>();
+    public static ArrayList<Node> commonTerms(Node o1, Node o2) {
+        ArrayList<Node> terms = new ArrayList<>();
         if (o1 instanceof BinLeafNode && o2 instanceof BinLeafNode) {
             if (o1.equals(o2)) {
                 terms.add(o1.copy());
             }
-        } else if (((o1 instanceof BinaryOperation) && (o2 instanceof BinLeafNode)) || ((o1 instanceof BinLeafNode) && (o2 instanceof BinaryOperation))) {
-            BinaryOperation binOp = (BinaryOperation) (o1 instanceof BinaryOperation ? o1 : o2);
-            Operable op = o1 instanceof BinaryOperation ? o2 : o1;
-            ArrayList<Operable> pool = binOp.flattened();
-            if (Operable.contains(pool, op))
+        } else if (((o1 instanceof Binary) && (o2 instanceof BinLeafNode)) || ((o1 instanceof BinLeafNode) && (o2 instanceof Binary))) {
+            Binary binOp = (Binary) (o1 instanceof Binary ? o1 : o2);
+            Node op = o1 instanceof Binary ? o2 : o1;
+            ArrayList<Node> pool = binOp.flattened();
+            if (Node.contains(pool, op))
                 terms.add(op.copy());
-        } else if (o1 instanceof BinaryOperation && o2 instanceof BinaryOperation) {
-            BinaryOperation binOp1 = (BinaryOperation) o1;
-            BinaryOperation binOp2 = (BinaryOperation) o2;
-            ArrayList<Operable> pool1 = binOp1.flattened();
-            ArrayList<Operable> pool2 = binOp2.flattened();
+        } else if (o1 instanceof Binary && o2 instanceof Binary) {
+            Binary binOp1 = (Binary) o1;
+            Binary binOp2 = (Binary) o2;
+            ArrayList<Node> pool1 = binOp1.flattened();
+            ArrayList<Node> pool2 = binOp2.flattened();
             for (int i = pool1.size() - 1; i >= 0; i--) {
-                Operable op1 = pool1.get(i);
+                Node op1 = pool1.get(i);
                 for (int k = pool2.size() - 1; k >= 0; k--) {
-                    Operable op2 = pool2.get(k);
+                    Node op2 = pool2.get(k);
                     if (op1.equals(op2)) {
                         pool1.remove(i);
                         pool2.remove(k);
@@ -58,18 +58,18 @@ public abstract class Operable implements Evaluable {
         return terms;
     }
 
-    public static boolean contains(ArrayList<Operable> operables, Operable target) {
-        for (Operable operable : operables) {
-            if (operable.equals(target))
+    public static boolean contains(ArrayList<Node> nodes, Node target) {
+        for (Node node : nodes) {
+            if (node.equals(target))
                 return true;
         }
         return false;
     }
 
-    public static boolean remove(ArrayList<Operable> operables, Operable target) {
-        for (Operable operable : operables) {
-            if (operable.equals(target))
-                return operables.remove(operable);
+    public static boolean remove(ArrayList<Node> nodes, Node target) {
+        for (Node node : nodes) {
+            if (node.equals(target))
+                return nodes.remove(node);
         }
         return false;
     }
@@ -78,9 +78,9 @@ public abstract class Operable implements Evaluable {
         return color("(", PARENTHESIS_COLOR) + s + color(")", PARENTHESIS_COLOR);
     }
 
-    public abstract boolean equals(Operable other);
+    public abstract boolean equals(Node other);
 
-    public abstract Operable copy();
+    public abstract Node copy();
 
     public boolean isMultiVar() {
         return numVars() > 1;
@@ -114,12 +114,12 @@ public abstract class Operable implements Evaluable {
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
      * returns -1 if not found.
      *
-     * @param o the Operable instance that you are looking for.
-     * @return the level at which operable is found.
+     * @param o the Node instance that you are looking for.
+     * @return the level at which node is found.
      */
-    public abstract int levelOf(Operable o);
+    public abstract int levelOf(Node o);
 
-    public boolean contains(Operable o) {
+    public boolean contains(Node o) {
         return levelOf(o) != -1;
     }
 
@@ -139,12 +139,12 @@ public abstract class Operable implements Evaluable {
      *
      * @return new instance that is the negated version of the original
      */
-    public Operable negate() {
+    public Node negate() {
         return Operation.mult(RawValue.ONE.negate(), this);
     }
 
     /**
-     * @return whether the operable represents a number
+     * @return whether the node represents a number
      */
     public boolean isNaN() {
         return Double.isNaN(val());
@@ -152,9 +152,9 @@ public abstract class Operable implements Evaluable {
 
     /**
      * traverses the composite tree and evaluates every single node that represents a raw value.
-     * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
+     * e.g. if the Node represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
      * however, if variables exists in the expression, NaN is returned.
-     * e.g. if the Operable represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
+     * e.g. if the Node represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
      *
      * @return arbitrary value of the node.
      */
@@ -168,20 +168,20 @@ public abstract class Operable implements Evaluable {
 
     /**
      * NOTE: useful for simple simplifications.
-     * Operable::simplify(Operable o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
+     * Node::simplify(Node o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
      *
      * @return simplified expression
      */
-    public abstract Operable simplify();
+    public abstract Node simplify();
 
     /**
      * handles super complex simplifications. Unless you have hundreds of nested binary operations, don't use this method.
      *
      * @return the simplest representation of the expression in expanded form.
      */
-    public Operable simplest() {
-        ArrayList<Operable> simplifiedForms = new ArrayList<>();
-        Operable s = this.copy();
+    public Node simplest() {
+        ArrayList<Node> simplifiedForms = new ArrayList<>();
+        Node s = this.copy();
         while (!contains(simplifiedForms, s)) {
             simplifiedForms.add(s.copy());
             s = s.expand().simplify();
@@ -195,24 +195,24 @@ public abstract class Operable implements Evaluable {
      * a*(1/3) -> a/3,
      * a+(-1)*b -> a-b
      * <p>
-     * before invoking this method, the Operable should already by at a stage where it is simplified,
+     * before invoking this method, the Node should already by at a stage where it is simplified,
      * converted to additional only and in exponential form.
      *
      * @return beautified version of the original
      */
-    public abstract Operable beautify();
+    public abstract Node beautify();
 
     /**
      * (-#)*x will be converted to (-1)*#*x, where # denotes a number
      * NOTE: does not modify self.
      *
-     * @return explicit negative form of the original Operable
+     * @return explicit negative form of the original Node
      */
-    public abstract Operable explicitNegativeForm();
+    public abstract Node explicitNegativeForm();
 
-    public abstract Operable toAdditionOnly();
+    public abstract Node toAdditionOnly();
 
-    public abstract Operable toExponentialForm();
+    public abstract Node toExponentialForm();
 
     /**
      * If this method is successfully implemented, it would be marked as a milestone.
@@ -220,15 +220,15 @@ public abstract class Operable implements Evaluable {
      * @param v the variable in which the first derivative is taken with respect to.
      * @return first derivative of the expression
      */
-    public abstract Operable firstDerivative(Variable v);
+    public abstract Node firstDerivative(Variable v);
 
     /**
      * @param v the variable in which the first derivative is taken with respect to.
      * @param n the nth derivative
      * @return the nth derivative of the expression
      */
-    public Operable derivative(Variable v, int n) {
-        Operable der = this.copy().simplify();
+    public Node derivative(Variable v, int n) {
+        Node der = this.copy().simplify();
         while (n > 0) {
             //.expand().simplify() gives the completely simplified form.
             der = der.firstDerivative(v).simplest();
@@ -237,7 +237,7 @@ public abstract class Operable implements Evaluable {
         return der;
     }
 
-    public Operable exec() {
+    public Node exec() {
         return this;
     }
 
@@ -245,69 +245,69 @@ public abstract class Operable implements Evaluable {
      * Expand the expression; its behavior is exactly what you would expect.
      * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
      *
-     * @return expanded expression of type Operable
+     * @return expanded expression of type Node
      */
-    public abstract Operable expand();
+    public abstract Node expand();
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     public abstract String coloredString();
 
     /**
-     * @param o the operable to be replaced
-     * @param r the operable to take o's place
-     * @return the original operable with o replaced by r.
+     * @param o the node to be replaced
+     * @param r the node to take o's place
+     * @return the original node with o replaced by r.
      */
-    public abstract Operable replace(Operable o, Operable r);
+    public abstract Node replace(Node o, Node r);
 
     public abstract boolean isUndefined();
 
-    public BinaryOperation mult(Operable o) {
-        return new BinaryOperation(this.copy(), "*", o);
+    public Binary mult(Node o) {
+        return new Binary(this.copy(), "*", o);
     }
 
-    public BinaryOperation mult(double n) {
-        return new BinaryOperation(this.copy(), "*", new RawValue(n));
+    public Binary mult(double n) {
+        return new Binary(this.copy(), "*", new RawValue(n));
     }
 
-    public BinaryOperation add(Operable o) {
-        return new BinaryOperation(this.copy(), "+", o.copy());
+    public Binary add(Node o) {
+        return new Binary(this.copy(), "+", o.copy());
     }
 
-    public BinaryOperation add(double n) {
-        return new BinaryOperation(this.copy(), "+", new RawValue(n));
+    public Binary add(double n) {
+        return new Binary(this.copy(), "+", new RawValue(n));
     }
 
-    public BinaryOperation sub(Operable o) {
-        return new BinaryOperation(this.copy(), "-", o.copy());
+    public Binary sub(Node o) {
+        return new Binary(this.copy(), "-", o.copy());
     }
 
-    public BinaryOperation sub(double n) {
-        return new BinaryOperation(this.copy(), "-", new RawValue(n));
+    public Binary sub(double n) {
+        return new Binary(this.copy(), "-", new RawValue(n));
     }
 
-    public BinaryOperation div(Operable o) {
-        return new BinaryOperation(this.copy(), "/", o.copy());
+    public Binary div(Node o) {
+        return new Binary(this.copy(), "/", o.copy());
     }
 
-    public BinaryOperation div(double n) {
-        return new BinaryOperation(this.copy(), "/", new RawValue(n));
+    public Binary div(double n) {
+        return new Binary(this.copy(), "/", new RawValue(n));
     }
 
-    public BinaryOperation exp(Operable o) {
-        return new BinaryOperation(this.copy(), "^", o.copy());
+    public Binary exp(Node o) {
+        return new Binary(this.copy(), "^", o.copy());
     }
 
-    public BinaryOperation exp(double n) {
-        return new BinaryOperation(this.copy(), "^", new RawValue(n));
+    public Binary exp(double n) {
+        return new Binary(this.copy(), "^", new RawValue(n));
     }
 
-    public BinaryOperation sqrt() {
+    public Binary sqrt() {
         return exp(new Fraction(1, 2));
     }
 
-    public BinaryOperation sq() {
+    public Binary sq() {
         return exp(2);
     }
 }

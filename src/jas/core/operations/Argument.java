@@ -1,7 +1,7 @@
 package jas.core.operations;
 
 import jas.core.JMCException;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.*;
 
 /**
@@ -18,7 +18,7 @@ public enum Argument {
     VECTOR,
     LITERAL;
 
-    public static Argument resolve(Operable o) {
+    public static Argument resolve(Node o) {
         if (!o.isNaN() || o instanceof RawValue) {
             return NUMBER;
         } else if (o instanceof Literal) { // be careful, Literal is a subclass of Variable.

@@ -2,7 +2,7 @@ package jas.core.components;
 
 import jas.core.JMCException;
 import jas.core.Mode;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.utils.ColorFormatter;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class Constants {
             return computedConst.compute();
         }
 
-        public boolean equals(Operable other) {
+        public boolean equals(Node other) {
             return other instanceof Constant && (((Constant) other).getName().equals(getName())
                     || other.val() == this.val());
         }
@@ -112,7 +112,7 @@ public class Constants {
         }
 
         @Override
-        public Operable firstDerivative(Variable v) {
+        public Node firstDerivative(Variable v) {
             return RawValue.ZERO;
         }
 

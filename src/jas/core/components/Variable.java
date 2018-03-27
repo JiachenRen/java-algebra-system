@@ -13,7 +13,7 @@ import java.util.Optional;
  */
 public class Variable extends LeafNode implements Nameable {
     private String name;
-    private static Map<String, Operable> storedVars = new HashMap<>();
+    private static Map<String, Node> storedVars = new HashMap<>();
 
     public Variable(String name) {
         if (name.equals("")) throw new JMCException("variable name cannot be empty");
@@ -24,7 +24,7 @@ public class Variable extends LeafNode implements Nameable {
         return x;
     }
 
-    public boolean equals(Operable other) {
+    public boolean equals(Node other) {
         return other instanceof Variable && ((Variable) other).getName().equals(name);
     }
 
@@ -50,7 +50,7 @@ public class Variable extends LeafNode implements Nameable {
         return get().orElse(RawValue.UNDEF).val();
     }
 
-    private Optional<Operable> get() {
+    private Optional<Node> get() {
         return get(this.name);
     }
 
@@ -58,17 +58,17 @@ public class Variable extends LeafNode implements Nameable {
         return false;
     }
 
-    public Operable simplify() {
+    public Node simplify() {
         return get().orElse(this);
     }
 
     /**
-     * Assign the variable with an Operable
+     * Assign the variable with an Node
      *
      * @param var the name of the variable
-     * @param o   the Operable to be assigned to the variable name .
+     * @param o   the Node to be assigned to the variable name .
      */
-    public static void store(Operable o, String var) {
+    public static void store(Node o, String var) {
         storedVars.put(var, o);
     }
 
@@ -76,7 +76,7 @@ public class Variable extends LeafNode implements Nameable {
      * @param var variable name
      * @return Optional type of var's definition
      */
-    public static Optional<Operable> get(String var) {
+    public static Optional<Node> get(String var) {
         return Optional.ofNullable(storedVars.get(var));
     }
 
@@ -86,7 +86,7 @@ public class Variable extends LeafNode implements Nameable {
      * @param var the name of the variable
      * @return definition of var
      */
-    public static Operable del(String var) {
+    public static Node del(String var) {
         return storedVars.remove(var);
     }
 
@@ -94,13 +94,13 @@ public class Variable extends LeafNode implements Nameable {
      * @param v the variable in which the first derivative is taken with respect to.
      * @return if v == this, 1, otherwise 0; rule of derivative applies.
      */
-    public Operable firstDerivative(Variable v) {
+    public Node firstDerivative(Variable v) {
         if (v.equals(this)) return RawValue.ONE;
         return RawValue.ZERO;
     }
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     @Override
     public String coloredString() {
@@ -116,7 +116,7 @@ public class Variable extends LeafNode implements Nameable {
         return new Variable(name);
     }
 
-    public Operable explicitNegativeForm() {
+    public Node explicitNegativeForm() {
         return this.copy();
     }
 

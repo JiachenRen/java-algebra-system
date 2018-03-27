@@ -4,10 +4,10 @@ package jas.core;
  * Created by Jiachen on 3/10/18.
  * Leaf Node: super class of Variable and RawValue
  */
-public abstract class LeafNode extends Operable implements BinLeafNode {
-    public abstract Operable copy();
+public abstract class LeafNode extends Node implements BinLeafNode {
+    public abstract Node copy();
 
-    public int levelOf(Operable o) {
+    public int levelOf(Node o) {
         return this.equals(o) ? 0 : -1;
     }
 
@@ -17,29 +17,29 @@ public abstract class LeafNode extends Operable implements BinLeafNode {
         return 1;
     }
 
-//    public abstract Operable firstDerivative();
+//    public abstract Node firstDerivative();
 
     public abstract int complexity();
 
-    public Operable beautify() {
+    public Node beautify() {
         return this;
     }
 
-    public abstract Operable explicitNegativeForm();
+    public abstract Node explicitNegativeForm();
 
-    public Operable toAdditionOnly() {
+    public Node toAdditionOnly() {
         return this;
     }
 
-    public Operable toExponentialForm() {
+    public Node toExponentialForm() {
         return this;
     }
 
-    public Operable expand() {
+    public Node expand() {
         return this;
     }
 
-    public Operable replace(Operable o, Operable r) {
+    public Node replace(Node o, Node r) {
         return this.equals(o) ? r : this;
     }
 

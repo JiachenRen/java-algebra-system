@@ -2,8 +2,8 @@ package jas.core.components;
 
 import jas.core.LeafNode;
 import jas.core.Mode;
-import jas.core.Operable;
-import jas.core.operations.BinaryOperation;
+import jas.core.Node;
+import jas.core.operations.Binary;
 import jas.utils.ColorFormatter;
 
 import java.math.BigDecimal;
@@ -112,26 +112,26 @@ public class RawValue extends LeafNode {
         return new RawValue(n);
     }
 
-    public Operable explicitNegativeForm() {
+    public Node explicitNegativeForm() {
         if (this.equals(ONE.negate())) return this;
-        return doubleValue() < 0 ? new BinaryOperation(ONE.negate(), "*", this.copy().negate()) : this.copy();
+        return doubleValue() < 0 ? new Binary(ONE.negate(), "*", this.copy().negate()) : this.copy();
     }
 
     @Override
-    public Operable firstDerivative(Variable v) {
+    public Node firstDerivative(Variable v) {
         if (isUndefined()) return UNDEF;
         return ZERO;
     }
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     @Override
     public String coloredString() {
         return ColorFormatter.color(this.toString(), Mode.NUMBER_COLOR);
     }
 
-    public boolean equals(Operable other) {
+    public boolean equals(Node other) {
         return other instanceof RawValue
                 && other.isUndefined()
                 && this.isUndefined()
@@ -140,7 +140,7 @@ public class RawValue extends LeafNode {
                 == this.doubleValue();
     }
 
-    public Operable simplify() {
+    public Node simplify() {
         return this;
     }
 

@@ -1,7 +1,7 @@
 package tests.cas;
 
 import jas.core.Compiler;
-import jas.core.Operable;
+import jas.core.Node;
 
 import java.util.ArrayList;
 
@@ -39,22 +39,22 @@ public class CasExpansionTest {
 
     public static void main(String args[]) {
          synopticDiagnosis();
-//        Operable operable = GraphFunction.compile("(x+3)(x-sin<x>)/(x-1)*x(x+2)").getOperable();
-//        operable = Operable.getFirstDerivative(operable);
-//        //operable = Operable.expand(operable); TODO: debug
-//        System.out.println(operable);
+//        Node node = GraphFunction.compile("(x+3)(x-sin<x>)/(x-1)*x(x+2)").getNode();
+//        node = Node.getFirstDerivative(node);
+//        //node = Node.expand(node); TODO: debug
+//        System.out.println(node);
     }
 
     private static void synopticDiagnosis() {
-        ArrayList<Operable> operables = new ArrayList<>();
+        ArrayList<Node> nodes = new ArrayList<>();
         for (String expression : testSubjects) {
-            Operable extracted = Compiler.compile(expression);
+            Node extracted = Compiler.compile(expression);
             extracted = extracted.copy().expand();
-            operables.add(extracted);
+            nodes.add(extracted);
         }
-        for (int i = 0; i < operables.size(); i++) {
+        for (int i = 0; i < nodes.size(); i++) {
             l("original:\t" + f(testSubjects[i]));
-            l("expanded:\t" + f(operables.get(i).toString()));
+            l("expanded:\t" + f(nodes.get(i).toString()));
         }
     }
 
@@ -67,8 +67,8 @@ public class CasExpansionTest {
     }
 
 //    private static void inspect(String s) {
-//        Operable extracted = Compiler.compile(s);
-//        extracted = Operable.expand(extracted);
+//        Node extracted = Compiler.compile(s);
+//        extracted = Node.expand(extracted);
 //        l((char) 27 + "[31;1m" + "expanded: " + (char) 27 + "[0m" + f(extracted.toString()));
 //    }
 }

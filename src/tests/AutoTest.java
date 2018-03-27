@@ -2,8 +2,8 @@ package tests;
 
 import jas.core.Compiler;
 import jas.core.JMCException;
-import jas.core.Operable;
-import jas.core.operations.BinaryOperation;
+import jas.core.Node;
+import jas.core.operations.Binary;
 import jas.utils.Utils;
 
 import java.lang.reflect.Method;
@@ -196,7 +196,7 @@ public class AutoTest {
 
     private static void test(String fileName, boolean testValue, String... methods) throws Exception {
         ArrayList<String> lines = getLines(Utils.read(fileName));
-        ArrayList<Operable> ops = (ArrayList<Operable>) lines.stream()
+        ArrayList<Node> ops = (ArrayList<Node>) lines.stream()
                 .map(l -> Compiler.compile(getOriginal(l)))
                 .collect(Collectors.toList());
 
@@ -205,7 +205,7 @@ public class AutoTest {
                 .collect(Collectors.toList());
 
         int maxLength = 0;
-        for (Operable op : ops) {
+        for (Node op : ops) {
             int l = op.toString().length();
             maxLength = l > maxLength ? l : maxLength;
         }
@@ -220,8 +220,8 @@ public class AutoTest {
             String line = lines.get(i), prev = simplifiedStrs.get(i).replace(" ", "");
             Object obj = ops.get(i).copy();
             for (String method : methods) {
-                if (obj instanceof Operable) {
-                    obj = getMethod(Operable.class, method).invoke(obj);
+                if (obj instanceof Node) {
+                    obj = getMethod(Node.class, method).invoke(obj);
                 } else break;
             }
 
@@ -232,7 +232,7 @@ public class AutoTest {
                         + lightCyan(now));
             }
             if (testValue) {
-                Operable o1 = Compiler.compile(line), o2 = Compiler.compile(now);
+                Node o1 = Compiler.compile(line), o2 = Compiler.compile(now);
                 if (o1.numVars() > 0) {
                     ArrayList<String> errs = new ArrayList<>();
                     for (int k = 0; k <= 10; k++) {
@@ -268,7 +268,7 @@ public class AutoTest {
     }
 
     private static void configureCAS() {
-        BinaryOperation.define("%", 2, (a, b) -> a % b);
+        Binary.define("%", 2, (a, b) -> a % b);
     }
 
     private static String ensureLength(String s, int length) {

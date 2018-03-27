@@ -1,9 +1,9 @@
 package jas.core;
 
 import jas.core.components.*;
-import jas.core.operations.BinaryOperation;
-import jas.core.operations.CustomOperation;
-import jas.core.operations.UnaryOperation;
+import jas.core.operations.Binary;
+import jas.core.operations.Custom;
+import jas.core.operations.Unary;
 
 import java.util.ArrayList;
 
@@ -23,7 +23,7 @@ public class Compiler {
      * @since May 19th. This method is the core of JMC. Took Jiachen tremendous effort. This system of
      * method represents his life's work
      */
-    public static Operable compile(String exp) {
+    public static Node compile(String exp) {
         if (exp.toLowerCase().contains("undef")) return RawValue.UNDEF;
         if ((exp = exp.replace(" ", "")).equals("")) throw new JMCException("cannot compile an empty string");
         if (exp.contains(">") || exp.contains("<")) throw new JMCException("angle brackets '<>' no longer supported");
@@ -39,23 +39,23 @@ public class Compiler {
         exp = formatParenthesis(exp);
         exp = formatLiteral(exp);
         log(boldBlack("formatted input: ") + exp);
-        ArrayList<Operable> components = new ArrayList<>();
+        ArrayList<Node> components = new ArrayList<>();
         int hashId = 0;
         while (exp.indexOf(')') != -1) {
             int[] indices = innermostIndices(exp, '(', ')');
             String innermost = exp.substring(indices[0] + 1, indices[1]);
-            Operable compiled = generateOperations(innermost, components);
+            Node compiled = generateOperations(innermost, components);
             components.add(compiled);
             String left = indices[0] > 0 ? exp.substring(0, indices[0]) : "";
             exp = left + "&" + hashId + exp.substring(indices[1] + 1);
             log(lightCyan("func:\t") + colorMathSymbols(exp));
             hashId++;
         }
-        Operable operable = generateOperations(exp, components);
-        if (operable instanceof BinaryOperation) ((BinaryOperation) operable).setOmitParenthesis(true);
-        String colored = colorMathSymbols(operable.toString());
+        Node node = generateOperations(exp, components);
+        if (node instanceof Binary) ((Binary) node).setOmitParenthesis(true);
+        String colored = colorMathSymbols(node.toString());
         log(lightRed("output:\t") + colored);
-        return operable;
+        return node;
     }
 
     private static String formatLiteral(String exp) {
@@ -157,25 +157,25 @@ public class Compiler {
         return new int[]{openIndex, closeIndex};
     }
 
-    private static void flat(Operable tree, ArrayList<Operable> flattened) {
-        if (tree instanceof BinaryOperation && ((BinaryOperation) tree).is(",")) {
-            BinaryOperation binOp = ((BinaryOperation) tree);
+    private static void flat(Node tree, ArrayList<Node> flattened) {
+        if (tree instanceof Binary && ((Binary) tree).is(",")) {
+            Binary binOp = ((Binary) tree);
             flat(binOp.getLeft(), flattened);
             flat(binOp.getRight(), flattened);
         } else {
-            if (tree instanceof BinaryOperation) ((BinaryOperation) tree).setOmitParenthesis(true);
+            if (tree instanceof Binary) ((Binary) tree).setOmitParenthesis(true);
             flattened.add(tree);
         }
     }
 
-    private static Operable generateOperations(String segment, ArrayList<Operable> operables) {
+    private static Node generateOperations(String segment, ArrayList<Node> nodes) {
         log(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
-        int operableHashId = 0;
-        ArrayList<Operable> pending = new ArrayList<>(); //pending operations
+        int nodeHashId = 0;
+        ArrayList<Node> pending = new ArrayList<>(); //pending operations
         while (segment.indexOf('<') != -1) {
             int indices[] = innermostIndices(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
-            Operable operand = generateOperations(extracted, operables);
+            Node operand = generateOperations(extracted, nodes);
             String operationName = segment.substring(0, indices[0]);
             int startIndex = 0;
             for (int i = indices[0] - 1; i >= 0; i--) {
@@ -187,45 +187,45 @@ public class Compiler {
                 }
             }
             if (operationName.equals("list")) {
-                ArrayList<Operable> list = new ArrayList<>();
+                ArrayList<Node> list = new ArrayList<>();
                 if (!isList(operand)) {
                     if (!operand.equals(RawValue.UNDEF))
                         list.add(operand);
                 } else list = toList(operand);
                 pending.add(new List(list));
             } else if (isList(operand)) {
-                pending.add(new CustomOperation(operationName, toList(operand)));
+                pending.add(new Custom(operationName, toList(operand)));
             } else {
                 ensureValidity(operand);
-                if (UnaryOperation.isDefined(operationName)) {
-                    pending.add(new UnaryOperation(operand, operationName));
-                } else pending.add(new CustomOperation(operationName, operand));
+                if (Unary.isDefined(operationName)) {
+                    pending.add(new Unary(operand, operationName));
+                } else pending.add(new Custom(operationName, operand));
             }
             String left = startIndex == 0 ? "" : segment.substring(0, startIndex + 1);
             log(lightBlue("unary:\t") + colorMathSymbols(segment));
-            segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
-            operableHashId++;
+            segment = left + "#" + nodeHashId + segment.substring(indices[1] + 1);
+            nodeHashId++;
         }
         for (int p = 1; p <= 4; p++) { //prioritize ^ over */ over +-. This way it is flexible for adding more operations.
             for (int i = 0; i < segment.length(); i++) { // p == 4 -> ',' for composite operations
                 CharSequence op = segment.subSequence(i, i + 1);
-                if (BinaryOperation.operators(p).contains(op) || p == 4 && op.charAt(0) == ',') {
+                if (Binary.operators(p).contains(op) || p == 4 && op.charAt(0) == ',') {
                     int[] indices = operationIndices(segment, i);
                     String[] operandStrs = new String[]{segment.substring(indices[0], i), segment.substring(i + 1, indices[1] + 1)};
-                    ArrayList<Operable> operands = getOperands(pending, operables, operandStrs);
+                    ArrayList<Node> operands = getOperands(pending, nodes, operandStrs);
                     ensureValidity(operands); // check to see if operands are missing
-                    BinaryOperation operation = new BinaryOperation(operands.get(0), op.toString(), operands.get(1));
+                    Binary operation = new Binary(operands.get(0), op.toString(), operands.get(1));
                     pending.add(operation);
                     String left = indices[0] == 0 ? "" : segment.substring(0, indices[0]);
-                    segment = left + "#" + operableHashId + segment.substring(indices[1] + 1);
+                    segment = left + "#" + nodeHashId + segment.substring(indices[1] + 1);
                     log("->\t\t" + colorMathSymbols(segment));
                     i = 0;
-                    operableHashId++;
+                    nodeHashId++;
                 }
             }
         }
         if (pending.size() == 0) {
-            return getOperands(pending, operables, new String[]{segment}).get(0);
+            return getOperands(pending, nodes, new String[]{segment}).get(0);
         }
         return pending.get(pending.size() - 1);
     }
@@ -234,20 +234,20 @@ public class Compiler {
      * @param operand a list in the form of a binary tree -> (a,b),c...
      * @return list converted from the binary tree.
      */
-    private static ArrayList<Operable> toList(Operable operand) {
-        BinaryOperation tree = ((BinaryOperation) operand);
-        ArrayList<Operable> operands = new ArrayList<>();
+    private static ArrayList<Node> toList(Node operand) {
+        Binary tree = ((Binary) operand);
+        ArrayList<Node> operands = new ArrayList<>();
         ensureValidity(operands);
         flat(tree, operands);
         return operands;
     }
 
-    private static boolean isList(Operable operable) {
-        return operable instanceof BinaryOperation && ((BinaryOperation) operable).is(",");
+    private static boolean isList(Node node) {
+        return node instanceof Binary && ((Binary) node).is(",");
     }
 
-    private static ArrayList<Operable> getOperands(ArrayList<Operable> pending, ArrayList<Operable> operables, String[] operandStrs) {
-        ArrayList<Operable> operands = new ArrayList<>();
+    private static ArrayList<Node> getOperands(ArrayList<Node> pending, ArrayList<Node> nodes, String[] operandStrs) {
+        ArrayList<Node> operands = new ArrayList<>();
         for (String operand : operandStrs) {
             if (operand.equals("")) { // pending operands... x/... x*..., etc.
                 operands.add(RawValue.UNDEF);
@@ -258,7 +258,7 @@ public class Compiler {
             if (componentIndex != -1)
                 operands.add(pending.get(Integer.valueOf(operand.substring(componentIndex + 1))));
             else if (bundleIndex != -1)
-                operands.add(operables.get(Integer.valueOf(operand.substring(bundleIndex + 1))));
+                operands.add(nodes.get(Integer.valueOf(operand.substring(bundleIndex + 1))));
             else if (Constants.contains(operand)) {
                 operands.add(Constants.get(operand));
             } else if (operand.charAt(0) == '\'') {
@@ -272,12 +272,12 @@ public class Compiler {
         return operands;
     }
 
-    private static void ensureValidity(ArrayList<Operable> operands) {
+    private static void ensureValidity(ArrayList<Node> operands) {
         operands.forEach(Compiler::ensureValidity);
     }
 
-    private static void ensureValidity(Operable operable) {
-        if (operable.equals(RawValue.UNDEF))
+    private static void ensureValidity(Node node) {
+        if (node.equals(RawValue.UNDEF))
             throw new JMCException("missing operand(s)");
     }
 

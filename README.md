@@ -25,7 +25,7 @@ As of now, the CAS will attempt to convert any decimal numbers to fractions when
 ## Meet... CAS
 This is as powerful and accurate as it gets... I've put my life into making this system...
 ```java
-Operable o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
+Node o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
 System.out.println(o.copy().expand());
 //prints 3*x*cos(a)+(-1)*x*x*cos(a)+3*4*cos(a)+(-1)*x*4*cos(a)+ln(x)^2*sin(a)+c*sin(a)
 System.out.println(o.copy().expand().simplify()); 
@@ -59,9 +59,9 @@ The simplification algorithm is based on a **composite binary tree**, an origina
 #### How does it work?
 An emnormous advantage that this data structure offers is that it simplifies the process of designing recursive algorithms. Takes the binary operation `a*b+c` for example: the top level binary operation in this case would be the `+`. The following code segment demonstrates how the recursive simplification works.
 ```java
-BinaryOperation mult = new BinaryOperation(new Variable("a"), "*", new Variable("a"));
-BinaryOperation exp = new BinaryOperation(new Variable("a"), "^", new RawValue(2));
-BinaryOperation add = new BinaryOperation(mult, "+", exp);
+Binary mult = new Binary(new Variable("a"), "*", new Variable("a"));
+Binary exp = new Binary(new Variable("a"), "^", new RawValue(2));
+Binary add = new Binary(mult, "+", exp);
 System.out.println(add); // prints "a*a+a^2"
 ```
 Call to `add.simplify()` will subsequently invoke `mult.simplify()`, which takes `a*a` and returns `a^2` which then produces the expression `a^2+a^2`, which is then simplified to `2*a^2` by invocation of `this.simplify()`.
@@ -70,7 +70,7 @@ System.out.println(add.copy().simplify()); // produces "2*a^2"
 ```
 Fortunately, you don't have to create mathematical expressions using JAS by creating algebraic operations one at a time. That would be extremely painful, slow, and buggy. The JAS library does all the hard parts for you! The expression `a*a+a^2` from the example above could also be created by using the `compile(String exp)` of the `Compiler` class.
 ```java
-Operable op = Compiler.compile("a*a+a^2"); // constructs the binary operation tree.
+Node op = Compiler.compile("a*a+a^2"); // constructs the binary operation tree.
 System.out.println(op.copy().simplify(); // prints "2*a^2"
 ```
 You can also set `Mode.DEBUG = true` to see how it actually performs the interpretation. `Compiler.compile("5+7-log<(11)>+e^2")` with debug on produces the following:
@@ -90,16 +90,16 @@ output:	5+7-log(11)+e^2
 
 To reduce the complexity of the simplification process, the algorithm will first attempt fundamental operations (arithmetic calculations of rational/irrational numbers, special cases like `x^0` and `0/x`). Then, it converts the mathematic expression to additional only exponential form. For example:
 ```java
-BinaryOperation binOp = (BinaryOperation) Compiler.compile("x*(a-b)/(c+d)^3");
+Binary binOp = (Binary) Compiler.compile("x*(a-b)/(c+d)^3");
 System.out.println(binOp); // prints "x*(a-b)/(c+d)^3"
 binOp.toAdditionOnly(); // converts the expression to additional only form
 System.out.println(binOp); // prints "x*(a+(-1)*b)/(c+d)^3"
 binOp.toExponentialForm(); // converts the expression to exponential form
 System.out.println(binOp); // prints "x*(a+(-1)*b)*(c+d)^(-3)"
 ```
-The expression `x*(a+(-1)*b)*(c+d)^(-3)` doesn't look much better than `x*(a-b)/(c+d)^3`, however, although it is considered "much simpler" by the computer as now it only needs to worry about handling `+,^,*` instead of `+,-,*,/,^`. However, to make it more readable to human eyes, it needs to be "beautified." You can do this by invoking `Operable::beautify`, which works by reversing the doings of negative exponentiation and addition. Consider the expression `a/3*2.5/n*b^2.5*a/4`:
+The expression `x*(a+(-1)*b)*(c+d)^(-3)` doesn't look much better than `x*(a-b)/(c+d)^3`, however, although it is considered "much simpler" by the computer as now it only needs to worry about handling `+,^,*` instead of `+,-,*,/,^`. However, to make it more readable to human eyes, it needs to be "beautified." You can do this by invoking `Node::beautify`, which works by reversing the doings of negative exponentiation and addition. Consider the expression `a/3*2.5/n*b^2.5*a/4`:
 ```java
-Operable op = Compiler.compile("a/3*2.5/n*b^2.5*a/4");
+Node op = Compiler.compile("a/3*2.5/n*b^2.5*a/4");
 System.out.println(op.copy().simplify()); // prints "a^2*n^(-1)*b^2.5*(5/24)"
 System.out.println(op.copy().simplify().beautify()); // prints "a^2*b^2.5*5/(n*24)"
 ```
@@ -140,27 +140,27 @@ tan(pi/2+pi*n)|   -> | undef      |   |     log(-#)     |   -> | undef      |   
 
 
 ### Extensibility
-The JAS framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `BinaryOperation` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JAS.
+The JAS framework is by no means limited to standard mathematical operations. It is built to be extensible. I made it fairly easy to implement customized binary/unary operations. Just be aware that introducing custom operations would compromise CAS capabilities. (However it is possible to subclass `Binary` and implement your own simplfication mechanism.) The following section demonstrates how to incorporate user-defined operations into the powerful JAS.
 #### Binary Operation
-BinaryOperation has a private nested class `BinaryOperator` that is invisible outside of the `jas.core` package. It conforms to interface `BinEvaluable`, which specifies only one method `double eval(double a, double b)`. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
+Binary has a private nested class `BinaryOperator` that is invisible outside of the `jas.core` package. It conforms to interface `BinEvaluable`, which specifies only one method `double eval(double a, double b)`. This enables it to take advantage of the **lambda expression**. If you are not already familiar with lambda, take a look [here](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html "Official Java Documentation"). To define a custom binary operation:
 ```java
-BinaryOperation.define("%", 2, (a, b) -> a % b); // defines the modular binary operation (which is nonstandard)
+Binary.define("%", 2, (a, b) -> a % b); // defines the modular binary operation (which is nonstandard)
 ```
 The first argument is the symbolic representation of binary operation. It can be any `String` that contains a single symbol. The second argument is the **priority** of the operation. The priority defines the order of binary operations - it can either be either `1`,`2`, or `3` with 3 being the highest. Addition and subtraction are of **priority 1** (lowest), while multiplification and division are of **priority 2** and exponentiation having **priority 3** (highest). In the code segment above, the `%` is defined to be having the same priority as `*` and `/`. The third argument is of type `BinEvaluable`. You can do any operation with the left/right operand as long as a double is returned.
 ```java
 System.out.println(Compiler.compile("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0"
 ```
 
-#### Composite Operation
+#### Custom Operation
 This operation type is what truly grants Java Algebra System's flexibility. A composite operation is an operation that takes in multiple operands/arguments. For example, `sum(x*ln(a),x,7*3*5)` would be a valid **composite operation**. Similar to unary operation, binary operation, and constants, it is extensible. For more information about the extensibility of composite operation, please refer to **Extensibility** section. As another example, the first derivative could also be expressed as a composite operation in JAS -- `derivative(cos(x),x)` -- taking the first derivative of `cos(x)` with respect to x:
 ```java
-Compiler.compile("derivative(derivative(cos(x),x),x)") //returns an operable defined as -cos(x), which is the second derivative of cos(x)
+Compiler.compile("derivative(derivative(cos(x),x),x)") //returns an node defined as -cos(x), which is the second derivative of cos(x)
 ```
 
 #### Unary Operation
-Similar to `BinaryOperation`, `UnaryOperation` has a private nested class `UnaryOperator`. Refer to BinaryOperation for how it works. Here's how to use it:
+Similar to `Binary`, `Unary` has a private nested class `Definitions`. Refer to Binary for how it works. Here's how to use it:
 ```java
-UnaryOperation.define("digits", x -> Integer.toString((int) x).length()); // an unary operation that calculates the numer of digits in the integer part of a number.
+Unary.define("digits", x -> Integer.toString((int) x).length()); // an unary operation that calculates the numer of digits in the integer part of a number.
 ```
 The first argument is the name of the unary operation, like `log`, `cos`, etc. The name could only contain letters `[a-Z]` and **must has more than 2 characters**. Single letters are reserved for variable names. The second argument is of type `Evaluable`, which must takes in a double and return a double.
 ```java

@@ -1,7 +1,7 @@
 package tests.specific;
 
 import jas.MathContext;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.RawValue;
 
 import java.math.BigInteger;
@@ -21,7 +21,7 @@ public class MathContextTest {
             int finalI = i;
             MathContext.toBaseExponentPairs(new BigInteger(Integer.toString(i))).stream()
                     .map(pair -> new RawValue(pair[0]).exp(pair[1]))
-                    .reduce(Operable::mult)
+                    .reduce(Node::mult)
                     .ifPresent(o -> l(boldBlack(finalI + " -> ")
                             + lightBlue(o + " -> ")
                             + lightGreen(o.val())));

@@ -1,8 +1,7 @@
 package tests.cas;
 
 import jas.core.Compiler;
-import jas.core.Mode;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.utils.Timer;
 import tests.AutoTest;
 import tests.TestPrint;
@@ -19,11 +18,11 @@ public class Benchmark {
         Timer timer = new Timer();
         AutoTest.WRITE = false;
 //        Mode.COMPACT = false;
-        Operable operable = Compiler.compile("derivative(x*cos(x)*sin(x)*ln(x),x,5)");
+        Node node = Compiler.compile("derivative(x*cos(x)*sin(x)*ln(x),x,5)");
         for (int i = 0; i < 5; i++) {
             TestPrint.DISABLED = true;
             AutoTest.main(args);
-            l(operable.copy().simplify().coloredString());
+            l(node.copy().simplify().coloredString());
             l(Compiler.compile("(a+c+b-d+f+e+g+i+h+j)*(a+e+c+f+h+j+b-d+g+i)").simplify().coloredString());
             l(Compiler.compile("(a+c+b+d+f+e+g+i+h+j)*(a+e+c+f+h+j+b+d+g+i)").expand().simplify().coloredString());
             l(Compiler.compile("derivative(ln(x)*x*cos(x),x,10)").simplify().eval(6));

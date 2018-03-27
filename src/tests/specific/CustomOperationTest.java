@@ -5,7 +5,7 @@ import jas.core.components.Constants;
 import jas.core.components.RawValue;
 import jas.core.components.Variable;
 import jas.core.operations.Argument;
-import jas.core.operations.CustomOperation;
+import jas.core.operations.Custom;
 import jas.core.operations.Manipulation;
 import jas.core.operations.Signature;
 
@@ -18,7 +18,7 @@ import static tests.TestPrint.l;
 public class CustomOperationTest {
     public static void main(String args[]) {
         l(Compiler.compile("a+log(3+a)+4"));
-        CustomOperation co = (CustomOperation) Compiler.compile("sum(4+7+5,5+x,log(7+cos(x)),x)");
+        Custom co = (Custom) Compiler.compile("sum(4+7+5,5+x,log(7+cos(x)),x)");
         l(co); //christ I finally did it!!!
         l(co.eval(5));
         l(co.simplify());
@@ -33,13 +33,13 @@ public class CustomOperationTest {
         l(Argument.OPERATION.equals(Argument.NUMBER));
         l(Compiler.compile("expand(a*(b+c))").exec());
 
-        CustomOperation.register(new Manipulation("custom", new Signature(Argument.ANY), operands -> {
+        Custom.register(new Manipulation("custom", new Signature(Argument.ANY), operands -> {
             double calc = Math.log(operands.get(0).numNodes());
             return new RawValue(calc);
         }));
 
         l(Compiler.compile("custom(x+b-c)").val());
-        CustomOperation.unregister("custom", Signature.ANY);
+        Custom.unregister("custom", Signature.ANY);
         l(Compiler.compile("custom(x+b-c)").val());
     }
 }

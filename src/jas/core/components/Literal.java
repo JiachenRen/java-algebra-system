@@ -1,7 +1,7 @@
 package jas.core.components;
 
 import jas.core.Mode;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.utils.ColorFormatter;
 
 /**
@@ -17,7 +17,7 @@ public class Literal extends Variable {
     }
 
     @Override
-    public boolean equals(Operable other) {
+    public boolean equals(Node other) {
         return other instanceof Literal && ((Literal) other).content.equals(content);
     }
 
@@ -38,7 +38,7 @@ public class Literal extends Variable {
      * @return first derivative of the expression
      */
     @Override
-    public Operable firstDerivative(Variable v) {
+    public Node firstDerivative(Variable v) {
         return RawValue.ZERO;
     }
 

@@ -1,18 +1,18 @@
 package jas.core.components;
 
-import jas.core.Operable;
+import jas.core.Node;
 
 /**
  * Created by Jiachen on 3/20/18.
  */
-public class Matrix extends Operable {
+public class Matrix extends Node {
     @Override
-    public boolean equals(Operable other) {
+    public boolean equals(Node other) {
         return false;
     }
 
     @Override
-    public Operable copy() {
+    public Node copy() {
         return null;
     }
 
@@ -30,11 +30,11 @@ public class Matrix extends Operable {
      * returns 0, if the current instance is what you are looking for, i.e. this.equals(o);
      * returns -1 if not found.
      *
-     * @param o the Operable instance that you are looking for.
-     * @return the level at which operable is found.
+     * @param o the Node instance that you are looking for.
+     * @return the level at which node is found.
      */
     @Override
-    public int levelOf(Operable o) {
+    public int levelOf(Node o) {
         return 0;
     }
 
@@ -57,9 +57,9 @@ public class Matrix extends Operable {
 
     /**
      * traverses the composite tree and evaluates every single node that represents a raw value.
-     * e.g. if the Operable represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
+     * e.g. if the Node represents the expression "(5 + 7) / 2 ^ 2", val() returns 3.
      * however, if variables exists in the expression, NaN is returned.
-     * e.g. if the Operable represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
+     * e.g. if the Node represents the expression "(5 + 7x) / 2 ^ 2", val() returns NaN.
      *
      * @return arbitrary value of the node.
      */
@@ -79,12 +79,12 @@ public class Matrix extends Operable {
 
     /**
      * NOTE: useful for simple simplifications.
-     * Operable::simplify(Operable o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
+     * Node::simplify(Node o) is optimized for complex simplifications like when taking the 10th derivative of x*cos(x)*sin(x)
      *
      * @return simplified expression
      */
     @Override
-    public Operable simplify() {
+    public Node simplify() {
         return null;
     }
 
@@ -94,13 +94,13 @@ public class Matrix extends Operable {
      * a*(1/3) -> a/3,
      * a+(-1)*b -> a-b
      * <p>
-     * before invoking this method, the Operable should already by at a stage where it is simplified,
+     * before invoking this method, the Node should already by at a stage where it is simplified,
      * converted to additional only and in exponential form.
      *
      * @return beautified version of the original
      */
     @Override
-    public Operable beautify() {
+    public Node beautify() {
         return null;
     }
 
@@ -108,20 +108,20 @@ public class Matrix extends Operable {
      * (-#)*x will be converted to (-1)*#*x, where # denotes a number
      * NOTE: does not modify self.
      *
-     * @return explicit negative form of the original Operable
+     * @return explicit negative form of the original Node
      */
     @Override
-    public Operable explicitNegativeForm() {
+    public Node explicitNegativeForm() {
         return null;
     }
 
     @Override
-    public Operable toAdditionOnly() {
+    public Node toAdditionOnly() {
         return null;
     }
 
     @Override
-    public Operable toExponentialForm() {
+    public Node toExponentialForm() {
         return null;
     }
 
@@ -132,7 +132,7 @@ public class Matrix extends Operable {
      * @return first derivative of the expression
      */
     @Override
-    public Operable firstDerivative(Variable v) {
+    public Node firstDerivative(Variable v) {
         return null;
     }
 
@@ -140,15 +140,15 @@ public class Matrix extends Operable {
      * Expand the expression; its behavior is exactly what you would expect.
      * e.g. (a+b+...)(c+d) = a*c + a*d + b*c + ...
      *
-     * @return expanded expression of type Operable
+     * @return expanded expression of type Node
      */
     @Override
-    public Operable expand() {
+    public Node expand() {
         return null;
     }
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     @Override
     public String coloredString() {
@@ -156,12 +156,12 @@ public class Matrix extends Operable {
     }
 
     /**
-     * @param o the operable to be replaced
-     * @param r the operable to take o's place
-     * @return the original operable with o replaced by r.
+     * @param o the node to be replaced
+     * @param r the node to take o's place
+     * @return the original node with o replaced by r.
      */
     @Override
-    public Operable replace(Operable o, Operable r) {
+    public Node replace(Node o, Node r) {
         return null;
     }
 

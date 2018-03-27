@@ -2,7 +2,7 @@ package tests.specific;
 
 import jas.MathContext;
 import jas.core.Compiler;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.Fraction;
 
 import java.math.BigInteger;
@@ -44,16 +44,16 @@ public class FractionTest {
         l(f1.getNumerator(), f1.getDenominator());
 
 
-        Operable o = f1.exp(f2);
+        Node o = f1.exp(f2);
         l(o);
 
         ArrayList<String> raw = new ArrayList<>();
         Collections.addAll(raw, ops);
-        ArrayList<Operable> operables;
-        operables = (ArrayList<Operable>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
-        operables.forEach(operable -> l(operable + " -> " + operable.copy().simplify() + ", "
+        ArrayList<Node> nodes;
+        nodes = (ArrayList<Node>) raw.stream().map(Compiler::compile).collect(Collectors.toList());
+        nodes.forEach(node -> l(node + " -> " + node.copy().simplify() + ", "
                 + boldBlack("status: ")
-                + ((operable.val() - operable.copy().simplify().val()) < 1E-10 ? lightGreen("PASSED") : lightRed("FAILED"))));
+                + ((node.val() - node.copy().simplify().val()) < 1E-10 ? lightGreen("PASSED") : lightRed("FAILED"))));
 
 //        l(Fraction.extractRoot(-2,3));
         l(((Fraction) Compiler.compile("3/4").simplify()).exp(-3));

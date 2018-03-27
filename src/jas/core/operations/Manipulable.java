@@ -1,6 +1,6 @@
 package jas.core.operations;
 
-import jas.core.Operable;
+import jas.core.Node;
 
 import java.util.ArrayList;
 
@@ -9,5 +9,5 @@ import java.util.ArrayList;
  * Manipulable
  */
 public interface Manipulable {
-    Operable manipulate(ArrayList<Operable> operands);
+    Node manipulate(ArrayList<Node> operands);
 }

@@ -1,9 +1,9 @@
 import jas.core.Compiler;
+import jas.core.Node;
 import jas.core.components.Constants;
-import jas.core.Operable;
 import jas.core.components.Variable;
-import jas.core.operations.BinaryOperation;
-import jas.core.operations.UnaryOperation;
+import jas.core.operations.Binary;
+import jas.core.operations.Unary;
 import jas.extras.Element;
 import jas.graph.Graph;
 import jas.graph.GraphFunction;
@@ -194,7 +194,7 @@ public class JGrapher extends PApplet {
             GraphFunction func = graph.getFunction(name);
             if (func == null) return;
             updateAdvPanel.run();
-            funcTextInput.setContent(func.getOperable().toString());
+            funcTextInput.setContent(func.getNode().toString());
         });
         functionInputWrapper.add(funcNameTextInput);
 
@@ -202,7 +202,7 @@ public class JGrapher extends PApplet {
         //Dynamic function interpretation
         funcTextInput.onSubmit(() -> {
             try {
-                Operable original = Compiler.compile(funcTextInput.getStaticContent());
+                Node original = Compiler.compile(funcTextInput.getStaticContent());
                 if (casEnabled) {
                     original = original.simplify().beautify();
                 }
@@ -213,7 +213,7 @@ public class JGrapher extends PApplet {
         }).setDefaultContent(" type in your function  here").setId("f(x)");
         funcTextInput.onKeyTyped(() -> {
             try {
-                Operable interpreted = Compiler.compile(funcTextInput.getContent());
+                Node interpreted = Compiler.compile(funcTextInput.getContent());
                 GraphFunction func = new GraphFunction(interpreted);
                 boolean shouldOverride = !graph.override(funcNameTextInput.getContent(), func);
                 updateSuppliedVarValueSelectors(shouldOverride);
@@ -401,14 +401,14 @@ public class JGrapher extends PApplet {
                         if (i < filtered.size()) {
                             GraphFunction func = filtered.get(i);
                             final String funcName = func.getName();
-                            final String operable = func.getOperable().toString();
+                            final String node = func.getNode().toString();
                             Button tmp = (Button) funcsWrapper.getDisplayables().get(i);
                             tmp.setContent(funcName).setVisible(true);
                             tmp.onClick(() -> {
                                 funcNameTextInput.setContent(funcName);
                                 updateSuppliedVarValueSelectors(true);
                                 //noinspection ConstantConditions
-                                JNode.getTextInputById("f(x)").setContent(operable);
+                                JNode.getTextInputById("f(x)").setContent(node);
                             });
                         } else {
                             funcsWrapper.getDisplayables().get(i).setVisible(false);
@@ -596,8 +596,8 @@ public class JGrapher extends PApplet {
 
         JNode.add(parent);
 
-        UnaryOperation.define("~", Compiler.compile("x*x"));
-        BinaryOperation.define("%", 2, (a, b) -> a % b);
+        Unary.define("~", Compiler.compile("x*x"));
+        Binary.define("%", 2, (a, b) -> a % b);
         Constants.define("$C", () -> 1);
 
         Element.getList().forEach(e -> Constants.define("$" + e, e::getAtomicMass));
@@ -647,7 +647,7 @@ public class JGrapher extends PApplet {
                     SuppliedVar sv = new SuppliedVar(v.getName());
                     sv.setVal(selector.getFloatValue());
                     v.setVal(sv.val());
-                    func.setOperable(func.getOperable().replace(v, sv));
+                    func.setNode(func.getNode().replace(v, sv));
                     graph.updateFunction(func);
                 };
                 selector.getTextInput().getSubmitMethod().run();

@@ -1,7 +1,7 @@
 package jas.graph;
 
 import jas.core.Mode;
-import jas.core.Operable;
+import jas.core.Node;
 import jas.core.components.Variable;
 
 /**
@@ -21,7 +21,7 @@ public class SuppliedVar extends Variable {
     }
 
     @Override
-    public boolean equals(Operable other) {
+    public boolean equals(Node other) {
         return other instanceof SuppliedVar && ((SuppliedVar) other).getName().equals(getName());
     }
 
@@ -46,7 +46,7 @@ public class SuppliedVar extends Variable {
     }
 
     @Override
-    public Operable replace(Operable o, Operable r) {
+    public Node replace(Node o, Node r) {
         return o.equals(this) ? r : this;
     }
 }

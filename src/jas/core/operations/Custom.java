@@ -15,12 +15,12 @@ import static jas.utils.ColorFormatter.color;
  * Created by Jiachen on 3/17/18.
  * Custom Operation
  */
-public class CustomOperation extends Operation implements BinLeafNode, Nameable {
+public class Custom extends Operation implements BinLeafNode, Nameable {
     private static ArrayList<Manipulation> manipulations = new ArrayList<>();
     private Manipulation manipulation;
 
     static {
-        define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Operable::add).get()));
+        define(Calculus.SUM, Signature.ANY, (operands -> operands.stream().reduce(Node::add).get()));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE), (operands -> operands.get(0).firstDerivative((Variable) operands.get(1))));
         define(Calculus.DERIVATIVE, new Signature(ANY, VARIABLE, NUMBER), (operands -> {
             double i = operands.get(2).val();
@@ -33,7 +33,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         define("mod", new Signature(ANY, ANY), operands -> {
             double a = operands.get(0).val();
             double b = operands.get(1).val();
-            if (Double.isNaN(a) || Double.isNaN(b)) return new CustomOperation("mod", operands);
+            if (Double.isNaN(a) || Double.isNaN(b)) return new Custom("mod", operands);
             return new RawValue(a % b); //NOTE: never return a new CompositeOperation! Causes StackOverflow
         });
         define("num_nodes", new Signature(ANY), operands -> new RawValue(operands.get(0).numNodes()));
@@ -59,7 +59,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         define("define", new Signature(LITERAL, LIST, ANY), operands -> {
             String name = ((Literal) operands.get(0)).get();
             List arguments = ((List) operands.get(1));
-            final Operable operation = operands.get(2);
+            final Node operation = operands.get(2);
             Signature signature = new Signature(arguments.size());
 
             // unregister existing manipulations with the same signature.
@@ -67,10 +67,10 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
             String s = "Overridden: " + toString(overridden);
             Literal msg = new Literal(overridden.size() == 0 ? "Done." : s);
             define(name, signature, feed -> {
-                ArrayList<Operable> args = arguments.unwrap();
-                Operable tmp = operation.copy();
+                ArrayList<Node> args = arguments.unwrap();
+                Node tmp = operation.copy();
                 for (int i = 0; i < args.size(); i++) {
-                    Operable arg = args.get(i);
+                    Node arg = args.get(i);
                     tmp = tmp.replace(arg, feed.get(i));
                 }
                 return tmp.simplify();
@@ -81,20 +81,20 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         define("binary", new Signature(LITERAL, NUMBER, OPERATION), operands -> {
             String operator = ((Literal) operands.get(0)).get();
             RawValue priority = ((RawValue) operands.get(1));
-            Operable operation = operands.get(2);
-            ArrayList<Operable> variables = operation.extractVariables().stream()
-                    .map(o -> (Operable) o)
+            Node operation = operands.get(2);
+            ArrayList<Node> variables = operation.extractVariables().stream()
+                    .map(o -> (Node) o)
                     .collect(Collectors.toCollection(ArrayList::new));
-            if (variables.size() != 2 || !Operable.contains(variables, new Variable("a"))
-                    || !Operable.contains(variables, new Variable("b"))) {
+            if (variables.size() != 2 || !Node.contains(variables, new Variable("a"))
+                    || !Node.contains(variables, new Variable("b"))) {
                 throw new JMCException("definition of binary operation should use only contain 2 variables, [a,b]");
             }
             if (!priority.isInteger()) throw new JMCException("priority must be an integer");
             if (operator.length() > 1) throw new JMCException("binary operator can only be a single character");
             if (Assets.isSymbol(operator.charAt(0)) || Assets.isValidVarName(operator))
                 throw new JMCException("reserved symbol '" + operator + "', choose a different one");
-            BinaryOperation.define(operator, (int) priority.val(), (a, b) -> {
-                Operable tmp = operation.copy();
+            Binary.define(operator, (int) priority.val(), (a, b) -> {
+                Node tmp = operation.copy();
                 return tmp.replace(new Variable("a"), new RawValue(a))
                         .replace(new Variable("b"), new RawValue(b))
                         .val();
@@ -104,7 +104,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
 
         define("store", new Signature(LITERAL, ANY), operands -> {
             Variable v = ((Variable) operands.get(0));
-            Operable o = operands.get(1);
+            Node o = operands.get(1);
             Variable.store(o, v.getName());
             return o;
         });
@@ -153,11 +153,11 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
     }
 
 
-    public CustomOperation(String name, Operable... operands) {
+    public Custom(String name, Node... operands) {
         this(name, wrap(operands));
     }
 
-    public CustomOperation(String name, ArrayList<Operable> operands) {
+    public Custom(String name, ArrayList<Node> operands) {
         super(operands);
         this.manipulation = resolveManipulation(name, Signature.resolve(operands));
     }
@@ -194,15 +194,15 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
 
     public String toString() {
         Optional<String> args = getOperands().stream()
-                .map(Operable::toString)
+                .map(Node::toString)
                 .reduce((a, b) -> a + "," + b);
         return getName() + "(" + (args.orElse("")) + ")";
     }
 
     public double val() {
-        Operable operable = manipulation.manipulate(getOperands());
-        if (operable.equals(this)) return Double.NaN;
-        return operable.val();
+        Node node = manipulation.manipulate(getOperands());
+        if (node.equals(this)) return Double.NaN;
+        return node.val();
     }
 
     public String getName() {
@@ -214,7 +214,7 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
     }
 
     @Override
-    public Operable simplify() {
+    public Node simplify() {
         super.simplify();
         /* special case: when f(x) is defined as f(ANY), the default behavior is to distribute the custom operation
         to each element in the List accordingly, such that define('f',{x},x^2+2x+1), f({a,b}) = {a^2+2a+1,b^2+2b+1}
@@ -222,41 +222,41 @@ public class CustomOperation extends Operation implements BinLeafNode, Nameable 
         if (manipulation.getSignature().equals(new Signature(ANY)) && getOperand(0) instanceof List) {
             return ((List) getOperand(0)).customOp(this).simplify();
         }
-        Operable manipulated = manipulation.manipulate(getOperands());
+        Node manipulated = manipulation.manipulate(getOperands());
         if (manipulated.equals(this)) return this;
         return manipulated.simplify();
     }
 
-    public Operable exec() {
+    public Node exec() {
         return manipulation.manipulate(getOperands());
     }
 
     /**
-     * @return string representation of the operable coded with Ansi color codes.
+     * @return string representation of the node coded with Ansi color codes.
      */
     @Override
     public String coloredString() {
         Optional<String> args = getOperands().stream()
-                .map(Operable::coloredString)
+                .map(Node::coloredString)
                 .reduce((a, b) -> a + color(",", COMMA_COLOR) + b);
         return color(getName(), CUSTOM_OP_COLOR) + color("(", PARENTHESIS_COLOR) + (args.orElse("")) + color(")", PARENTHESIS_COLOR);
     }
 
     @Override
-    public Operable firstDerivative(Variable v) {
+    public Node firstDerivative(Variable v) {
         return this.simplify().firstDerivative(v);
     }
 
-    public CustomOperation copy() {
-        return new CustomOperation(getName(), getOperands().stream()
-                .map(Operable::copy)
+    public Custom copy() {
+        return new Custom(getName(), getOperands().stream()
+                .map(Node::copy)
                 .collect(Collectors.toCollection(ArrayList::new)));
     }
 
-    public boolean equals(Operable o) {
+    public boolean equals(Node o) {
         if (!super.equals(o)) return false;
-        if (o instanceof CustomOperation) {
-            CustomOperation co = ((CustomOperation) o);
+        if (o instanceof Custom) {
+            Custom co = ((Custom) o);
             return co.getName().equals(getName());
         }
         return false;
