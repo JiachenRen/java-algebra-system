@@ -26,18 +26,18 @@ As of now, the CAS will attempt to convert any decimal numbers to fractions when
 This is as powerful and accurate as it gets... I've put my life into making this system...
 ```java
 Node o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
-System.out.println(o.copy().expand());
-//prints 3*x*cos(a)+(-1)*x*x*cos(a)+3*4*cos(a)+(-1)*x*4*cos(a)+ln(x)^2*sin(a)+c*sin(a)
-System.out.println(o.copy().expand().simplify()); 
-//prints (-1)*x^2*cos(a)+12*cos(a)+cos(a)*x*(-1)+ln(x)^2*sin(a)+c*sin(a)
-System.out.println(o.copy().expand().simplify().beautify());
-//prints 12*cos(a)-cos(a)*x^2-x*cos(a)+ln(x)^2*sin(a)+c*sin(a)
-System.out.println(o.copy().firstDerivative());
-//prints ((1+0)*(3-x)+(0-1)*(x+4))*cos(a)+0*(-1)*sin(a)*(x+4)*(3-x)+0*cos(a)*(ln(x)^2+c)+(2*ln(x)^(2-1)*1*(1/x)+0)*sin(a)
-System.out.println(o.copy().firstDerivative().simplify());
-//prints (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
-System.out.println(o.copy().firstDerivative().expand().simplify().beautify());
-//prints x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
+o.copy().expand();
+// 3*x*cos(a)+(-1)*x*x*cos(a)+3*4*cos(a)+(-1)*x*4*cos(a)+ln(x)^2*sin(a)+c*sin(a)
+o.copy().expand().simplify();
+// (-1)*x^2*cos(a)+12*cos(a)+cos(a)*x*(-1)+ln(x)^2*sin(a)+c*sin(a)
+o.copy().expand().simplify().beautify();
+// 12*cos(a)-cos(a)*x^2-x*cos(a)+ln(x)^2*sin(a)+c*sin(a)
+o.copy().firstDerivative();
+// ((1+0)*(3-x)+(0-1)*(x+4))*cos(a)+0*(-1)*sin(a)*(x+4)*(3-x)+0*cos(a)*(ln(x)^2+c)+(2*ln(x)^(2-1)*1*(1/x)+0)*sin(a)
+o.copy().firstDerivative().simplify();
+// (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
+o.copy().firstDerivative().expand().simplify().beautify();
+// x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
 ```
 
 For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
@@ -61,17 +61,16 @@ An emnormous advantage that this data structure offers is that it simplifies the
 ```java
 Binary mult = new Binary(new Variable("a"), "*", new Variable("a"));
 Binary exp = new Binary(new Variable("a"), "^", new RawValue(2));
-Binary add = new Binary(mult, "+", exp);
-System.out.println(add); // prints "a*a+a^2"
+Binary add = new Binary(mult, "+", exp); // "a*a+a^2"
 ```
 Call to `add.simplify()` will subsequently invoke `mult.simplify()`, which takes `a*a` and returns `a^2` which then produces the expression `a^2+a^2`, which is then simplified to `2*a^2` by invocation of `this.simplify()`.
 ```java
-System.out.println(add.copy().simplify()); // produces "2*a^2"
+add.copy().simplify(); // produces "2*a^2"
 ```
 Fortunately, you don't have to create mathematical expressions using JAS by creating algebraic operations one at a time. That would be extremely painful, slow, and buggy. The JAS library does all the hard parts for you! The expression `a*a+a^2` from the example above could also be created by using the `compile(String exp)` of the `Compiler` class.
 ```java
 Node op = Compiler.compile("a*a+a^2"); // constructs the binary operation tree.
-System.out.println(op.copy().simplify(); // prints "2*a^2"
+op.copy().simplify(); // "2*a^2"
 ```
 You can also set `Mode.DEBUG = true` to see how it actually performs the interpretation. `Compiler.compile("5+7-log<(11)>+e^2")` with debug on produces the following:
 ```
@@ -90,10 +89,8 @@ output:	5+7-log(11)+e^2
 
 To reduce the complexity of the simplification process, the algorithm will first attempt fundamental operations (arithmetic calculations of rational/irrational numbers, special cases like `x^0` and `0/x`). Then, it converts the mathematic expression to additional only exponential form. For example:
 ```java
-Binary binOp = (Binary) Compiler.compile("x*(a-b)/(c+d)^3");
-System.out.println(binOp); // prints "x*(a-b)/(c+d)^3"
-binOp.toAdditionOnly(); // converts the expression to additional only form
-System.out.println(binOp); // prints "x*(a+(-1)*b)/(c+d)^3"
+Binary binOp = (Binary) Compiler.compile("x*(a-b)/(c+d)^3"); // "x*(a-b)/(c+d)^3"
+binOp.toAdditionOnly(); // converts the expression to additional only form, "x*(a+(-1)*b)/(c+d)^3"
 binOp.toExponentialForm(); // converts the expression to exponential form
 System.out.println(binOp); // prints "x*(a+(-1)*b)*(c+d)^(-3)"
 ```
@@ -148,7 +145,7 @@ Binary.define("%", 2, (a, b) -> a % b); // defines the modular binary operation 
 ```
 The first argument is the symbolic representation of binary operation. It can be any `String` that contains a single symbol. The second argument is the **priority** of the operation. The priority defines the order of binary operations - it can either be either `1`,`2`, or `3` with 3 being the highest. Addition and subtraction are of **priority 1** (lowest), while multiplification and division are of **priority 2** and exponentiation having **priority 3** (highest). In the code segment above, the `%` is defined to be having the same priority as `*` and `/`. The third argument is of type `BinEvaluable`. You can do any operation with the left/right operand as long as a double is returned.
 ```java
-System.out.println(Compiler.compile("x % 3").eval(5)); // 5 % 3 = 2, prints "2.0"
+Compiler.compile("x % 3").eval(5); // 5 % 3 = 2, produces "2.0"
 ```
 
 #### Custom Operation
