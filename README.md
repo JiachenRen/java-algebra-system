@@ -1,7 +1,6 @@
 # Java Algebra System (JAS)
 A math library with powerful CAS that is capable of performing algebraic simplifications, manipulations, and some calculus. (A Grapher is also included)
-## What's new
-Epic update to JGrapher - introducing multi-variable graphing capability! Type in `x^a*cos(b*x)` and see what happens along the way! Play around with the sliders. Press `[TAB]` to hide/unhide function input. Significant improvements to the CAS, though not as powerful, it is no longer considered experimental with bugs now gone and inheritance optimized. Completely original & intuitive way of performing algebra manipulations by an ORIGINAL composite tree structure that proved to be immensely powerful and ingenious.
+
 ## What can it do?
 JAS is a multivariate computer algebra system built using Java. JAS handles the following senarios in both fraction and decimal mode:
 
@@ -39,7 +38,7 @@ o.copy().firstDerivative().expand().simplify().beautify();
 
 For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
 
-### Simplification
+### Data Structure
 The simplification algorithm is based on a **composite binary tree**, an original data structure.
 ```
  e.g.           BinOp           would represent the expression          (ln(3^x)*(3/4) + (5/e+2.5))
@@ -168,3 +167,7 @@ Constants.define("seed", Math::random); // a "dynamic constant" that returns a r
 System.out.println(Constants.valueOf("π")) // prints 3.14159265357659...
 System.out.println(Compiler.compile("seed*2-1").val()) // prints a random number between -1 and 1.
 ``` 
+# The JAS Based Grapher
+
+## What's new
+Epic update to JGrapher - introducing multi-variable graphing capability! Type in `x^a*cos(b*x)` and see what happens along the way! Play around with the sliders. Press `[TAB]` to hide/unhide function input. Significant improvements to the CAS, though not as powerful, it is no longer considered experimental with bugs now gone and inheritance optimized. Completely original & intuitive way of performing algebra manipulations by an ORIGINAL composite tree structure that proved to be immensely powerful and ingenious.
