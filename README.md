@@ -6,7 +6,7 @@ Epic update to JGrapher - introducing multi-variable graphing capability! Type i
 JAS is a multivariate computer algebra system built using Java. Right now it handles simplification of many forms and convertion of output expression to a more human readable form. 
 
 ### What can it do?
-As of now, the CAS will attempt to convert any decimal numbers to fractions when needed during the simplification phase. It handles the following senarios:
+JAS handles the following senarios in both fraction and decimal mode:
 
 * Commutative arithmetic & algebra
 * Nested unary operation simplification
