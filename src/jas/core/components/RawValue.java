@@ -113,14 +113,14 @@ public class RawValue extends LeafNode {
     }
 
     public Operable explicitNegativeForm() {
-        if (this.equals(RawValue.ONE.negate())) return this;
-        return doubleValue() < 0 ? new BinaryOperation(RawValue.ONE.negate(), "*", this.copy().negate()) : this.copy();
+        if (this.equals(ONE.negate())) return this;
+        return doubleValue() < 0 ? new BinaryOperation(ONE.negate(), "*", this.copy().negate()) : this.copy();
     }
 
     @Override
     public Operable firstDerivative(Variable v) {
-        if (isUndefined()) return RawValue.UNDEF;
-        return RawValue.ZERO;
+        if (isUndefined()) return UNDEF;
+        return ZERO;
     }
 
     /**

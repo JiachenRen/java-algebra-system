@@ -20,6 +20,7 @@ import static jas.MathContext.*;
 import static jas.core.Mode.*;
 import static jas.utils.ColorFormatter.color;
 import static java.lang.Math.*;
+import static jas.core.components.RawValue.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -102,10 +103,10 @@ public class UnaryOperation extends Operation implements BinLeafNode {
             return ((List) getOperand()).uOp(this).simplify();
         }
 
-        if (this.isUndefined()) return RawValue.UNDEF;
+        if (this.isUndefined()) return UNDEF;
 
         double val = this.val();
-        if (RawValue.isInteger(val))
+        if (isInteger(val))
             return new RawValue(val);
 
         if (getOperand() instanceof UnaryOperation) {
@@ -134,17 +135,17 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 case "e":
                     switch (operation.getName()) {
                         case "ln":
-                            return RawValue.ONE;
+                            return ONE;
                     }
                     break;
                 case "pi":
                     switch (operation.getName()) {
                         case "cos":
                         case "sec":
-                            return RawValue.ONE.negate();
+                            return ONE.negate();
                         case "sin":
                         case "tan":
-                            return RawValue.ZERO;
+                            return ZERO;
                     }
             }
         } else if (getOperand() instanceof RawValue) {
@@ -187,28 +188,28 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         Operable bigKahuna = null;
         switch (this.operation.getName()) {
             case "cos": // d/dx cos(x) = -sin(x)
-                bigKahuna = RawValue.ONE.negate().mult(new UnaryOperation(getOperand(), "sin"));
+                bigKahuna = ONE.negate().mult(new UnaryOperation(getOperand(), "sin"));
                 break;
             case "sin": // d/dx sin(x) = cos(x)
                 bigKahuna = new UnaryOperation(getOperand(), "cos");
                 break;
             case "ln": // d/dx ln(x) = 1/x
-                bigKahuna = RawValue.ONE.div(getOperand());
+                bigKahuna = ONE.div(getOperand());
                 break;
             case "log": // d/dx log(x) = 1/x*log(e)
-                bigKahuna = RawValue.ONE.div(getOperand()).mult(new UnaryOperation(Constants.E, "log"));
+                bigKahuna = ONE.div(getOperand()).mult(new UnaryOperation(Constants.E, "log"));
                 break;
             case "acos": // d/dx arccos(x) = (-1)/(1-x^2)^(1/2)
-                bigKahuna = RawValue.ONE.negate().div(RawValue.ONE.sub(getOperand().sq()).sqrt());
+                bigKahuna = ONE.negate().div(ONE.sub(getOperand().sq()).sqrt());
                 break;
             case "asin": // d/dx arcsin(x) = -arccos(x)
-                bigKahuna = RawValue.ONE.div(RawValue.ONE.sub(getOperand().sq()).sqrt());
+                bigKahuna = ONE.div(ONE.sub(getOperand().sq()).sqrt());
                 break;
             case "tan": // d/dx tan(x) = 1/cos(x)^2
-                bigKahuna = RawValue.ONE.div(new UnaryOperation(getOperand(), "cos").sq());
+                bigKahuna = ONE.div(new UnaryOperation(getOperand(), "cos").sq());
                 break;
             case "atan": // d/dx arctan(x) = 1/(x^2+1)
-                bigKahuna = RawValue.ONE.div(getOperand().sq().add(1));
+                bigKahuna = ONE.div(getOperand().sq().add(1));
                 break;
             case "abs": // d/dx |x| = sign(x)
                 bigKahuna = new UnaryOperation(getOperand(), "sign");
@@ -220,7 +221,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 bigKahuna = new UnaryOperation(getOperand(), "sin").div(new UnaryOperation(getOperand(), "cos").sq());
                 break;
             case "cot": // d/dx cot(x) = -1/sin(x)^2
-                bigKahuna = RawValue.ONE.negate().div(new UnaryOperation(getOperand(), "sin").sq());
+                bigKahuna = ONE.negate().div(new UnaryOperation(getOperand(), "sin").sq());
                 break;
             case "cosh": // d/dx cosh(x) = sinh(x)
                 bigKahuna = new UnaryOperation(getOperand(), "sinh");
@@ -229,7 +230,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
                 bigKahuna = new UnaryOperation(getOperand(), "cosh");
                 break;
             case "tanh": // d/dx tanh(x) = 1/cosh(x)^2
-                bigKahuna = RawValue.ONE.div(new UnaryOperation(getOperand(), "cosh").sq());
+                bigKahuna = ONE.div(new UnaryOperation(getOperand(), "cosh").sq());
                 break;
         }
         if (bigKahuna != null) return smallKahuna.mult(bigKahuna);
@@ -268,7 +269,7 @@ public class UnaryOperation extends Operation implements BinLeafNode {
         switch (operation.getName()) {
             case "tan": // domain: x != pi/2 + n*pi
             case "sec":
-                o = Operation.div(this.getOperand(), Operation.div(Constants.get("pi"), RawValue.TWO)).simplify();
+                o = Operation.div(this.getOperand(), Operation.div(Constants.get("pi"), TWO)).simplify();
                 if (o instanceof RawValue && ((RawValue) o).isInteger()) {
                     return Math.abs(((RawValue) o).longValue() % 2) == 1;
                 }

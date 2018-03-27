@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static jas.core.Mode.*;
 import static jas.utils.ColorFormatter.color;
+import static jas.core.components.RawValue.*;
 
 /**
  * Created by Jiachen on 16/05/2017.
@@ -105,7 +106,7 @@ public class BinaryOperation extends Operation {
             BinaryOperation binOp1 = ((BinaryOperation) binOp.getRight());
             if (binOp1.is("*")) {
                 ArrayList<Operable> pool = ((BinaryOperation) binOp1.explicitNegativeForm()).flattened();
-                if (Operable.contains(pool, RawValue.ONE.negate()))
+                if (Operable.contains(pool, ONE.negate()))
                     return 3;
             }
         }
@@ -242,7 +243,7 @@ public class BinaryOperation extends Operation {
         if (!operator.isStandard())
             // nothing could be done with non-standard operations, except when it reduces to a RawValue.
             return Double.isNaN(val()) ? this : new RawValue(val());
-        if (isUndefined()) return RawValue.UNDEF;
+        if (isUndefined()) return UNDEF;
 
         if (getLeft() instanceof RawValue && getRight() instanceof RawValue) {
             Operable simplified = simplify((RawValue) getLeft(), (RawValue) getRight());
@@ -265,11 +266,11 @@ public class BinaryOperation extends Operation {
                 case "+":
                     return new BinaryOperation(new RawValue(2), "*", getLeft());
                 case "-":
-                    return RawValue.ZERO;
+                    return ZERO;
                 case "*":
                     return new BinaryOperation(getLeft(), "^", new RawValue(2));
                 case "/":
-                    return RawValue.ONE;
+                    return ONE;
             }
         }
 
@@ -326,18 +327,18 @@ public class BinaryOperation extends Operation {
                 separate(right, denominators, numerators);
                 Operable numerator = reconstruct(numerators);
                 Operable denominator = reconstruct(denominators);
-                if (denominator == null || denominator.equals(RawValue.ONE))
+                if (denominator == null || denominator.equals(ONE))
                     return numerator;
                 else {
-                    if (numerator == null) numerator = RawValue.ONE;
+                    if (numerator == null) numerator = ONE;
                     return new BinaryOperation(numerator, "/", denominator);
                 }
             case "+":
                 if (isVirtuallyNegative(left) && !isVirtuallyNegative(right)) {
-                    Operable right1 = new BinaryOperation(left, "*", RawValue.ONE.negate()).simplify();
+                    Operable right1 = new BinaryOperation(left, "*", ONE.negate()).simplify();
                     return new BinaryOperation(right, "-", right1).beautify();
                 } else if (isVirtuallyNegative(right) && !isVirtuallyNegative(left)) {
-                    Operable right1 = new BinaryOperation(right, "*", RawValue.ONE.negate()).simplify();
+                    Operable right1 = new BinaryOperation(right, "*", ONE.negate()).simplify();
                     return new BinaryOperation(left, "-", right1).beautify();
                 }
             case "^":
@@ -350,7 +351,7 @@ public class BinaryOperation extends Operation {
                 Operable n = reconstruct(ns);
                 Operable d = reconstruct(ds);
                 if (n == null) return this;
-                if (d == null || d.equals(RawValue.ONE))
+                if (d == null || d.equals(ONE))
                     return n;
                 else return new BinaryOperation(n, "/", d);
 
@@ -527,7 +528,7 @@ public class BinaryOperation extends Operation {
             if (r1 instanceof Fraction) {
                 return ((Fraction) r1).exp(r2);
             } else if (r1.isInteger() && r2 instanceof Fraction) {
-                if (r1.val() == 0) return RawValue.ZERO; // 0^x = 0, as long as x != 0
+                if (r1.val() == 0) return ZERO; // 0^x = 0, as long as x != 0
                 boolean r1Negative = false;
                 if (!r1.isPositive()) {
                     r1Negative = true;
@@ -553,7 +554,7 @@ public class BinaryOperation extends Operation {
             }
 
             if (r2.val() == 0) { // 0^0
-                return r1.val() == 0 ? RawValue.UNDEF : new RawValue(1);
+                return r1.val() == 0 ? UNDEF : new RawValue(1);
             } else if (r2.val() < 0) { // x^-b = (1/x)^b
                 return new BinaryOperation(r1.inverse(), "^", r2.negate()).simplify();
             }
@@ -621,11 +622,11 @@ public class BinaryOperation extends Operation {
                 case "-":
                     return getLeft();
                 case "*":
-                    return RawValue.ZERO;
+                    return ZERO;
                 case "/":
-                    return RawValue.UNDEF;
+                    return UNDEF;
                 case "^":
-                    return RawValue.ONE;
+                    return ONE;
             }
         } else if (i == 1) {
             switch (operator.name) {
@@ -674,7 +675,7 @@ public class BinaryOperation extends Operation {
                             if (getLeft() instanceof RawValue) {
                                 RawValue r = (RawValue) getLeft();
                                 double n = new UnaryOperation(r, "log").val();
-                                if (r.isInteger() && RawValue.isInteger(n)) {
+                                if (r.isInteger() && isInteger(n)) {
                                     return Operation.exp(uop.getOperand(), new RawValue(n)).simplify();
                                 }
                             }
@@ -727,29 +728,29 @@ public class BinaryOperation extends Operation {
                     case "*":
                         return new RawValue(0);
                     case "^":
-                        return i == 1 ? RawValue.ZERO : RawValue.ONE;
+                        return i == 1 ? ZERO : ONE;
                 }
-            } else if (get(i).equals(RawValue.ONE)) {
+            } else if (get(i).equals(ONE)) {
                 switch (operator.name) {
                     case "*":
                         return getOther(i);
                     case "^":
-                        return i == 1 ? RawValue.ONE : getLeft();
+                        return i == 1 ? ONE : getLeft();
                 }
             }
         }
 
         switch (operator.name) {
             case "-":
-                if (getLeft().equals(RawValue.ZERO)) {
+                if (getLeft().equals(ZERO)) {
                     return getRight().negate();
-                } else if (getRight().equals(RawValue.ZERO)) {
+                } else if (getRight().equals(ZERO)) {
                     return getLeft();
                 }
             case "/":
-                if (getRight().equals(RawValue.ZERO)) return RawValue.UNDEF; // x/0 = undef
-                else if (getRight().equals(RawValue.ONE)) return getLeft(); // x/1 = x
-                else if (getLeft().equals(RawValue.ZERO)) return RawValue.ZERO; // 0/x = 0
+                if (getRight().equals(ZERO)) return UNDEF; // x/0 = undef
+                else if (getRight().equals(ONE)) return getLeft(); // x/1 = x
+                else if (getLeft().equals(ZERO)) return ZERO; // 0/x = 0
         }
         return null;
     }
@@ -824,7 +825,7 @@ public class BinaryOperation extends Operation {
             case "*":
                 if (op.equals(binOp.getLeft()) && binOp.is("^")) {
                     if (!(op instanceof RawValue)) { //only when a is a variable or expression, a*a^b = a^(b+1) applies
-                        BinaryOperation exp = new BinaryOperation(binOp.getRight(), "+", RawValue.ONE);
+                        BinaryOperation exp = new BinaryOperation(binOp.getRight(), "+", ONE);
                         return new BinaryOperation(op, "^", exp).simplify();
                     }
                 }
@@ -987,7 +988,7 @@ public class BinaryOperation extends Operation {
     }
 
     private boolean isVirtuallyNegative(Operable binOp) {
-        return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), RawValue.ONE.negate());
+        return binOp.val() < 0 || binOp instanceof BinaryOperation && Operable.contains(((BinaryOperation) binOp.explicitNegativeForm()).flattened(), ONE.negate());
     }
 
     private Operable reconstruct(ArrayList<Operable> operables) {
@@ -1026,7 +1027,7 @@ public class BinaryOperation extends Operation {
                     break;
                 case 2:
                     RawValue r = ((RawValue) binOp.getRight()).negate();
-                    if (r.equals(RawValue.ONE)) { //1/n^1 -> 1/n
+                    if (r.equals(ONE)) { //1/n^1 -> 1/n
                         denominators.add(binOp.getLeft());
                         break;
                     }
@@ -1034,7 +1035,7 @@ public class BinaryOperation extends Operation {
                     denominators.add(b1);
                     break;
                 case 3:
-                    Operable exp1 = new BinaryOperation(binOp.getRight(), "*", RawValue.ONE.negate()).simplify();
+                    Operable exp1 = new BinaryOperation(binOp.getRight(), "*", ONE.negate()).simplify();
                     BinaryOperation b2 = new BinaryOperation(binOp.getLeft(), "^", exp1);
                     denominators.add(b2);
                     break;
