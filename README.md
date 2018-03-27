@@ -28,11 +28,13 @@ o.simplify();
 // (-1)*x^2*cos(a)+12*cos(a)+cos(a)*x*(-1)+ln(x)^2*sin(a)+c*sin(a)
 o.beautify();
 // 12*cos(a)-cos(a)*x^2-x*cos(a)+ln(x)^2*sin(a)+c*sin(a)
-o.firstDerivative();
+
+Variable x = new Variable("x");
+o.firstDerivative(x);
 // ((1+0)*(3-x)+(0-1)*(x+4))*cos(a)+0*(-1)*sin(a)*(x+4)*(3-x)+0*cos(a)*(ln(x)^2+c)+(2*ln(x)^(2-1)*1*(1/x)+0)*sin(a)
-o.firstDerivative().simplify();
+o.firstDerivative(x).simplify();
 // (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
-o.firstDerivative().expand().simplify().beautify();
+o.firstDerivative(x).expand().simplify().beautify();
 // x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
 ```
 
