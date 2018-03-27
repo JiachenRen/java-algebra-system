@@ -25,7 +25,7 @@ public class Fraction extends RawValue {
     private BigInteger denominator;
 
 
-    private Fraction(BigInteger numerator, BigInteger denominator) {
+    Fraction(BigInteger numerator, BigInteger denominator) {
         super(Double.NaN);
         this.numerator = numerator;
         this.denominator = denominator;

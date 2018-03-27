@@ -16,11 +16,11 @@ import java.text.DecimalFormat;
  * This class should NEVER modify a instance after it is created. Be sure to make new ones for every single operation.
  */
 public class RawValue extends LeafNode {
-    public static RawValue UNDEF = new RawValue(Double.NaN);
-    public static RawValue ONE = new RawValue(1);
-    public static RawValue ZERO = new RawValue(0);
-    public static RawValue TWO = new RawValue(2);
-    public static RawValue INFINITY = new RawValue(Double.POSITIVE_INFINITY);
+    public static final RawValue UNDEF = new RawValue(Double.NaN);
+    public static final RawValue ONE = new RawValue(1);
+    public static final RawValue ZERO = new RawValue(0);
+    public static final RawValue TWO = new RawValue(2);
+    public static final RawValue INFINITY = new RawValue(Double.POSITIVE_INFINITY);
 
     private Double n;
 
