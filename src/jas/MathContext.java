@@ -5,6 +5,7 @@ import jas.core.JMCException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,7 +106,9 @@ public class MathContext {
     public static ArrayList<BigInteger> factor(BigInteger N) {
         ArrayList<BigInteger> factors = new ArrayList<>();
         recursiveFactor(N, factors);
-        return factors;
+        return factors.stream()
+                .sorted(BigInteger::compareTo)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -121,11 +124,11 @@ public class MathContext {
         return (ArrayList<Long>) factors;
     }
 
-    public static ArrayList<Long> getUniqueFactors(ArrayList<Long> factors) {
-        ArrayList<Long> uniqueFactors = new ArrayList<>();
-        long cur = 1;
-        for (Long f : factors) {
-            if (cur != f) {
+    public static ArrayList<BigInteger> getUniqueFactors(ArrayList<BigInteger> factors) {
+        ArrayList<BigInteger> uniqueFactors = new ArrayList<>();
+        BigInteger cur = BigInteger.ONE;
+        for (BigInteger f : factors) {
+            if (!cur.equals(f)) {
                 uniqueFactors.add(f);
                 cur = f;
             }
@@ -144,14 +147,14 @@ public class MathContext {
      * @return an array having the same dimension as "targets" with each item
      * being the num occurrences of # in targets at the corresponding index.
      */
-    public static int[] numOccurrences(ArrayList<Long> targets, ArrayList<Long> pool) {
+    public static int[] numOccurrences(ArrayList<BigInteger> targets, ArrayList<BigInteger> pool) {
         int[] num = new int[targets.size()];
-        int max = targets.get(targets.size() - 1).intValue();
+        int max = targets.get(targets.size() - 1).intValueExact();
         int[] map = new int[max + 1];
         for (int i = 0; i < targets.size(); i++) {
-            map[targets.get(i).intValue()] = i;
+            map[targets.get(i).intValueExact()] = i;
         }
-        pool.forEach(f -> num[map[f.intValue()]] += 1);
+        pool.forEach(f -> num[map[f.intValueExact()]] += 1);
         return num;
     }
 
@@ -163,22 +166,20 @@ public class MathContext {
         return true;
     }
 
-    public static long mult(ArrayList<Long> longs) {
-        final long[] out = {1};
-        longs.forEach(l -> out[0] *= l);
-        return out[0];
+    public static BigInteger mult(ArrayList<BigInteger> list) {
+        return list.stream().reduce(BigInteger::multiply).get();
     }
 
-    public static ArrayList<int[]> toBaseExponentPairs(long n) {
+    public static ArrayList<int[]> toBaseExponentPairs(BigInteger n) {
         ArrayList<int[]> pairs = new ArrayList<>();
-        if (n < 0) throw new JMCException("input must be positive");
-        else if (n == 0 || n == 1) return pairs;
-        ArrayList<Long> factors = getFactors(n);
-        ArrayList<Long> uFactors = getUniqueFactors(factors);
+        if (n.compareTo(BigInteger.ZERO) < 0) throw new JMCException("input must be positive");
+        else if (n.equals(BigInteger.ZERO) || n.equals(BigInteger.ONE)) return pairs;
+        ArrayList<BigInteger> factors = factor(n);
+        ArrayList<BigInteger> uFactors = getUniqueFactors(factors);
         int[] num = numOccurrences(uFactors, factors);
         for (int i = 0; i < uFactors.size(); i++) {
-            Long factor = uFactors.get(i);
-            pairs.add(new int[]{factor.intValue(), num[i]});
+            BigInteger factor = uFactors.get(i);
+            pairs.add(new int[]{factor.intValueExact(), num[i]});
         }
         return pairs;
     }

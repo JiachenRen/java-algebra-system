@@ -2,15 +2,16 @@ package tests.specific;
 
 import jas.MathContext;
 import jas.core.Compiler;
-import jas.core.components.Fraction;
 import jas.core.Operable;
+import jas.core.components.Fraction;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-import static tests.TestPrint.l;
 import static jas.utils.ColorFormatter.*;
+import static tests.TestPrint.l;
 
 /**
  * Created by Jiachen on 3/6/18.
@@ -31,12 +32,15 @@ public class FractionTest {
     };
 
     public static void main(String args[]) {
-        l(Fraction.extractRoot(350003000, 2));
+        l(Fraction.extractRoot(BigInteger.valueOf(350003000), BigInteger.valueOf(2)));
         l(MathContext.getFactors(35000));
 
         Fraction f1 = new Fraction(3, 4);
         Fraction f2 = new Fraction(4, 3);
-        f1.setNumerator(100).setDenominator(3).setDenominator(5).setNumerator(7);
+        f1.setNumerator(BigInteger.valueOf(100))
+                .setDenominator(BigInteger.valueOf(3))
+                .setDenominator(BigInteger.valueOf(5))
+                .setNumerator(BigInteger.valueOf(7));
         l(f1.getNumerator(), f1.getDenominator());
 
 
