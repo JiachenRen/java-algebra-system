@@ -23,7 +23,7 @@ public class Fraction extends RawValue {
     private BigInteger denominator;
 
     public Fraction(BigInteger numerator, BigInteger denominator) {
-        super(Double.NaN);
+        super(denominator.equals(BigInteger.ZERO) ? Double.NaN : numerator.divide(denominator).doubleValue());
         this.numerator = numerator;
         this.denominator = denominator;
         this.reduce();
@@ -168,7 +168,7 @@ public class Fraction extends RawValue {
             BinaryOperation e = new BinaryOperation(nu.getRight(), "*", conjugate);
             return new BinaryOperation(d, "*", e).simplify();
         } else if (o.isInteger()) {
-            this.exp(o.longValue());
+            this.exp(o.toBigInteger().intValueExact());
             this.reduce();
             return this;
         } else {
@@ -194,8 +194,8 @@ public class Fraction extends RawValue {
     public RawValue mult(RawValue o) {
         if (o.isUndefined() || this.isUndefined()) return RawValue.UNDEF;
         if (o instanceof Fraction) {
-            setNumerator(numerator.divide(((Fraction) o).numerator));
-            setDenominator(denominator.divide(((Fraction) o).denominator));
+            setNumerator(numerator.multiply(((Fraction) o).numerator));
+            setDenominator(denominator.multiply(((Fraction) o).denominator));
             return this.reduce();
         } else if (o.isInteger()) {
             setNumerator(numerator.multiply(o.toBigInteger()));
@@ -223,7 +223,7 @@ public class Fraction extends RawValue {
     @Override
     public double doubleValue() {
         if (isUndefined()) return Double.NaN;
-        return numerator.divide(denominator).doubleValue();
+        return numerator.doubleValue() / denominator.doubleValue();
     }
 
     @Override

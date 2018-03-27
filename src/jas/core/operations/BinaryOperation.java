@@ -538,6 +538,7 @@ public class BinaryOperation extends Operation {
                         .filter(p -> p[1] > 1)
                         .map(p -> Operation.exp(p[0], Operation.mult(p[1], r2)))
                         .reduce(Operable::mult);
+
                 if (reduced.isPresent()) {
                     Optional<Integer> retained = pairs.stream()
                             .filter(p -> p[1] == 1)
