@@ -24,7 +24,7 @@ import static tests.TestPrint.l;
  * Created by Jiachen on 16/05/2017.
  * toExponentialForm test
  */
-public class CasComprehensiveTest {
+public class ComprehensiveTest {
     public static void main(String args[]) {
         //to exponential form test
         Operation operation = (Operation) Compiler.compile("x/(x-1)/(x+1/(x-1))");
@@ -165,6 +165,19 @@ public class CasComprehensiveTest {
         n.exec();
         n.simplify();
         l(n);
+
+        Node p = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
+        l(p);
+        p.expand();
+        l(p);
+        l(p.simplify());
+        p.beautify();
+        l(p);
+
+        Variable x = new Variable("x");
+        p.firstDerivative(x);
+        p.firstDerivative(x).simplify();
+        p.firstDerivative(x).expand().simplify().beautify();
     }
 
 }

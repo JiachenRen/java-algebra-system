@@ -6,7 +6,7 @@ import java.lang.annotation.*;
  * Created by Jiachen on 3/27/18.
  * Invocation of @Mutating methods alters the original
  */
-@Documented // this way it shows up in JavaDoc
+@Documented // This way it shows up in JavaDoc
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mutating {

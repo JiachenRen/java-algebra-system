@@ -17,7 +17,7 @@ import static tests.TestPrint.l;
  * Created by Jiachen on 3/7/18.
  * Simplification Test
  */
-public class CasSimplificationTest {
+public class SimplifyTest {
     private static String ops[] = new String[]{
             "1*x",
             "0*x",
