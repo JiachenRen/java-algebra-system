@@ -12,7 +12,7 @@ public class Utils {
     public static String read(String filePath) {
         final String[] acc = {""};
         InputStream inputStream;
-        inputStream = Class.class.getResourceAsStream(filePath);
+        inputStream = Utils.class.getResourceAsStream(filePath);
         InputStreamReader reader = new InputStreamReader(inputStream);
         BufferedReader bufferedReader = new BufferedReader(reader);
         bufferedReader.lines().forEach(line -> acc[0] += line + "\n");
