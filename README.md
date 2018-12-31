@@ -1,5 +1,7 @@
 # Java Algebra System (JAS)
-A math library with powerful CAS that is capable of performing algebraic simplifications, manipulations, and some calculus. (A Grapher is also included)
+A powerful graphing computer algebra system that is capable of performing algebraic simplifications, manipulations, and some calculus. (A Grapher is also included)
+
+![1](misc/screenshots/jas_simple_ui.png)
 
 ## What can it do?
 JAS is a multivariate computer algebra system built using Java. JAS handles the following senarios in both fraction and decimal mode:
@@ -15,6 +17,7 @@ JAS is a multivariate computer algebra system built using Java. JAS handles the 
   - [x] Logarithmic differentiation
   - [x] Implicit differentiation
   - [x] n<sup>th</sup> derivative
+  - [ ] Integration
 
 **Note: the following section demonstrates the power of JAS, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
 
