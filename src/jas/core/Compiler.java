@@ -169,9 +169,9 @@ public class Compiler {
     }
 
     private static Node generateOperations(String segment, ArrayList<Node> nodes) {
-        log(lightGreen("exp:\t") + colorMathSymbols(segment)); //skill learned May 16th, colored output!
+        log(lightGreen("exp:\t") + colorMathSymbols(segment)); // Colored output
         int nodeHashId = 0;
-        ArrayList<Node> pending = new ArrayList<>(); //pending operations
+        ArrayList<Node> pending = new ArrayList<>(); // Pending operations
         while (segment.indexOf('<') != -1) {
             int indices[] = innermostIndices(segment, '<', '>');
             String extracted = segment.substring(indices[0] + 1, indices[1]);
