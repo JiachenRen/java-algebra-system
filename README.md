@@ -18,8 +18,8 @@ JAS is a multivariate computer algebra system built using Java. JAS handles the 
 
 **Note: the following section demonstrates the power of JAS, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
 
-## Meet... JAS
-This is as powerful and accurate as it gets... I've put my life into making this system...
+## Meet JAS - an exciting way to do algebra
+With Java Algebra System, you can easily compile algebraic expressions and perform operations on them programmatically.
 ```java
 Node o = Compiler.compile("(x+4)(3-x)*cos(a)+sin(a)(ln(x)^2+c)");
 o.expand();
@@ -36,6 +36,123 @@ o.firstDerivative(x).simplify();
 // (3+(-1)*(4+2*x))*cos(a)+2*ln(x)*x^(-1)*sin(a)
 o.firstDerivative(x).expand().simplify().beautify();
 // x*cos(a)*(-2)+cos(a)*(-1)+2*ln(x)*sin(a)/x
+```
+
+Or, here comes the exciting part... use it like a calculator with CAS capabilities in a commandline environment. Here are some example inputs and outputs (to do so, run `CasCmdline`):
+
+> Define a function with a single argument
+```swift
+INPUT:   define('f',{x}, x^2/cos(x))
+OUTPUT:  'Done.'
+```
+
+> Call a function
+```swift
+INPUT:   f(x+3)
+OUTPUT:  (x+3)^2*cos((x+3))^(-1)
+INPUT:   f(3)
+OUTPUT:  9*cos(3)^(-1)
+```
+
+> Convert exact value to decimal
+```swift
+INPUT:   val(f(3))
+OUTPUT:  -9.090977993171945
+INPUT:   val(f(x))
+OUTPUT:  undef
+```
+
+> Expand an expression
+```swift
+INPUT:   expand((x+3)^2*cos((x+3))^(-1))
+OUTPUT:  9*cos(3+x)^(-1)+cos(3+x)^(-1)*x^2+6*cos(3+x)^(-1)*x
+INPUT:   expand((x+3)(a^2+4/e+5)*log(x))
+OUTPUT:  4*e^(-1)*x*log(x)+5*x*log(x)+12*log(x)*x^2+12*e^(-1)*log(x)+15*log(x)+4*log(x)*x^3
+```
+> Evaluate an expression
+```swift
+INPUT:   eval(9*cos(3+x)^(-1)+cos(3+x)^(-1)*x^2+6*cos(3+x)^(-1)*x, 3)
+OUTPUT:  37.49334935742388
+```
+
+> Define a variable
+```swift
+INPUT:   store('a', 2x)
+OUTPUT:  2*x
+```
+
+> Delete a variable
+```swift
+INPUT:   del_var('a')
+OUTPUT:  '[a:3]'
+```
+
+> Define a constant
+```swift
+INPUT:   define('b',2pi)
+OUTPUT:  b
+```
+
+> Evaluate a constant
+```swift
+INPUT:   val(b)
+OUTPUT:  6.283185307179586
+```
+
+> Define a function with multiple arguments
+```swift
+INPUT:   define('g',{x,a,b},x + a + b^2)
+OUTPUT:  'Done.'
+```
+
+> Differentiate with respect to a variable:
+```swift
+INPUT:   derivative(log(ln(x)^2)*c^2+b,x)
+OUTPUT:  c^2*x^(-1)*2*ln(x)^(-1)*log(e)
+INPUT:   derivative(cos(2x^2),x)
+OUTPUT:  sin(2*x^2)*x*(-4)
+```
+
+> Take the nth derivative
+```swift
+INPUT:   derivative(sin(2*x^2)*x*(-4),x,3)
+OUTPUT:  (-48)*cos(2*x^2)+256*cos(2*x^2)*x^4+384*sin(2*x^2)*x^2
+```
+
+> Define a list
+```swift
+INPUT:   {3,4}
+OUTPUT:  {3,4}
+```
+
+> Perform an operation on a list
+```swift
+INPUT:   {3,4,x}+7
+OUTPUT:  {10,11,x+7}
+INPUT:   {3,4,5}+{1,4,5}
+OUTPUT:  {4,8,10}
+INPUT:   {3,4,5}+{2,3}
+OUTPUT:  list dimension mismatch
+```
+
+> List as argument
+```swift
+INPUT:   f({3,5,7})
+OUTPUT:  {9*cos(3)^(-1),25*cos(5)^(-1),49*cos(7)^(-1)}
+```
+
+> Summation
+```swift
+INPUT:   sum(x,a,{2,3},log(e))
+OUTPUT:  {x*3+2+log(e),x*3+3+log(e)}
+```
+
+> Fraction/irrational number simplification
+```swift
+INPUT:   3/4*(453/645)
+OUTPUT:  (453/860)
+INPUT:   3*2x^(2/3)/x^(3/4)*3^(1/3)*3^(1/3)
+OUTPUT:  6*x^((-1/12))*3^(2/3)
 ```
 
 For detailed documentation of the simplifiable expressions, please refer to **simplifiable forms** under the **Simplification** section.
