@@ -4,17 +4,17 @@ A math library with powerful CAS that is capable of performing algebraic simplif
 ## What can it do?
 JAS is a multivariate computer algebra system built using Java. JAS handles the following senarios in both fraction and decimal mode:
 
-* Commutative arithmetic & algebra
-* Nested unary operation simplification
-* Algebraic domain validation
-* Trigonometric simplification
-* Logarithmic exponential simplification
-* Basic irrational/rational number arithmetic
-* **(NEW!)** Some Calculus (I am currently working on it...)
-  * First derivative
-  * Logarithmic differentiation
-  * Implicit differentiation
-  * n<sup>th</sup> derivative
+- [x] Commutative arithmetic & algebra
+- [x] Nested unary operation simplification
+- [x] Algebraic domain validation
+- [x] Trigonometric simplification
+- [x] Logarithmic exponential simplification
+- [x] Basic irrational/rational number arithmetic
+- [x] **(NEW!)** Some Calculus (I am currently working on it...)
+  - [x] First derivative
+  - [x] Logarithmic differentiation
+  - [x] Implicit differentiation
+  - [x] n<sup>th</sup> derivative
 
 **Note: the following section demonstrates the power of JAS, since not a lot of people are aware of its existence... for information about how to use it (or how it works), please scroll down and read from the "Simplification" section.
 
